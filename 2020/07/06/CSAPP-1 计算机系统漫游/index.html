@@ -180,6 +180,14 @@
 
   
   
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
 </div>
 
             
@@ -205,7 +213,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2 小时前
+                  本文最后更新于：4 分钟前
                 
               </p>
             
@@ -260,8 +268,8 @@
 <p>​        现代操作系统经常通过网络和其他系统连接到一起。从一个单独的系统来看，网络可视为一个I/O 设备，如图所示。当系统从主存复制一串字节到网络适配器时，数据流经过网络到达另一台机器，而不是比如说到达本地磁盘驱动器。相似地，系统可以读取从其他机器发送来的数据，并把数据复制到自己的主存。</p>
 <p>​        随着Internet 这样的全球网络的出现，从一台主机复制信息到另外一台主机已经成为<br>计算机系统最重要的用途之一。比如，像电子邮件、即时通信、万维网、FTP和telnet 这样的应用都是基于网络复制信息的功能。</p>
 <p><img src="/2020/07/06/CSAPP-1%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%BC%AB%E6%B8%B8/9.png" srcset="/img/loading.gif" alt="利用telnet通过网络远程运行hello"></p>
-<h3 id="Amdahl-定律"><a href="#Amdahl-定律" class="headerlink" title="Amdahl 定律"></a>Amdahl 定律</h3><p>​        该定律的主要思想是，当我们对系统的某个部分加速时，其对系统整体性能的影响取决于该部分的重要性和加速程度。若系统执行某应用程序需要时间为$T_{old}$。假设系统某部分所需执行时间与该时间的比例为 $α$，而该部分性能提升比例为 $k$。即该部分初始所需时间为 $αT_{old}$ ，现在所需时间为$αT_{old}/k$。因此，总的执行时间应为<br>$$<br>T_{new} = (1-α)T_{old} + (αT_{old})/k = T_{old} [(1-α)+α/k]<br>$$<br>由此，可以计算加速比$S =T_{new}/T_{old} $为<br>$$<br>S = \frac{1}{(1-α)+α/k}<br>$$<br>考虑 $k$ 趋向于$\infty$时</p>
-<p>$$<br>S_\infty = \frac{1}{1-α}<br>$$</p>
+<h3 id="Amdahl-定律"><a href="#Amdahl-定律" class="headerlink" title="Amdahl 定律"></a>Amdahl 定律</h3><p>​        该定律的主要思想是，当我们对系统的某个部分加速时，其对系统整体性能的影响取决于该部分的重要性和加速程度。若系统执行某应用程序需要时间为$T_{old}$。假设系统某部分所需执行时间与该时间的比例为 $\alpha$，而该部分性能提升比例为 $k$。即该部分初始所需时间为 $\alpha T_{old}$ ，现在所需时间为$αT_{old}/k$。因此，总的执行时间应为<br>$$<br>T_{new} = (1-\alpha)T_{old} + (\alpha T_{old})/k = T_{old} [(1-\alpha)+\alpha/k]<br>$$<br>由此，可以计算加速比$S =T_{new}/T_{old} $为<br>$$<br>S = \frac{1}{(1-\alpha)+\alpha/k}<br>$$<br>考虑 $k$ 趋向于$\infty$时</p>
+<p>$$<br>S_\infty = \frac{1}{1-\alpha}<br>$$</p>
 <h3 id="并发和并行"><a href="#并发和并行" class="headerlink" title="并发和并行"></a>并发和并行</h3><p>​        我们用的术语<strong>并发(concurrency)</strong>是一个通用的概念，指一个同时具有多个活动的系统；而术语<strong>并行（parallelism)</strong>指的是用并发来使一个系统运行得更快。并行可以在计算机系统的多个抽象层次上运用。</p>
 <h4 id="线程级并发"><a href="#线程级并发" class="headerlink" title="线程级并发"></a>线程级并发</h4><p>​        构建在进程这个抽象之上，我们能够设计出同时有多个程序执行的系统，这就导致了并发。使用线程，我们甚至能够在一个进程中执行多个控制流。传统意义上，这种并发执行只是<strong>模拟</strong>出来的，是通过使一台计算机在它正在执行的进程间快速切换来实现的，就好像一个杂耍艺人保持多个球在空中飞舞一样。在以前，即使处理器必须在多个任务间切换，大多数实际的计算也都是由一个处理器来完成的。这种配置称为<strong>单处理器系统</strong>。</p>
 <p>​        当构建一个由单操作系统内核控制的多处理器组成的系统时，我们就得到了一个<strong>多处理器系统</strong>。</p>
@@ -530,6 +538,45 @@
 
 
 
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
 
 
 
