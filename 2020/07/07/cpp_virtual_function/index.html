@@ -7,8 +7,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/head.jpg">
-  <link rel="icon" type="image/png" href="/img/head.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" type="image/png" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -57,7 +57,7 @@
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
-       href="/">&nbsp;<strong>vinkle's space</strong>&nbsp;</a>
+       href="/">&nbsp;<strong>Vinkle's space</strong>&nbsp;</a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
             data-target="#navbarSupportedContent"
@@ -153,7 +153,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/post_front.jpg') no-repeat center center;
+         style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -227,7 +227,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月7日 凌晨
+                  本文最后更新于：2020年7月8日 下午
                 
               </p>
             
@@ -289,7 +289,7 @@ test-&gt;A::foo2(); 		<span class="hljs-comment">//call A::foo2()</span></code><
 <li><p>每一个class产生出一堆指向virtual function 的指针，放在表格之中。这个表格被称为virtual table (<strong>vtbl</strong>)。</p>
 </li>
 <li><p>每一个class object 被安插了一个指针，指向相关的virtual table。通常这个指针被称为<strong>vptr</strong>。</p>
-<p><img src="/2020/07/07/cpp_virtual_function/cpp_virtual_function.png" srcset="/img/loading.gif" alt="未命名文件"></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp_virtual_function.jpg" srcset="/img/loading.gif" alt="未命名文件"></p>
 </li>
 </ol>
 <p>在用派生类初始化基类的引用和指针时，编译器仅会修改指针的类型（即指针所指的内存的大小和其内容），但不会修改类中的<strong>vptr</strong>，所以类中的<strong>vptr</strong>指向的还是派生类的<strong>vtbl</strong>。注意指针所涵盖的地址只包含派生类中的派生于基类的成员，你不能通过其访问派生类特有的成员，但是你可以通过调用virtual function来访问派生类特有的成员。</p>
