@@ -17,7 +17,7 @@
   <meta name="description" content="vinkle&#39;s space">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
-  <title>C++ template 函数模板 - vinkle&#39;s space</title>
+  <title>C++ Template-1 函数模板 - vinkle&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -177,7 +177,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      7.5k 字
+      7.7k 字
     </span>
   
 
@@ -187,7 +187,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      91
+      94
        分钟
     </span>
   
@@ -227,7 +227,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月9日 下午
+                  本文最后更新于：2020年7月15日 晚上
                 
               </p>
             
@@ -235,7 +235,12 @@
               <p>通过大量的例子介绍了C++函数模板。你可以学习到如何使用C++的函数模板以及使用时需要注意的要点。</p>
 <a id="more"></a>
 
-<h1 id="C-template-函数模板"><a href="#C-template-函数模板" class="headerlink" title="C++ template 函数模板"></a>C++ template 函数模板</h1><h2 id="初识函数模板"><a href="#初识函数模板" class="headerlink" title="初识函数模板"></a>初识函数模板</h2><h3 id="定义模板"><a href="#定义模板" class="headerlink" title="定义模板"></a>定义模板</h3><p>一下是一个函数模板，它返回两数中的最大值</p>
+<p>这是本系列<strong>第一篇</strong>文章，以下是本系列文章目录。</p>
+<p><a href="#1-函数模板">1. 函数模板（本文）</a></p>
+<p><a href>2. 类模板 （正在编写）</a></p>
+<h1 id="1-函数模板"><a href="#1-函数模板" class="headerlink" title="1. 函数模板"></a>1. 函数模板</h1><p>本章介绍了函数模板。函数模板是被参数化的函数，因此他们代表了一组行为相似的函数(a family of functions)。</p>
+<h2 id="1-1-初识函数模板"><a href="#1-1-初识函数模板" class="headerlink" title="1.1. 初识函数模板"></a>1.1. 初识函数模板</h2><p>函数模板提供了适用于不同类型的函数行为。也就是说，函数模板代表了一组行为相似的函数。函数模板看起来几乎就跟普通函数一样，除了某些信息没有被确定以外。我们通过下面一个简单的例子来说明这一问题。</p>
+<h3 id="1-1-1-定义模板"><a href="#1-1-1-定义模板" class="headerlink" title="1.1.1 定义模板"></a>1.1.1 定义模板</h3><p>一下是一个函数模板，它返回两数中的最大值</p>
 <pre><code class="hljs c++"><span class="hljs-comment">//max1.hpp</span>
 <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
 <span class="hljs-function">T <span class="hljs-title">max</span><span class="hljs-params">(T a, T b)</span></span>
@@ -247,7 +252,7 @@
 <p>模板参数应该按照如下的语法来声明：</p>
 <p><em>template &lt;由逗号分隔的模板参数&gt;</em></p>
 <p>在本例中，模板参数是 <code>typename T</code> 。关键字 <code>typename</code> 标识了一个<em>类型参数</em>，即 <code>T</code> 是<strong>类型参数(type parameter)</strong>，你可以用任意的标识作为类型参数的参数名，但是习惯上我们使用 <code>T</code> 作为参数名。本例中，类型 <code>T</code> 必须支持小于运算符，因为 <code>a</code> 和 <code>b</code> 比较时运用到了它。另外比较隐秘的一点，为了支持返回值，<code>T</code> 还应该是可拷贝的。</p>
-<h3 id="使用模板"><a href="#使用模板" class="headerlink" title="使用模板"></a>使用模板</h3><p>下面的程序展现了如何使用 <code>max()</code>模板：</p>
+<h3 id="1-1-2-使用模板"><a href="#1-1-2-使用模板" class="headerlink" title="1.1.2 使用模板"></a>1.1.2 使用模板</h3><p>下面的程序展现了如何使用 <code>max()</code>模板：</p>
 <pre><code class="hljs c++"><span class="hljs-comment">//max1.cpp</span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"max1.hpp"</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
@@ -294,7 +299,7 @@
 foo(vp); <span class="hljs-comment">// OK: 模板参数被推导为 void</span>
 foo(<span class="hljs-keyword">void</span>*)</code></pre>
 
-<h3 id="二阶段翻译-Two-Phase-Translation"><a href="#二阶段翻译-Two-Phase-Translation" class="headerlink" title="二阶段翻译(Two-Phase Translation)"></a>二阶段翻译(Two-Phase Translation)</h3><p>在实例化模板的时候，如果模板参数类型不支持所有模板中用到的操作符，将会遇到编译期错误(compile-time error)。比如：</p>
+<h3 id="1-1-3-二阶段翻译-Two-Phase-Translation"><a href="#1-1-3-二阶段翻译-Two-Phase-Translation" class="headerlink" title="1.1.3 二阶段翻译(Two-Phase Translation)"></a>1.1.3 二阶段翻译(Two-Phase Translation)</h3><p>在实例化模板的时候，如果模板参数类型不支持所有模板中用到的操作符，将会遇到编译期错误(compile-time error)。比如：</p>
 <pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">complex</span>&lt;<span class="hljs-keyword">float</span>&gt; c1, c2; <span class="hljs-comment">// std::complex&lt;&gt; 没有提供小于运算符</span>
 ...
 ::<span class="hljs-built_in">max</span>(c1,c2); <span class="hljs-comment">// 编译期 ERROR</span></code></pre>
@@ -323,7 +328,7 @@ foo(<span class="hljs-keyword">void</span>*)</code></pre>
 </ol>
 <p>需要注意的是，有些编译器并不会执行第一阶段中的所有检查。因此如果模板没有被至少实例化一次的话，你可能一直都不会发现代码中的常规错误。</p>
 <h4 id="编译和链接"><a href="#编译和链接" class="headerlink" title="编译和链接"></a>编译和链接</h4><p>两阶段的编译检查给模板的处理带来了一个问题：当实例化一个模板的时候，编译器需要（一定程度上）看到模板的完整定义。这不同于函数编译和链接分离的思想，函数在编译阶段只需要声明就够了。后面将讨论如何应对这一问题。现在暂时采取最简单的方法：将模板的实现写在头文件里。</p>
-<h2 id="模板参数推导"><a href="#模板参数推导" class="headerlink" title="模板参数推导"></a>模板参数推导</h2><p>当我们调用形如 <code>max()</code> 的函数模板来处理某些变量时，模板参数将由被传递的调用参数决定。如果我们传递两个 <code>int</code> 类型的参数给模板函数，C++编译器会将模板参数 T 推导为 <code>int</code>。</p>
+<h2 id="1-2-模板参数推导"><a href="#1-2-模板参数推导" class="headerlink" title="1.2. 模板参数推导"></a>1.2. 模板参数推导</h2><p>当我们调用形如 <code>max()</code> 的函数模板来处理某些变量时，模板参数将由被传递的调用参数决定。如果我们传递两个 <code>int</code> 类型的参数给模板函数，C++编译器会将模板参数 T 推导为 <code>int</code>。</p>
 <p>不过 T 可能只是实际传递的函数参数类型的一部分。比如我们定义了如下接受常量引用作为函数参数的模板：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
 <span class="hljs-function">T <span class="hljs-title">max</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; a, T <span class="hljs-keyword">const</span>&amp; b)</span></span>
@@ -332,7 +337,7 @@ foo(<span class="hljs-keyword">void</span>*)</code></pre>
 &#125;</code></pre>
 
 <p>此时如果我们传递 <code>int</code> 类型的调用参数，由于调用参数和 <code>int const &amp;</code> 匹配，类型参数 T 将被推导为<code>int</code>。</p>
-<h3 id="类型推导中的类型转换"><a href="#类型推导中的类型转换" class="headerlink" title="类型推导中的类型转换"></a>类型推导中的类型转换</h3><p>在类型推导的时候自动的类型转换是受限制的：</p>
+<h3 id="1-2-1-类型推导中的类型转换"><a href="#1-2-1-类型推导中的类型转换" class="headerlink" title="1.2.1 类型推导中的类型转换"></a>1.2.1 类型推导中的类型转换</h3><p>在类型推导的时候自动的类型转换是受限制的：</p>
 <ul>
 <li>如果调用参数是按引用传递的，任何类型转换都不被允许。通过模板类型参数 T 定义的两个参数，它们实参的类型必须完全一样。</li>
 <li>如果调用参数是按值传递的，那么只有<strong>退化(decay)</strong>这一类简单转换是被允许的：<code>const</code> 和 <code>volatile</code> 限制符会被忽略，引用被转换成被引用的类型，<strong>数组(raw array)</strong>和函数被转换为相应的指针类型。通过模板类型参数 T 定义的两个参数，它们实参的类型在退化后必须一样。</li>
@@ -366,7 +371,7 @@ max(&amp;i, arr); <span class="hljs-comment">// OK: T 被推导为 int*</span></
 <li><p>指明参数可能有多个不同的类型（使用多个模板参数）。</p>
 </li>
 </ol>
-<h3 id="对默认参数的类型推导"><a href="#对默认参数的类型推导" class="headerlink" title="对默认参数的类型推导"></a>对默认参数的类型推导</h3><p>需要注意的是，类型推导并不适用于默认参数。例如：</p>
+<h3 id="1-2-2-对默认参数的类型推导"><a href="#1-2-2-对默认参数的类型推导" class="headerlink" title="1.2.2 对默认参数的类型推导"></a>1.2.2 对默认参数的类型推导</h3><p>需要注意的是，类型推导并不适用于默认参数。例如：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
 <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T = <span class="hljs-string">""</span>)</span></span>;
 ...
@@ -379,7 +384,7 @@ f(); <span class="hljs-comment">// ERROR: 无法推导 T 的类型</span></code>
 ...
 f(); <span class="hljs-comment">// OK</span></code></pre>
 
-<h2 id="多模板参数"><a href="#多模板参数" class="headerlink" title="多模板参数"></a>多模板参数</h2><p>目前我们看到与函数模板有关的两组参数：</p>
+<h2 id="1-3-多模板参数"><a href="#1-3-多模板参数" class="headerlink" title="1.3. 多模板参数"></a>1.3. 多模板参数</h2><p>目前我们看到与函数模板有关的两组参数：</p>
 <ol>
 <li><p><strong>模板参数(template parameters)</strong>，定义在函数模板前的尖括号中：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt; <span class="hljs-comment">// T 是模板参数</span></code></pre>
@@ -406,7 +411,7 @@ f(); <span class="hljs-comment">// OK</span></code></pre>
 <li>让编译器找出返回类型</li>
 <li>将返回类型定义为两个参数类型的<strong>公共类型(common type)</strong>。</li>
 </ol>
-<h3 id="返回类型的模板参数"><a href="#返回类型的模板参数" class="headerlink" title="返回类型的模板参数"></a>返回类型的模板参数</h3><p>我们可以像调用普通函数一样条用函数模板，也可以显式地指出模板参数的参数类型。</p>
+<h3 id="1-3-1-返回类型的模板参数"><a href="#1-3-1-返回类型的模板参数" class="headerlink" title="1.3.1 返回类型的模板参数"></a>1.3.1 返回类型的模板参数</h3><p>我们可以像调用普通函数一样条用函数模板，也可以显式地指出模板参数的参数类型。</p>
 <p>当模板参数和调用参数直接没有必然联系，且模板参数不能确定是，就要显式地指明模板参数。例如，你可以引入第三个模板参数来指定函数模板的返回类型：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2, <span class="hljs-keyword">typename</span> RT&gt;
 <span class="hljs-function">RT <span class="hljs-title">max</span><span class="hljs-params">(T1 a, T2 b)</span></span>;</code></pre>
@@ -424,7 +429,7 @@ f(); <span class="hljs-comment">// OK</span></code></pre>
 ::<span class="hljs-built_in">max</span>&lt;<span class="hljs-keyword">double</span>&gt;(<span class="hljs-number">4</span>, <span class="hljs-number">7.2</span>) <span class="hljs-comment">//OK: 返回类型是 double，T1 和 T2 根据调用参数推导</span></code></pre>
 
 <p>在本例中，调用 <code>max&lt;double&gt;</code> 时，显式的指明了 <code>RT</code> 的类型是 <code>double</code>，<code>T1</code> 和 <code>T2</code> 则基于传入调用参数的类型被推导为 <code>int</code> 和 <code>double</code>。<br>然而改进版的 <code>max()</code> 并没有带来显著的变化。使用单模板参数的版本，即使传入的两个调用参数的类型不同，你依然可以显式的指定模板参数类型（也作为返回类型）。因此为了简洁，我们最好还是使用单模板参数的版本。</p>
-<h3 id="推导返回类型"><a href="#推导返回类型" class="headerlink" title="推导返回类型"></a>推导返回类型</h3><p>如果返回类型是由模板参数决定的，那么推导返回类型最简单也是<strong>最好的</strong>办法就是让编译器来做这件事。C++14 开始，这成为可能，而且不需要把返回类型声明为任何模板参数类型（不过你需要声明返回类型为 <code>auto</code>）：</p>
+<h3 id="1-3-2-推导返回类型"><a href="#1-3-2-推导返回类型" class="headerlink" title="1.3.2 推导返回类型"></a>1.3.2 推导返回类型</h3><p>如果返回类型是由模板参数决定的，那么推导返回类型最简单也是<strong>最好的</strong>办法就是让编译器来做这件事。C++14 开始，这成为可能，而且不需要把返回类型声明为任何模板参数类型（不过你需要声明返回类型为 <code>auto</code>）：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
 <span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">max</span><span class="hljs-params">(T1 a, T2 b)</span></span>
 <span class="hljs-function"></span>&#123;
@@ -461,7 +466,7 @@ auto max(T1 a, T2 b) -&gt; typename std::decay&lt;decltype(true ? a : b)&gt;::ty
 <span class="hljs-keyword">int</span> <span class="hljs-keyword">const</span>&amp; ir = i; <span class="hljs-comment">// ir 是 i 的引用</span>
 <span class="hljs-keyword">auto</span> a = ir; <span class="hljs-comment">// a 的类型是 ir decay 之后的类型，也就是int</span></code></pre>
 
-<h3 id="作为通用类型返回"><a href="#作为通用类型返回" class="headerlink" title="作为通用类型返回"></a>作为通用类型返回</h3><p>从C++11 开始，标准库提供了一种指定“更一般类型”的方式。<code>std::common_type&lt;&gt;::type</code> 产生的类型是他的两个（或更多）模板参数的公共类型。比如：</p>
+<h3 id="1-3-3-作为通用类型返回"><a href="#1-3-3-作为通用类型返回" class="headerlink" title="1.3.3 作为通用类型返回"></a>1.3.3 作为通用类型返回</h3><p>从C++11 开始，标准库提供了一种指定“更一般类型”的方式。<code>std::common_type&lt;&gt;::type</code> 产生的类型是他的两个（或更多）模板参数的公共类型。比如：</p>
 <pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;type_traits&gt;</span></span>
 <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
 std::common_type_t&lt;T1, T2&gt; max(T1 a, T2 b)
@@ -476,7 +481,7 @@ std::common_type_t&lt;T1, T2&gt; max(T1 a, T2 b)
 <pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-keyword">common_type_t</span>&lt;T1, T2&gt; <span class="hljs-comment">// equivalent since C++14</span></code></pre>
 
 <p><code>std::common_type&lt;&gt;</code> 的实现用到了一些比较取巧的模板编程手法（后续会介绍）。它根据运算符 <code>?:</code> 的语法规则或者对某些类型的特化来决定目标类型。因此 <code>::max(4, 7.2)</code> 和 <code>::max(7.2, 4)</code> 都返回 <code>double</code> 类型的 <code>7.2</code>。需要注意的是，<code>std::common_type&lt;&gt;</code>的结果也是<strong>退化(decay)</strong>的。</p>
-<h2 id="缺省模板参数-Default-Template-Arguments"><a href="#缺省模板参数-Default-Template-Arguments" class="headerlink" title="缺省模板参数(Default Template Arguments)"></a>缺省模板参数(Default Template Arguments)</h2><p>你也可以给函数模板参数指定一个默认值。这些默认值被称为<strong>缺省模板参数(default template arguments)</strong>【也称为默认模板参数】并且可以用在任何类型的模板中。它们甚至可以通过前面的模板参数来决定自己的类型。</p>
+<h2 id="1-4-缺省模板参数-Default-Template-Arguments"><a href="#1-4-缺省模板参数-Default-Template-Arguments" class="headerlink" title="1.4. 缺省模板参数(Default Template Arguments)"></a>1.4. 缺省模板参数(Default Template Arguments)</h2><p>你也可以给函数模板参数指定一个默认值。这些默认值被称为<strong>缺省模板参数(default template arguments)</strong>【也称为默认模板参数】并且可以用在任何类型的模板中。它们甚至可以通过前面的模板参数来决定自己的类型。</p>
 <p>例如，如果你想像前面叙述的那样是返回类型有多个模板参数，你可以定义一个模板参数 <code>RT</code>，并将其默认类型声明为其他两个模板的公共类型。同样的我们也有多种实现方法：</p>
 <ol>
 <li><p>可以直接使用 <code>?:</code> 运算符。不过由于我们必须在<strong>调用参数(call parameters)</strong> <code>a</code> 和 <code>b</code> 被声明之前使用运算符 <code>?:</code>，我们只能用它们的类型：</p>
@@ -526,7 +531,7 @@ RT <span class="hljs-built_in">max</span>(T1 a, T2 b)
 
 <p>但是只有当模板参数具有一个“天生的”默认值时，这才有意义。我们真正想要的是从前面的模板参数推导出想要的默认值。原则是这也是可行的（后续会讨论到），但是他是基于类型萃取的，并且会使定义变得更加复杂。</p>
 <p>基于以上原因，最好也是最简单的办法就是像<a href="#推导返回类型">前面讨论的那样</a>让编译器来推断出返回类型。</p>
-<h2 id="重载函数模板"><a href="#重载函数模板" class="headerlink" title="重载函数模板"></a>重载函数模板</h2><p>像普通函数一样，模板也是可以重载的。也就是说，你可以定义多个有相同函数名的函数，当实际调用的时候，由C++编译器负责决定具体该调用哪一个函数。</p>
+<h2 id="1-5-重载函数模板"><a href="#1-5-重载函数模板" class="headerlink" title="1.5. 重载函数模板"></a>1.5. 重载函数模板</h2><p>像普通函数一样，模板也是可以重载的。也就是说，你可以定义多个有相同函数名的函数，当实际调用的时候，由C++编译器负责决定具体该调用哪一个函数。</p>
 <p>下列程序展示了函数模板的重载：</p>
 <pre><code class="hljs c++"><span class="hljs-comment">// maximum of two int values:</span>
 <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">max</span><span class="hljs-params">(<span class="hljs-keyword">int</span> a, <span class="hljs-keyword">int</span> b)</span></span>
@@ -689,7 +694,7 @@ RT <span class="hljs-built_in">max</span>(T1 a, T2 b)
     <span class="hljs-comment">// OOPS: uses max&lt;T&gt;() instead of max(int,int)</span>
 &#125;</code></pre>
 
-<h2 id="但是，不应该使用？"><a href="#但是，不应该使用？" class="headerlink" title="但是，不应该使用？"></a>但是，不应该使用？</h2><h3 id="按值传递还是按应用传递？"><a href="#按值传递还是按应用传递？" class="headerlink" title="按值传递还是按应用传递？"></a>按值传递还是按应用传递？</h3><p>我们声明的函数通常都是按值传递，而不是按引用传递。通常而言，建议将按引用传递除简单类型（比如<strong>基础类型(fundamental type)</strong>和 <code>std::string_view</code>）以外的类型，这样可以免除不必要的拷贝成本。</p>
+<h2 id="1-6-但是，不应该使用？"><a href="#1-6-但是，不应该使用？" class="headerlink" title="1.6. 但是，不应该使用？"></a>1.6. 但是，不应该使用？</h2><h3 id="1-6-1-按值传递还是按应用传递？"><a href="#1-6-1-按值传递还是按应用传递？" class="headerlink" title="1.6.1 按值传递还是按应用传递？"></a>1.6.1 按值传递还是按应用传递？</h3><p>我们声明的函数通常都是按值传递，而不是按引用传递。通常而言，建议将按引用传递除简单类型（比如<strong>基础类型(fundamental type)</strong>和 <code>std::string_view</code>）以外的类型，这样可以免除不必要的拷贝成本。</p>
 <p>但是出于以下原因，<strong>按值传递</strong>通常更好一些：</p>
 <ul>
 <li>语法简单。</li>
@@ -704,10 +709,10 @@ RT <span class="hljs-built_in">max</span>(T1 a, T2 b)
 <li>尽管传递 <em>string literal</em> 和 <em>raw array</em> 会产生一些问题，按时如果按照引用传递它们会产生更大的问题。</li>
 </ul>
 <p>后续会对此进行进一步讨论，<strong>除了某些不得不用按引用传递的情况，尽量使用按值传递。</strong></p>
-<h3 id="为什么不用-inline？"><a href="#为什么不用-inline？" class="headerlink" title="为什么不用 inline？"></a>为什么不用 inline？</h3><p>通常，函数模板不需要声明为 <code>inline</code>。不像普通的 <code>noninline</code> 函数，我们可以把 <code>noninline</code> 函数模板定义在同文件中，然后再多个编译单元里 <code>include</code> 这个头文件。</p>
+<h3 id="1-6-2-为什么不用-inline？"><a href="#1-6-2-为什么不用-inline？" class="headerlink" title="1.6.2 为什么不用 inline？"></a>1.6.2 为什么不用 inline？</h3><p>通常，函数模板不需要声明为 <code>inline</code>。不像普通的 <code>noninline</code> 函数，我们可以把 <code>noninline</code> 函数模板定义在同文件中，然后再多个编译单元里 <code>include</code> 这个头文件。</p>
 <p>唯一一个例外是模板对某些类型进行了<strong>全特化(full spcializations)</strong>，这时的结果代码不再是<strong>泛型(generic)</strong>的(所有的模板参数都已经被指定了)。后续会详细讨论。</p>
 <p>严格地从语言角度来看，<code>inline</code> 只意味着在程序中函数的定义可以出现很多次。不过它也给了编译器一个暗示，在调用该函数的地方函数应该被展开成 <code>inline</code> 的：这样做在某些情况下可以提高效率，但是在另一些情况下也可能降低效率。现代编译器在没有关键字 <code>inline</code> 暗示的情况下，通常也可以很好的决定是否将函数展开成 <code>inline</code> 的。当然，编译器在做决定的时候依然会将关键字 <code>inline</code> 纳入考虑因素。</p>
-<h3 id="为什么不用-constexpr？"><a href="#为什么不用-constexpr？" class="headerlink" title="为什么不用 constexpr？"></a>为什么不用 constexpr？</h3><p>从 C++11 开始，你可以通过关键字 <code>constexpr</code> 来在编译期进行某些运算。对于很多模板来说，这是有意义的。</p>
+<h3 id="1-6-3-为什么不用-constexpr？"><a href="#1-6-3-为什么不用-constexpr？" class="headerlink" title="1.6.3 为什么不用 constexpr？"></a>1.6.3 为什么不用 constexpr？</h3><p>从 C++11 开始，你可以通过关键字 <code>constexpr</code> 来在编译期进行某些运算。对于很多模板来说，这是有意义的。</p>
 <p>比如为了可以在编译期使用求最大值的函数，你需要将函数模板定义如下：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
 <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">auto</span> <span class="hljs-title">max</span><span class="hljs-params">(T1 a, T2 b)</span></span>
@@ -723,7 +728,7 @@ RT <span class="hljs-built_in">max</span>(T1 a, T2 b)
 
 <p>在这里我们传递的 1000 是 <code>unsigned int</code> 类型，这样可以避免直接比较一个有符号数值和一个无符号数值时产生的警报。</p>
 <p>后续也会继续讨论 <code>constexpr</code>。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<h2 id="1-7-小结"><a href="#1-7-小结" class="headerlink" title="1.7. 小结"></a>1.7. 小结</h2><ul>
 <li>函数模板定义了一组适用于不同类型的函数</li>
 <li>当向模板函数传递变量时，函数模板会自行推导模板参数的类型，来决定去实例化出那种类型的函数。</li>
 <li>你也可以显式的指出模板参数的类型。</li>
@@ -754,7 +759,7 @@ RT <span class="hljs-built_in">max</span>(T1 a, T2 b)
                     
                       <a class="hover-with-bg" href="/tags/C/">C++</a>
                     
-                      <a class="hover-with-bg" href="/tags/%E6%A8%A1%E6%9D%BF/">模板</a>
+                      <a class="hover-with-bg" href="/tags/%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/">泛型编程</a>
                     
                   </div>
                 
@@ -943,7 +948,7 @@ RT <span class="hljs-built_in">max</span>(T1 a, T2 b)
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "C++ template 函数模板&nbsp;",
+        "C++ Template-1 函数模板&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
