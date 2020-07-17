@@ -227,7 +227,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月17日 下午
+                  本文最后更新于：2020年7月17日 晚上
                 
               </p>
             
@@ -849,7 +849,7 @@ Stack intStack3 = intStack1;      <span class="hljs-comment">// OK since C++17</
 <pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>[<span class="hljs-number">7</span>]&gt;</code></pre>
 
 <p>当使用 <code>T</code> 的时候都会被实例化为 <code>char const[7]</code>。这样我们就不能放入不同长度的字符串了，因为这是不同的类型。详细的讨论<a href>参见 7.4 节（未写）</a>。</p>
-<p>但是，如果我们按值传递模板参数 <code>T</code> 的话，参数类型就会被 <em>decay*，也就是将 *raw array</em> 转换为相应的 <em>raw pointer<em>。这样，调用带有模板参数 <code>T</code> 的构造函数就会将模板参数 <code>T</code> 的类型推导成 `char const</em><code>，模板也被推导为</code>Stack&lt;char const</em>&gt;`。</p>
+<p>但是，如果我们按值传递模板参数 <code>T</code> 的话，参数类型就会被 <em>decay</em> ，也就是将 <em>raw array</em> 转换为相应的 <em>raw pointer</em> 。这样，调用带有模板参数 <code>T</code> 的构造函数就会将模板参数 <code>T</code> 的类型推导成 <code>char const*</code>，模板也被推导为 <code>Stack&lt;char const*&gt;</code>。</p>
 <p>基于以上原因，可能有必要讲构造函数声明成按值传递参数的形式：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
