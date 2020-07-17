@@ -166,8 +166,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-16 08:30">
-      2020年7月16日 早上
+    <time datetime="2020-07-17 13:30">
+      2020年7月17日 下午
     </time>
   </div>
 
@@ -177,7 +177,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      6.1k 字
+      8.2k 字
     </span>
   
 
@@ -187,7 +187,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      82
+      108
        分钟
     </span>
   
@@ -227,12 +227,13 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月16日 晚上
+                  本文最后更新于：2020年7月17日 下午
                 
               </p>
             
             <article class="markdown-body">
-              <a id="more"></a>
+              <p>运用大量例子介绍了类模板。你可以学习到如何声明和定义类模板，如何使用类模板，如何特化和偏特化类模板，类模板的参数推导等相关的知识。</p>
+<a id="more"></a>
 
 <p>这<strong>不是</strong>本系列第一篇文章，推荐阅读完前面的文章再看本文，以下是本系列文章目录。</p>
 <p><a href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">1. 函数模板</a></p>
@@ -394,9 +395,9 @@ T <span class="hljs-keyword">const</span>&amp; Stack&lt;T&gt;::top() <span class
 &#125;</code></pre>
 
 <p>通过声明 <code>Stack&lt;int&gt;</code> 类型，在类模板内部 <code>int</code> 会被用作类型 <code>T</code>。因此，被创建的对象 <code>intStack</code>会使用一个存储<code>int</code> 类型的 <code>vector</code>，所用调用的成员函数都会被用 <code>int</code> 实例化。同样的，对于用 <code>Stack&lt;std::string&gt;</code> 定义的对象，它会使用一个存储 <code>std::string</code> 的 <code>vector</code>，所有调用的成员函数也会被 <code>std::string</code> 实例化。</p>
-<p><strong>注意，模板（成员）函数只有在调用时才会被实例化。</strong>对于类模板来说，成员函数只有被调用时才会实例化。这样节省了时间和空间的消耗，也允许了对类模板进行局部使用，<a href="#2-3-类模板的局部使用">在 2.3 会讨论到</a>。</p>
+<p><strong>注意，模板（成员）函数只有在调用时才会被实例化。</strong>对于类模板来说，成员函数只有被调用时才会实例化。这样节省了时间和空间的消耗，也允许了对类模板进行局部使用，<a href="#2-3-类模板的局部使用">在 2.3 节会讨论到</a>。</p>
 <p>在这个例子中，默认构造函数，<code>push()</code> 和 <code>top()</code> 被实例化为 <code>int</code> 和 <code>std::string</code>。但是， <code>pop()</code> 仅被实例化为 <code>std::string</code>。如果类模板有静态成员，对于每一个用到类模板的类型，相应的静态成员也只会被实例化一次。</p>
-<p>被实例化的类模板类型可以向常规类型一样使用。你可以使用 <code>const</code> 或者 <code>volatile</code> 来修饰它，也可以创建相应的数组和引用。你可以通过 <code>typedef</code> 和 <code>using</code> 将他作为类型定义的一部分（<a href="#2-8-类型别名">2.8 会讨论到</a>）或者可以用它来实例化其他的模板类型，比如：</p>
+<p>被实例化的类模板类型可以向常规类型一样使用。你可以使用 <code>const</code> 或者 <code>volatile</code> 来修饰它，也可以创建相应的数组和引用。你可以通过 <code>typedef</code> 和 <code>using</code> 将他作为类型定义的一部分（<a href="#2-8-类型别名">2.8 节会讨论到</a>）或者可以用它来实例化其他的模板类型，比如：</p>
 <pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(Stack&lt;<span class="hljs-keyword">int</span>&gt; <span class="hljs-keyword">const</span>&amp; s)</span> 	 <span class="hljs-comment">// 参数 s 类型是 Stack&lt;int&gt;</span></span>
 <span class="hljs-function"></span>&#123;
     <span class="hljs-keyword">using</span> IntStack = Stack&lt;<span class="hljs-keyword">int</span>&gt;; <span class="hljs-comment">//IntStack 是 Stack&lt;int&gt; 的别名</span>
@@ -415,7 +416,7 @@ Stack&lt;Stack&lt;<span class="hljs-keyword">int</span>&gt;&gt; intStackStack; <
 <p>如果你不这么做，<code>&gt;&gt;</code> 会被解析成调用 <code>&gt;&gt;</code> 运算符，这会导致语法错误：</p>
 <pre><code class="hljs c++">Stack&lt;Stack&lt;<span class="hljs-keyword">int</span>&gt;&gt; intStackStack;  <span class="hljs-comment">// ERROR before C++11</span></code></pre>
 
-<p>这种旧行为使用的原因是，它可以帮助编译器在第一次 pass 源码时，不依赖语意就能对源代码进行正确的标记。但是，漏掉空格是一个很典型的 <code>bug</code>，需要有相关的错误信息，所以对代码语意分析已经被越来越多地考虑进来。因此，从 C++11 开始，通过 “angle bracket hack”技术（<a href>13.3.1（未写）会讨论到</a>），两个相邻的模板尖括号之间就不需要在用空格隔开了。</p>
+<p>这种旧行为使用的原因是，它可以帮助编译器在第一次 pass 源码时，不依赖语意就能对源代码进行正确的标记。但是，漏掉空格是一个很典型的 <code>bug</code>，需要有相关的错误信息，所以对代码语意分析已经被越来越多地考虑进来。因此，从 C++11 开始，通过 “angle bracket hack”技术（<a href>13.3.1 节（未写）会讨论到</a>），两个相邻的模板尖括号之间就不需要在用空格隔开了。</p>
 <h2 id="2-3-类模板的局部使用"><a href="#2-3-类模板的局部使用" class="headerlink" title="2.3. 类模板的局部使用"></a>2.3. 类模板的局部使用</h2><p>一个类模板通常会对用来实例化的模板参数进行多种操作（包含构造函数和析构函数）。这可能会让你以为，要为模板参数提供所有被模板成员函数用到的操作。但是事实不是这样：模板参数只需要提供那些会被用到的操作（而不是可能会被用到的操作）。</p>
 <p>比如 <code>Stack&lt;&gt;</code> 类可能提供了一个成员函数 <code>PrintOn()</code> 来打印整个 stack 的内容，它会调用 <code>operator &lt;&lt;</code> 来依次打印每一个元素：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
@@ -442,7 +443,7 @@ ps.push(&#123;<span class="hljs-number">6</span>, <span class="hljs-number">7</s
 <pre><code class="hljs c++">ps.printOn(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>); <span class="hljs-comment">// ERROR: 此元素类型不支持 operator&lt;&lt;</span></code></pre>
 
 <h3 id="2-3-1-Concept"><a href="#2-3-1-Concept" class="headerlink" title="2.3.1 Concept"></a>2.3.1 Concept</h3><p>这样就有一个问题：我们如何才能知道为了实例化一个模板需要哪些操作？名词 <strong><em>concept</em></strong> 通常被用来表示一组反复被模板库要求的限制条件。例如 C++ 标准库是基于这样一些 concepts 的：<strong>可随机进入的迭代器(random access iterator)</strong>和<strong>可默认构造的(default constructible)</strong>。</p>
-<p>目前（C++17），concepts 还只是或多或少的出现在文档当中（比如代码注释）。这会导致严重的问题，因为不遵守这些限制会导致让人难以理解的错误信息（<a href>参考 9.4（未写） 节</a>）。近年来有一些方法和尝试，试图在语言特性层面支持对 <em>concepts</em> 的定义和检查。但是直到 C++17，还没有哪一种方法得以被标准化。从 C++11 开始，你至少可以通过关键字 <code>static_assert</code> 和其它一些预定义的 <em>type traits</em> 来做一些简单的检查。比如：</p>
+<p>目前（C++17），concepts 还只是或多或少的出现在文档当中（比如代码注释）。这会导致严重的问题，因为不遵守这些限制会导致让人难以理解的错误信息（<a href>参考 9.4 节（未写）</a>）。近年来有一些方法和尝试，试图在语言特性层面支持对 <em>concepts</em> 的定义和检查。但是直到 C++17，还没有哪一种方法得以被标准化。从 C++11 开始，你至少可以通过关键字 <code>static_assert</code> 和其它一些预定义的 <em>type traits</em> 来做一些简单的检查。比如：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span>
 <span class="hljs-class">&#123;</span>
@@ -451,8 +452,8 @@ ps.push(&#123;<span class="hljs-number">6</span>, <span class="hljs-number">7</s
 ...
 &#125;;</code></pre>
 
-<p>即使没有这个 <code>static_assert</code>，如果需要 <code>T</code> 的默认构造函数的话，依然会遇到编译错误。只不过这个错误信息可能会包含整个模板实例化过程中所有的历史信息，从实例化被触发的地方直到模板定义中引发错误的地方（<a href>参见 9.4（未写） 节</a>）。</p>
-<p>然而还有更复杂的情况需要检查，比如模板类型 <code>T</code> 的实例需要提供一个特殊的成员函数，或者需要能够通过<code>operator &lt;</code> 进行比较。这一类情况的详细例子<a href>请参见 19.6.3 （未写）节</a>。</p>
+<p>即使没有这个 <code>static_assert</code>，如果需要 <code>T</code> 的默认构造函数的话，依然会遇到编译错误。只不过这个错误信息可能会包含整个模板实例化过程中所有的历史信息，从实例化被触发的地方直到模板定义中引发错误的地方（<a href>参见 9.4 节（未写）</a>）。</p>
+<p>然而还有更复杂的情况需要检查，比如模板类型 <code>T</code> 的实例需要提供一个特殊的成员函数，或者需要能够通过<code>operator &lt;</code> 进行比较。这一类情况的详细例子<a href>请参见 19.6.3 节（未写）</a>。</p>
 <p>C++20 增加对 <em>Concept</em> 的支持，笔者能力有限就不叙述了，请自行查阅 <a href="https://en.cppreference.com/w/cpp/language/constraints" target="_blank" rel="noopener">cpp reference</a> 了解。</p>
 <h2 id="2-4-友元"><a href="#2-4-友元" class="headerlink" title="2.4. 友元"></a>2.4. 友元</h2><p>相比于通过 <code>printOn()</code> 来打印 stack 的内容，更好的办法是去重载 stack 的 <code>operator &lt;&lt;</code> 运算符。而且和非模板类的情况一样，<code>operator&lt;&lt;</code> 应该被实现为非成员函数，在其实现中可以调用 <code>printOn()</code>：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
@@ -499,7 +500,7 @@ ps.push(&#123;<span class="hljs-number">6</span>, <span class="hljs-number">7</s
     <span class="hljs-keyword">friend</span> <span class="hljs-built_in">std</span>::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt; &lt;T&gt; (<span class="hljs-built_in">std</span>::ostream&amp;, Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;);
 &#125;;</code></pre>
 
-<p>注意这里在 <code>operator&lt;&lt;</code> 后面用了 <code>&lt;T&gt;</code>，这相当于声明了一个特化的非成员函数模板作为友元。如果没有 <code>T</code> 就相当于定义了一个新的非模板函数。<a href>具体细节请见 12.5.2（未写）节</a>。</p>
+<p>注意这里在 <code>operator&lt;&lt;</code> 后面用了 <code>&lt;T&gt;</code>，这相当于声明了一个特化的非成员函数模板作为友元。如果没有 <code>T</code> 就相当于定义了一个新的非模板函数。<a href>具体细节请见 12.5.2 节（未写）</a>。</p>
 </li>
 </ol>
 <p>无论如何，你依然可以使用这个没有定义 <code>operator&lt;&lt;</code> 的类模板，只是你在调用 <code>operator&lt;&lt;</code> 的时候会遇到错误：</p>
@@ -563,7 +564,7 @@ ps.push(&#123;<span class="hljs-number">6</span>, <span class="hljs-number">7</s
     <span class="hljs-keyword">return</span> elems.back(); <span class="hljs-comment">// return copy of last element</span>
 &#125;</code></pre>
 
-<p>在这个例子中，特化的类在向 <code>push()</code> 传递参数的时候运用了引用语意，对于 <code>std::string</code> 这一类型很有意义，提升了性能（其实最好使用 <em>forwarding reference</em> ， <a href>6.1（未写） 我们会讨论到</a>）。</p>
+<p>在这个例子中，特化的类在向 <code>push()</code> 传递参数的时候运用了引用语意，对于 <code>std::string</code> 这一类型很有意义，提升了性能（其实最好使用 <em>forwarding reference</em> ， <a href>6.1 节（未写）我们会讨论到</a>）。</p>
 <p>另外一个不同是使用了 <code>deque</code> 而不是 <code>vector</code> 来存储 stack 里面的元素。虽然这么做在这里没有好处，但是它确实说明了模板特例化之后的实现可能和类模板原始的实现有很大不同。</p>
 <h2 id="2-6-偏特化"><a href="#2-6-偏特化" class="headerlink" title="2.6. 偏特化"></a>2.6. 偏特化</h2><p>类模板可以被<strong>偏特化(partial specialization)</strong>。你可以为某些特殊情况提供特殊的实现，不过使用这必须定义某些模板参数。例如，我们可以定义一个特化的 <code>Stack&lt;&gt;</code> 类来专门处理指针：</p>
 <pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"stack1.hpp"</span></span>
@@ -618,7 +619,7 @@ ptrStack.push(<span class="hljs-keyword">new</span> <span class="hljs-keyword">i
 <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; *ptrStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
 <span class="hljs-keyword">delete</span> ptrStack.pop();</code></pre>
 
-<h4 id="多模板参数的偏特化"><a href="#多模板参数的偏特化" class="headerlink" title="多模板参数的偏特化"></a>多模板参数的偏特化</h4><p>类模板也可以特化多个模板参数的关系。比如下面这个类模板：</p>
+<h3 id="多模板参数的偏特化"><a href="#多模板参数的偏特化" class="headerlink" title="多模板参数的偏特化"></a>多模板参数的偏特化</h3><p>类模板也可以特化多个模板参数的关系。比如下面这个类模板：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span> </span>
 <span class="hljs-class">&#123;</span>
@@ -662,7 +663,7 @@ MyClass&lt;<span class="hljs-keyword">int</span>*, <span class="hljs-keyword">in
     ...
 &#125;;</code></pre>
 
-<p>更多关于偏特化的信息，<a href>请参见 16.4 （未写）节</a>。</p>
+<p>更多关于偏特化的信息，<a href>请参见 16.4 节（未写）</a>。</p>
 <h2 id="2-7-缺省类模板参数"><a href="#2-7-缺省类模板参数" class="headerlink" title="2.7. 缺省类模板参数"></a>2.7. 缺省类模板参数</h2><p>就像函数模板一样，你也可以给类模板的模板参数指定默认值。例如，在 <code>Stack&lt;&gt;</code> 类中你可以定义用来容纳元素的容器的类型作为第二个模板参数，使用 <code>std::vector&lt;&gt;</code> 作为默认值：</p>
 <pre><code class="hljs c++"><span class="hljs-comment">//stack3.hpp</span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;vector&gt;</span></span>
@@ -770,9 +771,166 @@ IntStack istack[<span class="hljs-number">10</span>];         <span class="hljs-
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
 <span class="hljs-keyword">using</span> DequeStack = Stack&lt;T, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">deque</span>&lt;T&gt;&gt;;</code></pre>
 
+<p>因此，类模板和 <strong><em>alias templates</em></strong> 都是可以被参数化的类型。同样的，<strong><em>alias template</em></strong> 只是简单地给一个已经存在的类型一个新名字，原来的类型名还是可以使用的。<code>DequeStack&lt;int&gt;</code> 和 <code>Stack&lt;int, std::deque&lt;int&gt;&gt;</code> 代表了同一个类型。</p>
+<p>再次注意，模板只可以被定义在 <em>global/namespace scope</em> 或者在类的声明之中。</p>
+<h3 id="Alias-Templates-for-Member-Types"><a href="#Alias-Templates-for-Member-Types" class="headerlink" title="Alias Templates for Member Types"></a>Alias Templates for Member Types</h3><p>使用 <strong><em>alias templates</em></strong> 可以很方便的给类模板的成员类型一个<strong>快捷名称(short cut)</strong>：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MyType</span></span>
+<span class="hljs-class">&#123;</span>
+    <span class="hljs-keyword">typedef</span> ... iterator;
+    ...
+&#125;;</code></pre>
 
+<p>或者</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MyType</span></span>
+<span class="hljs-class">&#123;</span>
+    <span class="hljs-keyword">using</span> iterator = ...;
+    ...
+&#125;;</code></pre>
 
-<h2 id="2-9-类模板参数推导"><a href="#2-9-类模板参数推导" class="headerlink" title="2.9. 类模板参数推导"></a>2.9. 类模板参数推导</h2><h2 id="2-10-模板聚合"><a href="#2-10-模板聚合" class="headerlink" title="2.10. 模板聚合"></a>2.10. 模板聚合</h2><h2 id="2-11-小结"><a href="#2-11-小结" class="headerlink" title="2.11. 小结"></a>2.11. 小结</h2><ul>
+<p>之后，下面这样的定义:</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-keyword">using</span> MyTypeIterator = <span class="hljs-keyword">typename</span> MyType&lt;T&gt;::iterator;</code></pre>
+
+<p>允许我们使用  <code>MyTypeIterator&lt;int&gt; pos;</code> 来取代 <code>typename MyType&lt;T&gt;::iterator pos;</code>。</p>
+<h3 id="Type-Traits-Sufflix-t"><a href="#Type-Traits-Sufflix-t" class="headerlink" title="Type Traits Sufflix_t"></a>Type Traits Sufflix_t</h3><p>从 C++14 开始，标准库使用这一技术为所有的 <em>type trait</em> 定义了一个<strong>快捷名称(short cut)</strong>。比如能用这种写法</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-keyword">add_const_t</span>&lt;T&gt; <span class="hljs-comment">// since C++14</span></code></pre>
+
+<p>来替代</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">typename</span> <span class="hljs-built_in">std</span>::add_const&lt;T&gt;::type <span class="hljs-comment">// since C++11</span></code></pre>
+
+<p>标准库做了如下的定义：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>
+&#123;
+    <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+    <span class="hljs-keyword">using</span> <span class="hljs-keyword">add_const_t</span> = <span class="hljs-keyword">typename</span> add_const&lt;T&gt;::type;
+&#125;</code></pre>
+
+<h2 id="2-9-类模板参数推导"><a href="#2-9-类模板参数推导" class="headerlink" title="2.9. 类模板参数推导"></a>2.9. 类模板参数推导</h2><p>在 C++17 之前，使用类模板时必须显式地支持所有模板参数的类型（除非它们有默认值）。C++17 开始，这一要求就没有那么严格了。如果类模板的构造函数可以推导出所有的参数类型（不含有默认值的），就不必需要显式地指明模板参数的类型了。</p>
+<p>比如在前面的例子中，你可以使用拷贝构造函数而不指定模板参数的参数类型：</p>
+<pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>&gt; intStack1;             <span class="hljs-comment">// stack of strings</span>
+Stack&lt;<span class="hljs-keyword">int</span>&gt; intStack2 = intStack1; <span class="hljs-comment">// OK in all versions</span>
+Stack intStack3 = intStack1;      <span class="hljs-comment">// OK since C++17</span></code></pre>
+
+<p>通过提供一个接受初始参数的构造函数，就可以推导出 stack 元素的类型。例如我们可以定义一个可以被一个参数初始化的 stack：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
+<span class="hljs-class">&#123;</span>
+<span class="hljs-keyword">private</span>:
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt; elems; <span class="hljs-comment">// elements</span>
+<span class="hljs-keyword">public</span>:
+	Stack () = <span class="hljs-keyword">default</span>;
+	Stack (T <span class="hljs-keyword">const</span>&amp; elem) <span class="hljs-comment">// initialize stack with one element</span>
+		: elems(&#123;elem&#125;) &#123;&#125;
+	...
+&#125;;</code></pre>
+
+<p>然后你就可以像这样声明一个 stack：</p>
+<pre><code class="hljs c++">Stack intStack = <span class="hljs-number">0</span>; <span class="hljs-comment">// 被推导为 Stack&lt;int&gt;，从 C++17 开始</span></code></pre>
+
+<p>通过用整数 <code>0</code> 来初始化 <code>Stack</code> 类型时，模板参数 <code>T</code> 被推导为 <code>int</code>，这样就实例化出一个 <code>Stack&lt;int&gt;</code>。</p>
+<p>注意下面这些细节：</p>
+<ul>
+<li><p>由于定义了接受 <code>int</code> 类型的模板构造函数，你需要请求一个默认的构造函数及其默认行为，这是因为默认构造函数只有在其他构造函数没有定义时才会生成，方法如下：</p>
+  <pre><code class="hljs c++">Stack() = <span class="hljs-keyword">default</span>;</code></pre>
+</li>
+<li><p>参数 <code>elem</code> 传递给 <code>elems</code> 时用大括号 <code>{}</code> 包裹起来，通过<strong>初始化列表(initializer list)</strong>的方式只用一个参数初始化 <code>vector</code> 类型的 <code>elems</code>: </p>
+<pre><code class="hljs c++">: elems(&#123;elem&#125;);</code></pre>
+
+<p>这是因为 <code>vector</code> 类型没有用一个参数直接初始化元素的构造函数。</p>
+</li>
+</ul>
+<p>注意，不同于函数模板，类模板参数可能无法部分推导其类型（通过显式地指明其中一部分模板参数的类型）。<a href>参见 15.12 节（未写）</a>。</p>
+<h3 id="类模板对字符串常量的参数推导："><a href="#类模板对字符串常量的参数推导：" class="headerlink" title="类模板对字符串常量的参数推导："></a>类模板对字符串常量的参数推导：</h3><p>原则上，你甚至可以通过字符串常量来初始化 stack：</p>
+<pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">"bottom"</span>; <span class="hljs-comment">// 被推导为 Stack&lt;char const[7]&gt;，从 C++17 开始</span></code></pre>
+
+<p><strong>但是</strong>，这会带来一大堆问题：一般，当通过引用来传递模板类型 <code>T</code> 的参数是，这个参数类型不会被 <em>decay</em> (将 raw array 转换为相应的 raw pointer)。这说明我们的确定义了这个类型的 <code>Stack</code>:</p>
+<pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>[<span class="hljs-number">7</span>]&gt;</code></pre>
+
+<p>当使用 <code>T</code> 的时候都会被实例化为 <code>char const[7]</code>。这样我们就不能放入不同长度的字符串了，因为这是不同的类型。详细的讨论<a href>参见 7.4 节（未写）</a>。</p>
+<p>但是，如果我们按值传递模板参数 <code>T</code> 的话，参数类型就会被 <em>decay*，也就是将 *raw array</em> 转换为相应的 <em>raw pointer<em>。这样，调用带有模板参数 <code>T</code> 的构造函数就会将模板参数 <code>T</code> 的类型推导成 `char const</em><code>，模板也被推导为</code>Stack&lt;char const</em>&gt;`。</p>
+<p>基于以上原因，可能有必要讲构造函数声明成按值传递参数的形式：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
+<span class="hljs-class">&#123;</span>
+<span class="hljs-keyword">private</span>:
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt; elems; <span class="hljs-comment">// elements</span>
+<span class="hljs-keyword">public</span>:
+	Stack (T elem) <span class="hljs-comment">// initialize stack with one element by value</span>
+		: elems(&#123;elem&#125;) &#123;&#125; <span class="hljs-comment">// to decay on class tmpl arg deduction</span>
+	...
+&#125;;</code></pre>
+
+<p>这样下面的初始化方式就可以正常运行：</p>
+<pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">"bottom"</span>; <span class="hljs-comment">// Stack&lt;char const*&gt; deduced since C++17</span></code></pre>
+
+<p>在这个例子中，我们最好使用 <em>move</em> 将临时变量 <code>elem</code> 添加至 stack 中，避免不必要的拷贝：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
+<span class="hljs-class">&#123;</span>
+<span class="hljs-keyword">private</span>:
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt; elems; <span class="hljs-comment">// elements</span>
+<span class="hljs-keyword">public</span>:
+	Stack (T elem) <span class="hljs-comment">// initialize stack with one element by value</span>
+		: elems(&#123;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(elem)&#125;) &#123;&#125; 
+	...
+&#125;;</code></pre>
+
+<h3 id="推导指引-Deduction-Guides"><a href="#推导指引-Deduction-Guides" class="headerlink" title="推导指引(Deduction Guides)"></a>推导指引(Deduction Guides)</h3><p>除了将构造函数声明成按值传递，还有一个解决方案：因为在容器中处理 <em>raw pointers</em> 可能会导致很多问题，我们应该禁止容器类将类型自动推导成 <em>raw character pointers</em>。</p>
+<p>我们可以通过定义推导指引来提供额外的模板参数推导规则，或者修改已有的模板参数推导规则。例如，你可以定义当一个字符串常量或者 C 类型字符串被传递时，stack 类型被实例化为 <code>std::string</code>：</p>
+<pre><code class="hljs c++">Stack(<span class="hljs-keyword">char</span> cosnt*) -&gt; Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;;</code></pre>
+
+<p>这个指引语句也必须出现在模板类定义的 <em>scope(namespace)</em> 内。通常它紧跟着模板类的定义。<code>-&gt;</code> 后面的类型被称为<strong>推导指引(deduction guide)</strong>的 <em>guided type</em>。</p>
+<p>现在，根据这个定义</p>
+<pre><code class="hljs c++">Stack stringStackStack stringStack&#123;<span class="hljs-string">"bottom"</span>&#125;; 
+<span class="hljs-comment">// OK: Stack&lt;std::string&gt; deduced since C++17</span></code></pre>
+
+<p>stack 被推导为 <code>Stack&lt;std::string&gt;</code>。但是，下面的语句仍旧是无效的：</p>
+<pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">"bottom"</span>; 
+<span class="hljs-comment">// Stack&lt;std::string&gt; deduced, but still not valid</span></code></pre>
+
+<p>模板参数类型被推导为 <code>std::string</code>，也实例化出了 <code>Stack&lt;std::string&gt;</code>：</p>
+<pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
+<span class="hljs-class">&#123;</span>
+<span class="hljs-keyword">private</span>:
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; elems; <span class="hljs-comment">// elements</span>
+<span class="hljs-keyword">public</span>:
+	Stack (<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span>&amp; elem) <span class="hljs-comment">// initialize stack with one element</span>
+		: elems(&#123;elem&#125;) &#123;&#125;
+	...
+&#125;;</code></pre>
+
+<p>但是根据语言规则，除了 <code>std::string</code>，你不能对字符串常量使用拷贝初始化（用 <code>=</code> 初始化）来初始化一个对象。因此你必须用如下的初始化方式：</p>
+<pre><code class="hljs c++">Stack stringStack&#123;<span class="hljs-string">"bottom"</span>&#125;; <span class="hljs-comment">// Stack&lt;std::string&gt; deduced and valid</span></code></pre>
+
+<p>跟类模板参数推导类似，在声明 <code>stringStack</code> 的类型是 <code>Stack&lt;std::string&gt;</code> 之后，下面的初始化声明了同一个类型（调用拷贝构造函数）而不是用类型为 <code>Stack&lt;std::string&gt;</code> 的元素对 stack 进行初始化（推导出的类型不会是 <code>Stack&lt;std::string&gt;</code>）：</p>
+<pre><code class="hljs c++">Stack stack2&#123;stringStack&#125;;    <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span>
+<span class="hljs-function">Stack <span class="hljs-title">stack3</span><span class="hljs-params">(stringStack)</span></span>;    <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span>
+Stack stack4 = &#123;stringStack&#125;; <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span></code></pre>
+
+<p>更多内容，<a href>参见 15.12 节（未写）</a>。</p>
+<h2 id="2-10-模板聚合"><a href="#2-10-模板聚合" class="headerlink" title="2.10. 模板聚合"></a>2.10. 模板聚合</h2><p>聚合类（<em>classes/structs</em> which没有用户定义的显式的或者是继承的构造函数，没有 private 或者 protected 的非静态成员，没有虚函数，没有 virtual, private, or protected 方式继承的父类）也可以是模板。例如：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ValueWithComment</span> </span>
+<span class="hljs-class">&#123;</span>
+	T value;
+	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> comment;
+&#125;;</code></pre>
+
+<p>定义了一个成员 <code>value</code> 的类型被参数化了的聚合类。可以像定义其它类模板的对象一样定义一个聚合类的对象：</p>
+<pre><code class="hljs c++">ValueWithComment&lt;<span class="hljs-keyword">int</span>&gt; vc;
+vc.value = <span class="hljs-number">42</span>;
+vc.comment = <span class="hljs-string">"initial value"</span>;</code></pre>
+
+<p>从C++17 开始，可以为聚合类的类模板定义推导指引：</p>
+<pre><code class="hljs c++">ValueWithComment(<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*, <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*) 
+    -&gt; ValueWithComment&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;;
+ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span class="hljs-string">"initial value"</span>&#125;;</code></pre>
+
+<p>没有“推导指引”的话，就不能使用上述初始化方法，因为 <code>ValueWithComment</code> 没有相应的构造函数来完成相关类型推导。</p>
+<p>标准库的 <code>std::array&lt;&gt;</code> 类也是一个聚合类，其元素类型和尺寸都是被参数化的。C++17 也给它定义了“推导指引”，<a href>在 4.4.4 节（未写）会做进一步讨论</a>。</p>
+<h2 id="2-11-小结"><a href="#2-11-小结" class="headerlink" title="2.11. 小结"></a>2.11. 小结</h2><ul>
 <li>类模板是有一个或者多个参数待定的类</li>
 <li>使用类模板是，你需要传递模板参数的类型，之后类模板会对这些类型进行实例化。</li>
 <li>对于类模板，成员函数只有被使用时才会被实例化。</li>
@@ -781,7 +939,7 @@ IntStack istack[<span class="hljs-number">10</span>];         <span class="hljs-
 <li>从 C++17 开始，类模板的模板参数可以通过其构造函数进行自动推导。</li>
 <li>你可以定义聚合类的类模板</li>
 <li>调用参数如果是按值传递的话，相应的模板类型会被 <em>decay</em>.</li>
-<li>模板只能声明和定义在 <code>global</code> 或者命名空间域中，或者定义在其他类中。</li>
+<li>模板只可以被定义在 <em>global/namespace scope</em> 或者在类的声明之中。</li>
 </ul>
 
             </article>
@@ -812,6 +970,23 @@ IntStack istack[<span class="hljs-number">10</span>];         <span class="hljs-
               
                 <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
               
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/07/15/union-find/">
+                        <span class="hidden-mobile">并查集</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
               
             </div>
 
