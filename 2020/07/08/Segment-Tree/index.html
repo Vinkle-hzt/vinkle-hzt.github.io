@@ -17,10 +17,21 @@
   <meta name="description" content="vinkle&#39;s space">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
-  <title>分类 - vinkle&#39;s space</title>
+  <title>线段树 - vinkle&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+  
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
@@ -42,7 +53,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -142,7 +153,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/categories_front.jpg') no-repeat center center;
+         style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -150,6 +161,48 @@
             <span class="h2" id="subtitle">
               
             </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-07-08 14:34">
+      2020年7月8日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      1
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
 
             
           </div>
@@ -162,227 +215,73 @@
 
   <main>
     
-      <div class="container nopadding-md">
-        <div class="py-5" id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+              <p class="note note-info">
                 
-
-
-
-
-
-
-
-<div class="category-list">
-  
-  
-  
-  
-    
-    
-    <div class="category row">
-      <a
-        class="category-item  list-group-item category-item-action col-10 col-md-11"
-        id="heading-ckct88djd0007bkvp7yhpcggh" role="tab" data-toggle="collapse" href="#collapse-ckct88djd0007bkvp7yhpcggh"
-        aria-expanded="true"
-      >
-        C++
-        <i class="iconfont icon-arrowright"></i>
-      </a>
-      <a href="/categories/C/" class="category-count col-2 col-md-1">
-        <i class="iconfont icon-articles"></i>
-        <span>3</span>
-      </a>
-      <div class="category-collapse">
-        
-          
-  <div id="collapse-ckct88djd0007bkvp7yhpcggh" class="collapse in show" role="tabpanel"
-       aria-labelledby="heading-ckct88djd0007bkvp7yhpcggh">
-    
-  
-  
-    
-    
-    <div class="category-sub row">
-      <a
-        class="category-subitem collapsed list-group-item category-item-action col-10 col-md-11"
-        id="heading-ckct88djn000rbkvp9zum6dev" role="tab" data-toggle="collapse" href="#collapse-ckct88djn000rbkvp9zum6dev"
-        aria-expanded="false"
-      >
-        Template
-        <i class="iconfont icon-arrowright"></i>
-      </a>
-      <a href="/categories/C/Template/" class="category-count col-2 col-md-1">
-        <i class="iconfont icon-articles"></i>
-        <span>2</span>
-      </a>
-      <div class="category-collapse">
-        
-          
-  <div id="collapse-ckct88djn000rbkvp9zum6dev" class="collapse in" role="tabpanel"
-       aria-labelledby="heading-ckct88djn000rbkvp9zum6dev">
-    
-    
-    
-      
-      
-        <a href="/2020/07/17/cpp-template-2/" class="list-group-item list-group-item-action">
-          <span class="category-post">C++ Template-2 类模板</span>
-        </a>
-      
-    
-      
-      
-        <a href="/2020/07/09/cpp-template-1/" class="list-group-item list-group-item-action">
-          <span class="category-post">C++ Template-1 函数模板</span>
-        </a>
-      
-    
-  </div>
-
-        
-      </div>
-    </div>
-  
-    
-    
-    <div class="category-sub row">
-      <a
-        class="category-subitem collapsed list-group-item category-item-action col-10 col-md-11"
-        id="heading-ckct88djs0017bkvpa99acacg" role="tab" data-toggle="collapse" href="#collapse-ckct88djs0017bkvpa99acacg"
-        aria-expanded="false"
-      >
-        杂项
-        <i class="iconfont icon-arrowright"></i>
-      </a>
-      <a href="/categories/C/%E6%9D%82%E9%A1%B9/" class="category-count col-2 col-md-1">
-        <i class="iconfont icon-articles"></i>
-        <span>1</span>
-      </a>
-      <div class="category-collapse">
-        
-          
-  <div id="collapse-ckct88djs0017bkvpa99acacg" class="collapse in" role="tabpanel"
-       aria-labelledby="heading-ckct88djs0017bkvpa99acacg">
-    
-    
-    
-      
-      
-        <a href="/2020/07/07/cpp_virtual_function/" class="list-group-item list-group-item-action">
-          <span class="category-post">C++ Virtual Function</span>
-        </a>
-      
-    
-  </div>
-
-        
-      </div>
-    </div>
-  
-  </div>
-
-        
-      </div>
-    </div>
-  
-    
-    
-    <div class="category row">
-      <a
-        class="category-item collapsed list-group-item category-item-action col-10 col-md-11"
-        id="heading-ckct88dj80002bkvp6n9wfsjh" role="tab" data-toggle="collapse" href="#collapse-ckct88dj80002bkvp6n9wfsjh"
-        aria-expanded="false"
-      >
-        CSAPP
-        <i class="iconfont icon-arrowright"></i>
-      </a>
-      <a href="/categories/CSAPP/" class="category-count col-2 col-md-1">
-        <i class="iconfont icon-articles"></i>
-        <span>2</span>
-      </a>
-      <div class="category-collapse">
-        
-          
-  <div id="collapse-ckct88dj80002bkvp6n9wfsjh" class="collapse in" role="tabpanel"
-       aria-labelledby="heading-ckct88dj80002bkvp6n9wfsjh">
-    
-    
-    
-      
-      
-        <a href="/2020/07/07/CSAPP_2_1/" class="list-group-item list-group-item-action">
-          <span class="category-post">CSAPP-2.1 信息表示和处理-信息储存</span>
-        </a>
-      
-    
-      
-      
-        <a href="/2020/07/06/CSAPP_1/" class="list-group-item list-group-item-action">
-          <span class="category-post">CSAPP-1 计算机系统漫游</span>
-        </a>
-      
-    
-  </div>
-
-        
-      </div>
-    </div>
-  
-    
-    
-    <div class="category row">
-      <a
-        class="category-item collapsed list-group-item category-item-action col-10 col-md-11"
-        id="heading-ckct88djj000hbkvphb2l58l0" role="tab" data-toggle="collapse" href="#collapse-ckct88djj000hbkvphb2l58l0"
-        aria-expanded="false"
-      >
-        算法
-        <i class="iconfont icon-arrowright"></i>
-      </a>
-      <a href="/categories/%E7%AE%97%E6%B3%95/" class="category-count col-2 col-md-1">
-        <i class="iconfont icon-articles"></i>
-        <span>2</span>
-      </a>
-      <div class="category-collapse">
-        
-          
-  <div id="collapse-ckct88djj000hbkvphb2l58l0" class="collapse in" role="tabpanel"
-       aria-labelledby="heading-ckct88djj000hbkvphb2l58l0">
-    
-    
-    
-      
-      
-        <a href="/2020/07/15/union-find/" class="list-group-item list-group-item-action">
-          <span class="category-post">并查集</span>
-        </a>
-      
-    
-      
-      
-        <a href="/2020/07/13/Dijkstra/" class="list-group-item list-group-item-action">
-          <span class="category-post">Dijkstra 算法</span>
-        </a>
-      
-    
-  </div>
-
-        
-      </div>
-    </div>
-  
-</div>
-
+                  本文最后更新于：2020年7月19日 晚上
+                
+              </p>
+            
+            <article class="markdown-body">
+              <h1 id="线段树"><a href="#线段树" class="headerlink" title="线段树"></a>线段树</h1>
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+                    
+                  </div>
+                
               </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
             </div>
+
+            
           </div>
         </div>
       </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
     
   </main>
 
@@ -486,6 +385,31 @@
 
 
 
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
 
 
   <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
@@ -493,7 +417,7 @@
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "分类&nbsp;",
+        "线段树&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
@@ -507,6 +431,21 @@
   </script>
 
 
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
 
 
 
@@ -522,9 +461,62 @@
 
 
 
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
 
 
 
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
 
 
 

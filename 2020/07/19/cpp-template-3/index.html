@@ -17,7 +17,7 @@
   <meta name="description" content="vinkle&#39;s space">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
-  <title>并查集 - vinkle&#39;s space</title>
+  <title>C++ Template-3 类模板 - vinkle&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -166,8 +166,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-15 20:06">
-      2020年7月15日 晚上
+    <time datetime="2020-07-19 13:30">
+      2020年7月19日 下午
     </time>
   </div>
 
@@ -177,7 +177,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.5k 字
+      1.1k 字
     </span>
   
 
@@ -187,7 +187,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      16
+      15
        分钟
     </span>
   
@@ -227,107 +227,124 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月15日 晚上
+                  本文最后更新于：2020年7月19日 晚上
                 
               </p>
             
             <article class="markdown-body">
-              <p>并查集是一种树型的数据结构，主要用于处理一些不交集的合并及查询问题。本文通过样例介绍了并查集，并给出了 C++ 算法的实现和两种优化方案。</p>
-<a id="more"></a>
+              <a id="more"></a>
 
-<h1 id="并查集"><a href="#并查集" class="headerlink" title="并查集"></a>并查集</h1><p>在计算机科学中，并查集是一种树型的数据结构，主要用于处理一些<strong>不交集（Disjoint Sets）</strong>的合并及查询问题。有一个<strong>联合-查找算法（Union-find Algorithm）</strong>定义了两个用于此数据结构的操作：</p>
-<ul>
-<li><code>Find</code>：确定元素属于哪一个子集。它用来确定两个元素是否属于同一子集。</li>
-<li><code>Union</code>：将两个子集合并成同一个几何。</li>
-</ul>
-<p>为了更加精确的定义这些方法，需要定义如何表示集合。一种常用的策略是为每个集合选定一个固定的元素，称为代表，以表示整个集合。接着，<code>Find(x)</code> 返回 <code>x</code> 所属集合的代表，而 <code>Union</code> 使用两个集合的代表作为参数。</p>
-<h2 id="并查集介绍和实现"><a href="#并查集介绍和实现" class="headerlink" title="并查集介绍和实现"></a>并查集介绍和实现</h2><p>市场上原来有 $1,2,3,4,5,6$ 这六家公司，各自经营着自己的生意。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/1.png" srcset="/img/loading.gif" alt></p>
-<p>有一天，$4$ 找到了 $1$ 说，最近形式不大好，要不我们两家公司合并成一家，$4$ 觉得自己的名字不够气派，就跟着 $1$ 叫同一个名字了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/2.png" srcset="/img/loading.gif" alt></p>
-<p>过了不久，$2$ 也想着找人合作，就找到了 $4$，$4$ 说我已经改叫 $1$ 了，你跟我和合作就是跟 $1$ 合作，$2$ 和 $1$ 商量了一下，$2$ 也觉得自己的名字不好听，也改成 $1$ 的名字了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/3.png" srcset="/img/loading.gif" alt></p>
-<p>$3,6$ 一看市场形势，也开始和 $5$ 商量起了合并的事宜，他们决定最后名字就是 $5$ 了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/4.png" srcset="/img/loading.gif" alt></p>
-<p>可是 $5$ 合并的太晚了， 已经临近破产，$2$ 公司看到机会跟 $6$ 公司商量事宜，其实最后就是 $1$ 和 $5$ （他们合并后的公司）商量，结果 $5$ 很无奈，被合并了，最后所有公司归为 $1$ 管理了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/5.png" srcset="/img/loading.gif" alt></p>
-<p>其实这个合并的图是一个<strong>树状结构</strong>，寻找每个集合的代表元素，只要层层向上访问<strong>父节点</strong>搜索即可，直到到达树的<strong>根节点</strong>。根节点的父节点是它自身。我们可以直接把这幅图表示成一棵树。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/6.png" srcset="/img/loading.gif" alt></p>
-<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>根据上面例子的步骤，我们可以轻松写出简单版本的并查集代码。</p>
-<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><pre><code class="hljs c++"><span class="hljs-keyword">int</span> root[N];
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)
-        root[i] = i;
-&#125;</code></pre>
+<p>这<strong>不是</strong>本系列第一篇文章，推荐阅读完前面的文章再看本文，以下是本系列文章目录。</p>
+<p><a href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">1. 函数模板</a></p>
+<p><a href="https://vinkle.top/2020/07/17/cpp-template-2/#2-%E7%B1%BB%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">2. 类模板</a></p>
+<p><a href="#3-非类型模板参数">3. 非类型模板参数（本文）</a></p>
+<h1 id="3-非类型模板参数"><a href="#3-非类型模板参数" class="headerlink" title="3. 非类型模板参数"></a>3. 非类型模板参数</h1><p>对于函数模板和类模板，模板参数不一定必须为类型，它们也可以是普通的值。和使用类型作为模板参数类似，你可以使代码的部分细节留到使用的时候再确定。只是，这些待定的细节不再是类型，而是某个数值。当我们使用这种模板的时候，你必须显式地表明出数值的具体值，之后代码才会被实例化。本章会通过一个新版本的 stack 类模板来说明这一新特性。顺便我们会介绍一下函数模板的非类型参数的使用，并讨论这一技术的一些局限性。</p>
+<h2 id="3-1-类模板的非类型参数"><a href="#3-1-类模板的非类型参数" class="headerlink" title="3.1 类模板的非类型参数"></a>3.1 类模板的非类型参数</h2><p>作为和前面章节实现的 stack 的对比，你可以实现一个用一个固定大小的数组作为容器的 stack。这种方式的优点是可以避免开发者或者标准库容器管理内存的开销。不同，确定一个合适的大小是一个难题。如果指定的值太小，那么 stack 容器就容易满。如果指定的大小太大，可能造成内存的浪费。因此最好让用户根据自身的情况合理确定 stack 的大小</p>
+<p>为此，可以将 stack 的大小定义成模板参数：</p>
+<pre><code class="hljs c++"><span class="hljs-comment">//stacknontype.hpp</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;array&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span>
 
-<p>我们用 <code>root</code> 数组存储每个节点的父节点， 刚开始，先把所有节点的父节点初始化为自己。</p>
-<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">if</span> (root[x] == x)
-        <span class="hljs-keyword">return</span> x;
-    <span class="hljs-keyword">else</span>
-        <span class="hljs-keyword">return</span> <span class="hljs-built_in">find</span>(root[x]);
-&#125;</code></pre>
-
-<p>查询这个节点的根节点时，我们使用递归的思想：一层一层访问该节点的父节点，直到访问到根节点（即父节点是自身）。</p>
-<h4 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h4><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span>
-<span class="hljs-function"></span>&#123;
-    root[<span class="hljs-built_in">find</span>(i)] = <span class="hljs-built_in">find</span>(j);
-&#125;</code></pre>
-
-<p>合并两个节点也很节点，只要把其中一个的根节点的父节点设置为另一个的父节点即可。</p>
-<h2 id="优化并查集"><a href="#优化并查集" class="headerlink" title="优化并查集"></a>优化并查集</h2><p>前面说的简单的并查集其实效率比较低。</p>
-<h3 id="路径压缩"><a href="#路径压缩" class="headerlink" title="路径压缩"></a>路径压缩</h3><p>我们可以看以下场景：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/7.png" srcset="/img/loading.gif" alt></p>
-<p>我们进行 <code>merge(2,3)</code> 和 <code>merge(2,4)</code> 操作后，图变为如下：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/8.png" srcset="/img/loading.gif" alt></p>
-<p>这是一条长链，随着节点的不断增多，这条链会越来越长，我们从链最底部找到其根节点的消耗也越来越多。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/9.png" srcset="/img/loading.gif" alt></p>
-<p>如果图是这样的，我们就不必层层查询根节点了。</p>
-<p>那么怎么实现呢？我们可以使用<strong>路径压缩</strong>的方法，在每次寻找元素根节点的时候，把它的父节点直接设为根节点，这样在下一次查询后，只要一次就能找到根节点了。</p>
-<p>同样用递归的方式，把沿途的父节点全设置为根节点：</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">if</span> (x != root[x])
-    &#123;
-        root[x] = <span class="hljs-built_in">find</span>(root[x]);
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
+<span class="hljs-class">&#123;</span>
+<span class="hljs-keyword">private</span>:
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span>&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span>
+    <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> numElems;         <span class="hljs-comment">// current number of elements</span>
+<span class="hljs-keyword">public</span>:
+    Stack();                  <span class="hljs-comment">// constructor</span>
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span>
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span>
+    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span>
+    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>
+<span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return whether the stack is empty</span>
+        <span class="hljs-keyword">return</span> numElems == <span class="hljs-number">0</span>;
     &#125;
-    <span class="hljs-keyword">return</span> root[x];
-&#125;</code></pre>
-
-<h3 id="按秩合并"><a href="#按秩合并" class="headerlink" title="按秩合并"></a>按秩合并</h3><p>由于路径压缩只对访问过的路径进行压缩，不是每个节点的父节点都是根节点。所以并查集的结构仍然可能是负载的。看下面的情形：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/10.png" srcset="/img/loading.gif" alt></p>
-<p>$8$ 要和 $7$ 合并，这是我们有两种方案，$7$ 作为 $8$ 的父节点和 $8$ 作为 $7$ 的父节点这两种方式：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/13.png" srcset="/img/loading.gif" alt></p>
-<p>显然第一种方式效率更加高。</p>
-<p>因为如果把  $8$ 作为 $7$ 的父节点，会使得数的<strong>深度</strong>（树中最长链的长度）加深，原来树的每个节点到根的距离都变长了，后面我们每次查询根节点复杂度也会变高。而把 $7$ 作为 $8$ 的父节点就不会有这个问题。因此我们每次合并的时候都应该把简单的树合并到复杂的树上面，保证每次合并到根节点距离变长的节点数量最少。</p>
-<p>运用这个思想我们可以写出相关的代码。</p>
-<h4 id="初始化-1"><a href="#初始化-1" class="headerlink" title="初始化"></a>初始化</h4><p>我们用 <code>rank</code> 数组来表示每个根节点对应的树的深度。一开始将所有的 <code>rank</code> 置为 <code>1</code>。</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">int</span> rank[N];
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)
-    &#123;
-        root[i] = i;
-        rank[i] = <span class="hljs-number">1</span>;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>
+<span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return current number of elements</span>
+        <span class="hljs-keyword">return</span> numElems;
     &#125;
+&#125;;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
+Stack&lt;T, Maxsize&gt;::Stack()
+    : numElems(<span class="hljs-number">0</span>) <span class="hljs-comment">// start with no elements</span>
+&#123;
+    <span class="hljs-comment">// nothing else to do</span>
+&#125;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
+<span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::push(T <span class="hljs-keyword">const</span>&amp; elem)
+&#123;
+    assert(numElems &lt; Maxsize);
+    elems[numElems] = elem; <span class="hljs-comment">// append element</span>
+    ++numElems;             <span class="hljs-comment">// increment number of elements</span>
+&#125;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
+<span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::pop()
+&#123;
+    assert(!elems.empty());
+    --numElems; <span class="hljs-comment">// decrement number of elements</span>
+&#125;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
+T <span class="hljs-keyword">const</span> &amp;Stack&lt;T, Maxsize&gt;::top() <span class="hljs-keyword">const</span>
+&#123;
+    assert(!elems.empty());
+    <span class="hljs-keyword">return</span> elems[numElems - <span class="hljs-number">1</span>]; <span class="hljs-comment">// return last element</span>
 &#125;</code></pre>
 
-<h4 id="合并-1"><a href="#合并-1" class="headerlink" title="合并"></a>合并</h4><p>合并时比较两个根节点的 <code>rank</code> 值，将 <code>rank</code> 小的向 <code>rank</code> 大的树合并。如果两个树深度相同，则合并后新树的 <code>rank</code> 值需要加一。</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span>
+<p>第二个新的模板参数 <code>Maxsize</code> 是 <code>int</code> 类型的，它指定了 stack 中数组中的大小：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
+<span class="hljs-class">&#123;</span>
+<span class="hljs-keyword">private</span>:
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span>&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span>
+    ...
+&#125;;</code></pre>
+
+<p>另外，成员函数 <code>push()</code> 在使用时也检测了 stack 是否已满：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
+<span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::push(T <span class="hljs-keyword">const</span>&amp; elem)
+&#123;
+    assert(numElems &lt; Maxsize);
+    elems[numElems] = elem; <span class="hljs-comment">// append element</span>
+    ++numElems;             <span class="hljs-comment">// increment number of elements</span>
+&#125;</code></pre>
+
+<p>为了使用这个类模板你必须同时显式地写出 stack 中元素的类型和其最大容量：</p>
+<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"stacknontype.hpp"</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
 <span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">int</span> x = <span class="hljs-built_in">find</span>(i), y = <span class="hljs-built_in">find</span>(j);
-    <span class="hljs-keyword">if</span> (rank[x] &lt;= rank[y])
-        root[x] = y;
-   	<span class="hljs-keyword">else</span>
-        root[y] = x;
-   	<span class="hljs-keyword">if</span> (rank[x] == rank[y] &amp;&amp; x != y)
-        rank[y]++;
+  Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">20</span>&gt;         int20Stack;     <span class="hljs-comment">// stack of up to 20 ints</span>
+  Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">40</span>&gt;         int40Stack;     <span class="hljs-comment">// stack of up to 40 ints</span>
+  Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>,<span class="hljs-number">40</span>&gt; stringStack;    <span class="hljs-comment">// stack of up to 40 strings</span>
+
+  <span class="hljs-comment">// manipulate stack of up to 20 ints</span>
+  int20Stack.push(<span class="hljs-number">7</span>);
+  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; int20Stack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
+  int20Stack.pop();
+
+  <span class="hljs-comment">// manipulate stack of up to 40 strings</span>
+  stringStack.push(<span class="hljs-string">"hello"</span>);
+  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; stringStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
+  stringStack.pop();
 &#125;</code></pre>
 
-<p>注意路径压缩和按秩合并一起使用时，可能会破坏按秩合并的准确性。</p>
+<p>注意，上面每一个模板都实例化出一个不同的类型。因此，<code>int20Stack</code> 和 <code>int40Stack</code> 它们的类型是不同的，而且它们之间没有定义隐式或者是显式的类型转换规则。因此，不能用其中一个取代另一个，也不能将其中一个赋值给另外一个。</p>
+<p>同时，对于非类型模板参数来说，也可以指定默认值：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T = <span class="hljs-keyword">int</span>, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize = <span class="hljs-number">100</span>&gt;
+class Stack
+&#123;
+    ...
+&#125;;</code></pre>
 
+<p>但是，从良好的程序设计的角度来看，这可能不是一个合适的例子。默认值应该直观地看上去是正确的。不过对于默认类型是 <code>int</code> 或者是默认大小是 <code>100</code> 对于一般的 stack 模板看上去都不够直观。因此，最好是让程序员同时显式地指定这两个模板参数，这样在声明的时候这个两个模板参数都可以被<strong>文档化(documented)</strong>。</p>
+<h2 id="3-2-非类型函数模板参数"><a href="#3-2-非类型函数模板参数" class="headerlink" title="3.2 非类型函数模板参数"></a>3.2 非类型函数模板参数</h2><h2 id="3-3-非类型模板参数的限制"><a href="#3-3-非类型模板参数的限制" class="headerlink" title="3.3 非类型模板参数的限制"></a>3.3 非类型模板参数的限制</h2><h2 id="3-4-模板参数类型-auto"><a href="#3-4-模板参数类型-auto" class="headerlink" title="3.4 模板参数类型 auto"></a>3.4 模板参数类型 auto</h2><h2 id="3-5-小结"><a href="#3-5-小结" class="headerlink" title="3.5 小结"></a>3.5 小结</h2>
             </article>
             <hr>
             <div>
@@ -336,7 +353,9 @@
                   <div class="post-meta mr-3">
                     <i class="iconfont icon-category"></i>
                     
-                      <a class="hover-with-bg" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                      <a class="hover-with-bg" href="/categories/C/">C++</a>
+                    
+                      <a class="hover-with-bg" href="/categories/C/Template/">Template</a>
                     
                   </div>
                 
@@ -344,9 +363,9 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
+                      <a class="hover-with-bg" href="/tags/C/">C++</a>
                     
-                      <a class="hover-with-bg" href="/tags/%E5%9B%BE%E8%AE%BA/">图论</a>
+                      <a class="hover-with-bg" href="/tags/%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/">泛型编程</a>
                     
                   </div>
                 
@@ -354,29 +373,6 @@
               
                 <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
               
-              
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/07/17/cpp-template-2/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">C++ Template-2 类模板</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </div>
-                  <div class="post-next col-6">
-                    
-                    
-                      <a href="/2020/07/13/Dijkstra/">
-                        <span class="hidden-mobile">Dijkstra 算法</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </div>
-                </div>
               
             </div>
 
@@ -535,7 +531,7 @@
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "并查集&nbsp;",
+        "C++ Template-3 类模板&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
