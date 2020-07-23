@@ -17,7 +17,7 @@
   <meta name="description" content="vinkle&#39;s space">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
-  <title>并查集 - vinkle&#39;s space</title>
+  <title>C++ Template-3 可变参数模板 - vinkle&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -166,8 +166,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-15 20:06">
-      2020年7月15日 晚上
+    <time datetime="2020-07-22 19:30">
+      2020年7月22日 晚上
     </time>
   </div>
 
@@ -177,7 +177,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.5k 字
+      1.1k 字
     </span>
   
 
@@ -187,7 +187,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      16
+      14
        分钟
     </span>
   
@@ -227,107 +227,106 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月15日 晚上
+                  本文最后更新于：2020年7月23日 晚上
                 
               </p>
             
             <article class="markdown-body">
-              <p>并查集是一种树型的数据结构，主要用于处理一些不交集的合并及查询问题。本文通过样例介绍了并查集，并给出了 C++ 算法的实现和两种优化方案。</p>
+              <p>通过大量例子介绍了非类型模板参数。你可以学习到如何使用非类型模板参数，了解非类型模板参数使用的限制。</p>
 <a id="more"></a>
 
-<h1 id="并查集"><a href="#并查集" class="headerlink" title="并查集"></a>并查集</h1><p>在计算机科学中，并查集是一种树型的数据结构，主要用于处理一些<strong>不交集（Disjoint Sets）</strong>的合并及查询问题。有一个<strong>联合-查找算法（Union-find Algorithm）</strong>定义了两个用于此数据结构的操作：</p>
+<p>这<strong>不是</strong>本系列第一篇文章，推荐阅读完前面的文章再看本文，以下是本系列文章目录。</p>
+<p><a href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">1. 函数模板</a></p>
+<p><a href="https://vinkle.top/2020/07/17/cpp-template-2/#2-%E7%B1%BB%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">2. 类模板</a></p>
+<p><a href="https://vinkle.top/2020/07/22/cpp-template-3/#3-1-%E7%B1%BB%E6%A8%A1%E6%9D%BF%E7%9A%84%E9%9D%9E%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0" target="_blank" rel="noopener">3. 非类型模板参数</a></p>
+<p><a href>4. 可变参数模板（本文）</a></p>
+<h1 id="4-可变参数模板"><a href="#4-可变参数模板" class="headerlink" title="4.可变参数模板"></a>4.可变参数模板</h1><p>从 C++ 11 开始，模板可以接受数量可变的参数。这个特性允许你在参数类型和参数数量都不确定的情况下使用模板。一个典型的应用是通过 class 或者 framework 传递一组数量和类型都不确定的参数。另一个应用是提供泛型代码处理数量任意且类型也任意的参数。</p>
+<h2 id="4-1-可变参数模板"><a href="#4-1-可变参数模板" class="headerlink" title="4.1 可变参数模板"></a>4.1 可变参数模板</h2><p>可以将模板参数定义为可以接受多个模板参数。这种模板被称为<strong>可变参数模板(variadic templates)</strong>。</p>
+<h3 id="4-1-1-可变参数模板实例"><a href="#4-1-1-可变参数模板实例" class="headerlink" title="4.1.1 可变参数模板实例"></a>4.1.1 可变参数模板实例</h3><p>例如，你可以通过以下代码调用 <code>print()</code> 函数来打印多个类型不确定的模板参数</p>
+<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span> <span class="hljs-params">()</span></span>
+<span class="hljs-function"></span>&#123;
+&#125;
+
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... Types&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">(T firstArg, Types... args)</span></span>
+<span class="hljs-function"></span>&#123;
+  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; firstArg &lt;&lt; <span class="hljs-string">'\n'</span>;  <span class="hljs-comment">// print first argument</span>
+  <span class="hljs-built_in">print</span>(args...);                 <span class="hljs-comment">// call print() for remaining arguments</span>
+&#125;</code></pre>
+
+<p>如果传入的参数是一个或者多个，就会调用这个函数模板，这里通过把第一个模板参数单独声明，就可以先打印第一个参数，然后再递归地调用 <code>print()</code> 来打印剩余的参数。这些被称为 <code>args</code> 的剩余参数，是一个<strong>函数参数包(function parameter pack)</strong>：</p>
+<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">(T firstArg, Types... args)</span></span></code></pre>
+
+<p>使用了<strong>模板参数包(template parameter pack)</strong>定义了 <code>Type</code>：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... Types&gt;</code></pre>
+
+<p>为了结束递归，重载了没有参数的非模板函数 <code>print()</code>，它会在参数包为空的时候被调用。</p>
+<p>比如这样一个调用：</p>
+<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-title">s</span><span class="hljs-params">(<span class="hljs-string">"world"</span>)</span></span>;
+<span class="hljs-built_in">print</span>(<span class="hljs-number">7.5</span>, <span class="hljs-string">"hello"</span>, s);</code></pre>
+
+<p>会输出以下结果：</p>
+<pre><code class="hljs angelscript"><span class="hljs-number">7.5</span>
+hello
+world</code></pre>
+
+<p>因为这个调用会首先扩展成：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">print</span>&lt;<span class="hljs-keyword">double</span>, <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;(<span class="hljs-number">7.5</span>, <span class="hljs-string">"hello"</span>, s);</code></pre>
+
+<p>其中：</p>
 <ul>
-<li><code>Find</code>：确定元素属于哪一个子集。它用来确定两个元素是否属于同一子集。</li>
-<li><code>Union</code>：将两个子集合并成同一个几何。</li>
+<li><code>firstArg</code> 的值是 <code>7.5</code>，其类型 <code>T</code> 是 <code>double</code>。</li>
+<li><code>args</code> 是一个可变模板参数，它包含类型是 <code>char const*</code> 的 <code>&quot;hello&quot;</code> 和类型是 <code>std::string</code> 的 <code>&quot;world&quot;</code>。</li>
 </ul>
-<p>为了更加精确的定义这些方法，需要定义如何表示集合。一种常用的策略是为每个集合选定一个固定的元素，称为代表，以表示整个集合。接着，<code>Find(x)</code> 返回 <code>x</code> 所属集合的代表，而 <code>Union</code> 使用两个集合的代表作为参数。</p>
-<h2 id="并查集介绍和实现"><a href="#并查集介绍和实现" class="headerlink" title="并查集介绍和实现"></a>并查集介绍和实现</h2><p>市场上原来有 $1,2,3,4,5,6$ 这六家公司，各自经营着自己的生意。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/1.png" srcset="/img/loading.gif" alt></p>
-<p>有一天，$4$ 找到了 $1$ 说，最近形式不大好，要不我们两家公司合并成一家，$4$ 觉得自己的名字不够气派，就跟着 $1$ 叫同一个名字了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/2.png" srcset="/img/loading.gif" alt></p>
-<p>过了不久，$2$ 也想着找人合作，就找到了 $4$，$4$ 说我已经改叫 $1$ 了，你跟我和合作就是跟 $1$ 合作，$2$ 和 $1$ 商量了一下，$2$ 也觉得自己的名字不好听，也改成 $1$ 的名字了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/3.png" srcset="/img/loading.gif" alt></p>
-<p>$3,6$ 一看市场形势，也开始和 $5$ 商量起了合并的事宜，他们决定最后名字就是 $5$ 了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/4.png" srcset="/img/loading.gif" alt></p>
-<p>可是 $5$ 合并的太晚了， 已经临近破产，$2$ 公司看到机会跟 $6$ 公司商量事宜，其实最后就是 $1$ 和 $5$ （他们合并后的公司）商量，结果 $5$ 很无奈，被合并了，最后所有公司归为 $1$ 管理了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/5.png" srcset="/img/loading.gif" alt></p>
-<p>其实这个合并的图是一个<strong>树状结构</strong>，寻找每个集合的代表元素，只要层层向上访问<strong>父节点</strong>搜索即可，直到到达树的<strong>根节点</strong>。根节点的父节点是它自身。我们可以直接把这幅图表示成一棵树。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/6.png" srcset="/img/loading.gif" alt></p>
-<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>根据上面例子的步骤，我们可以轻松写出简单版本的并查集代码。</p>
-<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><pre><code class="hljs c++"><span class="hljs-keyword">int</span> root[N];
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span>
+<p>在打印了 <code>firstArg</code> 对应的值 <code>7.5</code> 之后，继续调用 <code>print()</code> 打印剩余的参数，这时 <code>print()</code> 被扩展为：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">print</span>&lt;<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;(<span class="hljs-string">"hello"</span>, s);</code></pre>
+
+<p>其中：</p>
+<ul>
+<li><p><code>firstArg</code> 的值是 <code>&quot;hello&quot;</code>，其类型 <code>T</code> 是 <code>char const*</code>。</p>
+</li>
+<li><p><code>args</code> 是一个可变模板参数，它包含的参数类型是 <code>std::string</code>。</p>
+</li>
+</ul>
+<p>在打印了 <code>firstArg</code> 对应的 <code>&quot;hello&quot;</code>之后，继续调用 <code>print()</code> 打印剩余的参数，这时 <code>print()</code> 被扩展为：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">print</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;(s);</code></pre>
+
+<p>其中：</p>
+<ul>
+<li><code>firstArg</code> 的值是 <code>&quot;world&quot;</code>，其类型 <code>T</code> 是 <code>std::string</code>。</li>
+<li><code>args</code> 是一个空的可变模板参数，它没有任何值。</li>
+</ul>
+<p>这样在打印了<code>firstArg</code> 对应的 <code>&quot;world&quot;</code> 之后，就会调用被重载的不接受参数的非模板函数 <code>print()</code>，从而结束了递归。</p>
+<h3 id="4-1-2-重载可变参数和非可变参数模板"><a href="#4-1-2-重载可变参数和非可变参数模板" class="headerlink" title="4.1.2 重载可变参数和非可变参数模板"></a>4.1.2 重载可变参数和非可变参数模板</h3><p>上面的例子也可以这样实现：</p>
+<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span> <span class="hljs-params">(T arg)</span></span>
 <span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)
-        root[i] = i;
+  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; arg &lt;&lt; <span class="hljs-string">'\n'</span>;  <span class="hljs-comment">// print passed argument</span>
+&#125;
+
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... Types&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span> <span class="hljs-params">(T firstArg, Types... args)</span></span>
+<span class="hljs-function"></span>&#123;
+  <span class="hljs-built_in">print</span>(firstArg);           <span class="hljs-comment">// call print() for the first argument</span>
+  <span class="hljs-built_in">print</span>(args...);            <span class="hljs-comment">// call print() for remaining arguments</span>
 &#125;</code></pre>
 
-<p>我们用 <code>root</code> 数组存储每个节点的父节点， 刚开始，先把所有节点的父节点初始化为自己。</p>
-<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span>
+<p>也就是说，如果两个函数模板的区别只有尾部的参数包的话，没有参数包的函数模板会被优先选择。</p>
+<h3 id="4-1-3-运算符-sizeof…"><a href="#4-1-3-运算符-sizeof…" class="headerlink" title="4.1.3 运算符 sizeof…"></a>4.1.3 运算符 sizeof…</h3><p>C++11为可变参数模板引入了一个新的 <code>sizeof</code> 运算符：<code>sizeof...</code>。它会扩展成参数包所包含的参数数目。因此，</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... Types&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">(T firstArg, Types... args)</span></span>
 <span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">if</span> (root[x] == x)
-        <span class="hljs-keyword">return</span> x;
-    <span class="hljs-keyword">else</span>
-        <span class="hljs-keyword">return</span> <span class="hljs-built_in">find</span>(root[x]);
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-keyword">sizeof</span>...(Types) &lt;&lt; <span class="hljs-string">'\n'</span>; <span class="hljs-comment">// print number of remaining types</span>
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-keyword">sizeof</span>...(args) &lt;&lt; <span class="hljs-string">'\n'</span>;  <span class="hljs-comment">// print number of remaining args</span>
+    ...
 &#125;</code></pre>
 
-<p>查询这个节点的根节点时，我们使用递归的思想：一层一层访问该节点的父节点，直到访问到根节点（即父节点是自身）。</p>
-<h4 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h4><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span>
-<span class="hljs-function"></span>&#123;
-    root[<span class="hljs-built_in">find</span>(i)] = <span class="hljs-built_in">find</span>(j);
-&#125;</code></pre>
-
-<p>合并两个节点也很节点，只要把其中一个的根节点的父节点设置为另一个的父节点即可。</p>
-<h2 id="优化并查集"><a href="#优化并查集" class="headerlink" title="优化并查集"></a>优化并查集</h2><p>前面说的简单的并查集其实效率比较低。</p>
-<h3 id="路径压缩"><a href="#路径压缩" class="headerlink" title="路径压缩"></a>路径压缩</h3><p>我们可以看以下场景：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/7.png" srcset="/img/loading.gif" alt></p>
-<p>我们进行 <code>merge(2,3)</code> 和 <code>merge(2,4)</code> 操作后，图变为如下：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/8.png" srcset="/img/loading.gif" alt></p>
-<p>这是一条长链，随着节点的不断增多，这条链会越来越长，我们从链最底部找到其根节点的消耗也越来越多。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/9.png" srcset="/img/loading.gif" alt></p>
-<p>如果图是这样的，我们就不必层层查询根节点了。</p>
-<p>那么怎么实现呢？我们可以使用<strong>路径压缩</strong>的方法，在每次寻找元素根节点的时候，把它的父节点直接设为根节点，这样在下一次查询后，只要一次就能找到根节点了。</p>
-<p>同样用递归的方式，把沿途的父节点全设置为根节点：</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">if</span> (x != root[x])
-    &#123;
-        root[x] = <span class="hljs-built_in">find</span>(root[x]);
-    &#125;
-    <span class="hljs-keyword">return</span> root[x];
-&#125;</code></pre>
-
-<h3 id="按秩合并"><a href="#按秩合并" class="headerlink" title="按秩合并"></a>按秩合并</h3><p>由于路径压缩只对访问过的路径进行压缩，不是每个节点的父节点都是根节点。所以并查集的结构仍然可能是负载的。看下面的情形：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/10.png" srcset="/img/loading.gif" alt></p>
-<p>$8$ 要和 $7$ 合并，这是我们有两种方案，$7$ 作为 $8$ 的父节点和 $8$ 作为 $7$ 的父节点这两种方式：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/13.png" srcset="/img/loading.gif" alt></p>
-<p>显然第一种方式效率更加高。</p>
-<p>因为如果把  $8$ 作为 $7$ 的父节点，会使得数的<strong>深度</strong>（树中最长链的长度）加深，原来树的每个节点到根的距离都变长了，后面我们每次查询根节点复杂度也会变高。而把 $7$ 作为 $8$ 的父节点就不会有这个问题。因此我们每次合并的时候都应该把简单的树合并到复杂的树上面，保证每次合并到根节点距离变长的节点数量最少。</p>
-<p>运用这个思想我们可以写出相关的代码。</p>
-<h4 id="初始化-1"><a href="#初始化-1" class="headerlink" title="初始化"></a>初始化</h4><p>我们用 <code>rank</code> 数组来表示每个根节点对应的树的深度。一开始将所有的 <code>rank</code> 置为 <code>1</code>。</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">int</span> rank[N];
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)
-    &#123;
-        root[i] = i;
-        rank[i] = <span class="hljs-number">1</span>;
-    &#125;
-&#125;</code></pre>
-
-<h4 id="合并-1"><a href="#合并-1" class="headerlink" title="合并"></a>合并</h4><p>合并时比较两个根节点的 <code>rank</code> 值，将 <code>rank</code> 小的向 <code>rank</code> 大的树合并。如果两个树深度相同，则合并后新树的 <code>rank</code> 值需要加一。</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">int</span> x = <span class="hljs-built_in">find</span>(i), y = <span class="hljs-built_in">find</span>(j);
-    <span class="hljs-keyword">if</span> (rank[x] &lt;= rank[y])
-        root[x] = y;
-   	<span class="hljs-keyword">else</span>
-        root[y] = x;
-   	<span class="hljs-keyword">if</span> (rank[x] == rank[y] &amp;&amp; x != y)
-        rank[y]++;
-&#125;</code></pre>
-
-<p>注意路径压缩和按秩合并一起使用时，可能会破坏按秩合并的准确性。</p>
-
+<p>在第一个模板参数传入 <code>print()</code> 之后，会将剩余的参数数目打印两次。如你所见，运算符 <code>sizeof...</code> 既可以调用于模板参数包也可以调用于函数参数包。</p>
+<h2 id="4-2-折叠表达式"><a href="#4-2-折叠表达式" class="headerlink" title="4.2 折叠表达式"></a>4.2 折叠表达式</h2><h2 id="4-3-可变参数目标的应用"><a href="#4-3-可变参数目标的应用" class="headerlink" title="4.3 可变参数目标的应用"></a>4.3 可变参数目标的应用</h2><h2 id="4-4-可变参数模板和可变参数表达式"><a href="#4-4-可变参数模板和可变参数表达式" class="headerlink" title="4.4 可变参数模板和可变参数表达式"></a>4.4 可变参数模板和可变参数表达式</h2><h3 id="4-4-1-可变参数表达式"><a href="#4-4-1-可变参数表达式" class="headerlink" title="4.4.1 可变参数表达式"></a>4.4.1 可变参数表达式</h3><h3 id="4-4-2-可变参数指数"><a href="#4-4-2-可变参数指数" class="headerlink" title="4.4.2 可变参数指数"></a>4.4.2 可变参数指数</h3><h3 id="4-4-3-可变参数类模板"><a href="#4-4-3-可变参数类模板" class="headerlink" title="4.4.3 可变参数类模板"></a>4.4.3 可变参数类模板</h3><h3 id="4-4-4-可变参数推导指南"><a href="#4-4-4-可变参数推导指南" class="headerlink" title="4.4.4 可变参数推导指南"></a>4.4.4 可变参数推导指南</h3><h3 id="4-4-5-可变参数基类和-using"><a href="#4-4-5-可变参数基类和-using" class="headerlink" title="4.4.5 可变参数基类和 using"></a>4.4.5 可变参数基类和 using</h3><h2 id="4-5-小结"><a href="#4-5-小结" class="headerlink" title="4.5 小结"></a>4.5 小结</h2>
             </article>
             <hr>
             <div>
@@ -336,7 +335,9 @@
                   <div class="post-meta mr-3">
                     <i class="iconfont icon-category"></i>
                     
-                      <a class="hover-with-bg" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                      <a class="hover-with-bg" href="/categories/C/">C++</a>
+                    
+                      <a class="hover-with-bg" href="/categories/C/Template/">Template</a>
                     
                   </div>
                 
@@ -344,9 +345,9 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
+                      <a class="hover-with-bg" href="/tags/C/">C++</a>
                     
-                      <a class="hover-with-bg" href="/tags/%E5%9B%BE%E8%AE%BA/">图论</a>
+                      <a class="hover-with-bg" href="/tags/%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/">泛型编程</a>
                     
                   </div>
                 
@@ -354,29 +355,6 @@
               
                 <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
               
-              
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/07/17/cpp-template-2/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">C++ Template-2 类模板</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </div>
-                  <div class="post-next col-6">
-                    
-                    
-                      <a href="/2020/07/13/Dijkstra/">
-                        <span class="hidden-mobile">Dijkstra 算法</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </div>
-                </div>
               
             </div>
 
@@ -535,7 +513,7 @@
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "并查集&nbsp;",
+        "C++ Template-3 可变参数模板&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
