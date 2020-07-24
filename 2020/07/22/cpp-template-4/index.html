@@ -17,7 +17,7 @@
   <meta name="description" content="vinkle&#39;s space">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
-  <title>C++ Template-3 可变参数模板 - vinkle&#39;s space</title>
+  <title>C++ Template-4 可变参数模板 - vinkle&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -177,7 +177,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.1k 字
+      2.3k 字
     </span>
   
 
@@ -187,7 +187,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      14
+      30
        分钟
     </span>
   
@@ -227,7 +227,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月23日 晚上
+                  本文最后更新于：2020年7月24日 晚上
                 
               </p>
             
@@ -326,7 +326,126 @@ world</code></pre>
 &#125;</code></pre>
 
 <p>在第一个模板参数传入 <code>print()</code> 之后，会将剩余的参数数目打印两次。如你所见，运算符 <code>sizeof...</code> 既可以调用于模板参数包也可以调用于函数参数包。</p>
-<h2 id="4-2-折叠表达式"><a href="#4-2-折叠表达式" class="headerlink" title="4.2 折叠表达式"></a>4.2 折叠表达式</h2><h2 id="4-3-可变参数目标的应用"><a href="#4-3-可变参数目标的应用" class="headerlink" title="4.3 可变参数目标的应用"></a>4.3 可变参数目标的应用</h2><h2 id="4-4-可变参数模板和可变参数表达式"><a href="#4-4-可变参数模板和可变参数表达式" class="headerlink" title="4.4 可变参数模板和可变参数表达式"></a>4.4 可变参数模板和可变参数表达式</h2><h3 id="4-4-1-可变参数表达式"><a href="#4-4-1-可变参数表达式" class="headerlink" title="4.4.1 可变参数表达式"></a>4.4.1 可变参数表达式</h3><h3 id="4-4-2-可变参数指数"><a href="#4-4-2-可变参数指数" class="headerlink" title="4.4.2 可变参数指数"></a>4.4.2 可变参数指数</h3><h3 id="4-4-3-可变参数类模板"><a href="#4-4-3-可变参数类模板" class="headerlink" title="4.4.3 可变参数类模板"></a>4.4.3 可变参数类模板</h3><h3 id="4-4-4-可变参数推导指南"><a href="#4-4-4-可变参数推导指南" class="headerlink" title="4.4.4 可变参数推导指南"></a>4.4.4 可变参数推导指南</h3><h3 id="4-4-5-可变参数基类和-using"><a href="#4-4-5-可变参数基类和-using" class="headerlink" title="4.4.5 可变参数基类和 using"></a>4.4.5 可变参数基类和 using</h3><h2 id="4-5-小结"><a href="#4-5-小结" class="headerlink" title="4.5 小结"></a>4.5 小结</h2>
+<p>这<strong>可能</strong>让我们认为我们不调用空参数列表的 <code>print()</code> 函数来结束递归：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... Types&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">(T firstArg, Types... args)</span></span>
+<span class="hljs-function"></span>&#123;
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; firstArg &lt;&lt; <span class="hljs-string">'\n'</span>;
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">sizeof</span>...(args) &gt; <span class="hljs-number">0</span>) <span class="hljs-comment">// error if sizeof...(args) == 0</span>
+    &#123;
+        <span class="hljs-built_in">print</span>(args...);<span class="hljs-comment">// and no print() for no arguments declared</span>
+    &#125;
+&#125;</code></pre>
+
+<p>但是这一方法是<strong>错误</strong>的，因为通常 <code>if</code> 语句中的两个分支都会被实例化。是否调用实例化出的代码实在运行期间决定的，是否实例化是在编译期间决定的。由于以上原因，如果你对最后一个参数调用 <code>print()</code> 函数模板，虽然 <code>args...</code> 为空，单数如果没有定义不接受参数的 <code>print()</code> 函数，会出现错误。</p>
+<p>不过从 C++17 开始，可以使用编译期的 <code>if</code> 语句，这样通过一些稍微不同的语法，就可以实现前面的功能。<a href>8.5 节（未写）会具体讨论</a>。</p>
+<h2 id="4-2-折叠表达式"><a href="#4-2-折叠表达式" class="headerlink" title="4.2 折叠表达式"></a>4.2 折叠表达式</h2><p>从 C++17 开始，提供了一整计算参数包（可以有初始值）所有参数的二元运算符。</p>
+<p>例如，下面一个函数返回所有传递参数的和：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... T&gt;
+<span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">foldSum</span> <span class="hljs-params">(T... s)</span></span>
+<span class="hljs-function"></span>&#123;
+    <span class="hljs-keyword">return</span> (... + s); <span class="hljs-comment">// ((s1 + s2) + s3) + ...</span>
+&#125;</code></pre>
+
+<p>如果参数包是空的，这个表达式通常是 <em>ill-formed</em>（对于运算符 <code>&amp;&amp;</code> ，结果是 <code>true</code>；对于运算符 <code>||</code> ，结果是 <code>false</code>；对于运算符 <code>,</code> ，结果是 <code>void()</code>）。</p>
+<p>表4.1 列举了可用的折叠表达式：</p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/cpp_templates/1.png" srcset="/img/loading.gif" alt></p>
+<p>几乎所有的二元运算符都可以用于折叠表达式（<a href>参见12.4.6 节（未写）</a>）。例如，你可以使用折叠表达式和二元运算符 <code>-&gt;*</code> 去遍历一个二叉树的路径：</p>
+<pre><code class="hljs c++"><span class="hljs-comment">// define binary tree structure and traverse helpers:</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Node</span> </span>
+<span class="hljs-class">&#123;</span>
+  <span class="hljs-keyword">int</span> value;
+  Node* left;
+  Node* right;
+  Node(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>) : value(i), left(<span class="hljs-literal">nullptr</span>), right(<span class="hljs-literal">nullptr</span>) &#123;&#125;
+  <span class="hljs-comment">//...</span>
+&#125;;
+<span class="hljs-keyword">auto</span> left = &amp;Node::left;
+<span class="hljs-keyword">auto</span> right = &amp;Node::right;
+
+<span class="hljs-comment">// traverse tree, using fold expression:</span>
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... TP&gt;
+<span class="hljs-function">Node* <span class="hljs-title">traverse</span><span class="hljs-params">(T np, TP... paths)</span> </span>
+<span class="hljs-function"></span>&#123;
+  <span class="hljs-keyword">return</span> (np -&gt;* ... -&gt;* paths);      <span class="hljs-comment">// np -&gt;* paths1 -&gt;* paths2 ...</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
+<span class="hljs-function"></span>&#123;
+  <span class="hljs-comment">// init binary tree structure:</span>
+  Node* root = <span class="hljs-keyword">new</span> Node&#123;<span class="hljs-number">0</span>&#125;;
+  root-&gt;left = <span class="hljs-keyword">new</span> Node&#123;<span class="hljs-number">1</span>&#125;;
+  root-&gt;left-&gt;right = <span class="hljs-keyword">new</span> Node&#123;<span class="hljs-number">2</span>&#125;;
+  <span class="hljs-comment">//...</span>
+  <span class="hljs-comment">// traverse binary tree:</span>
+  Node* node = traverse(root, left, right);
+  <span class="hljs-comment">//...</span>
+&#125;</code></pre>
+
+<p>这里 <code>(np -&gt;* ... -&gt;* paths)</code> 使用了折叠表达式从 <code>np</code> 开始遍历了 <code>paths</code> 中所有可变元素。</p>
+<p>通过这样一个使用了初始化其的折叠表达式，我们可能会想到这样简化地打印可变参数木模板的所有参数：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>..Types&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">(Types <span class="hljs-keyword">const</span>&amp;... args)</span></span>
+<span class="hljs-function"></span>&#123;
+    (<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; ... &lt;&lt; args) &lt;&lt; <span class="hljs-string">'\n'</span>;
+&#125;</code></pre>
+
+<p>不过这样打印的参数包中的所有参数并不会有空白符分开它们。为了完成这个，你需要额外定义一个类模板，它可以在所有要打印的参数后面追加一个空格：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AddSpace</span></span>
+<span class="hljs-class">&#123;</span>
+<span class="hljs-keyword">private</span>:
+	T <span class="hljs-keyword">const</span>&amp; ref;                  <span class="hljs-comment">// refer to argument passed in constructor</span>
+<span class="hljs-keyword">public</span>:
+    AddSpace(T <span class="hljs-keyword">const</span>&amp; r): ref(r) &#123;&#125;
+    <span class="hljs-keyword">friend</span> <span class="hljs-built_in">std</span>::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt; (<span class="hljs-built_in">std</span>::ostream&amp; os, AddSpace&lt;T&gt; s) 
+    &#123;
+      <span class="hljs-keyword">return</span> os &lt;&lt; s.ref &lt;&lt; <span class="hljs-string">' '</span>;   <span class="hljs-comment">// output passed argument and a space</span>
+    &#125;
+&#125;;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... Args&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">(Args... args)</span> </span>
+<span class="hljs-function"></span>&#123;
+	(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; ... &lt;&lt; AddSpace(args) ) &lt;&lt; <span class="hljs-string">'\n'</span>;
+&#125;</code></pre>
+
+<p>注意在表达式 <code>AddSpace(args)</code> 中使用了类模板参数推导（<a href="https://vinkle.top/2020/07/17/cpp-template-2/#2-9-%E7%B1%BB%E6%A8%A1%E6%9D%BF%E5%8F%82%E6%95%B0%E6%8E%A8%E5%AF%BC" target="_blank" rel="noopener">参见2.9 节</a>），相当于使用了 <code>AddSpace&lt;Args&gt;(args)</code>，它会给每一个参数创建一个引用了该参数的 <code>AddSpace</code> 的对象，当这个对象用于输出的时候，会在后面追加一个空格。</p>
+<p>更多细节<a href>参见 12.4.6 节（未写）</a>。</p>
+<h2 id="4-3-可变参数模板的应用"><a href="#4-3-可变参数模板的应用" class="headerlink" title="4.3 可变参数模板的应用"></a>4.3 可变参数模板的应用</h2><p>可变参数模板在泛型库的开发中起到了很大的作用，比如 C++ 标准库。</p>
+<p>一个典型的应用就是转发任意类型和数量的参数。下面的例子就运用了这个特性：</p>
+<ul>
+<li><p>向一个由只能指针管理的，在堆中创建的对象的构造函数传递参数：</p>
+<pre><code class="hljs c++"><span class="hljs-comment">// creat shared pointer to complex&lt;float&gt; initialized by 4.2 and 7.7</span>
+<span class="hljs-keyword">auto</span> sp = <span class="hljs-built_in">std</span>::make_shared&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">complex</span>&lt;<span class="hljs-keyword">float</span>&gt;&gt;(<span class="hljs-number">4.2</span>, <span class="hljs-number">7.7</span>);</code></pre>
+</li>
+<li><p>向由库启动的 <code>thread</code> 传递参数：</p>
+<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-built_in">std</span>::thread <span class="hljs-title">t</span><span class="hljs-params">(foo, <span class="hljs-number">42</span>, <span class="hljs-string">"hello"</span>)</span></span>; <span class="hljs-comment">// call foo(42, "hello") in a separate thread</span></code></pre>
+</li>
+<li><p>向一个被 <code>push_back</code> 进 <code>vector</code> 的对象的构造函数传递参数：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;Customer&gt; v;
+...
+v.emplace(<span class="hljs-string">"Tim"</span>, <span class="hljs-string">"Jovi"</span>, <span class="hljs-number">1962</span>); 
+<span class="hljs-comment">// insert a Customer initialized by three argument</span></code></pre>
+
+</li>
+</ul>
+<p>通常，我们通过移动语意对参数进行<strong>完美转发(perfectly forward)</strong>（<a href>参见 6.1 节（未写）</a>），可以像下面这样声明：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>
+&#123;
+    <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... Args&gt; <span class="hljs-built_in">shared_ptr</span>&lt;T&gt;;
+    make_shared(Args&amp;&amp;... args);
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">thread</span></span>
+<span class="hljs-class">    &#123;</span>
+    <span class="hljs-keyword">public</span>:
+    	<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> F, <span class="hljs-keyword">typename</span>... Args&gt;
+        <span class="hljs-keyword">explicit</span> thread&lt;
+    &#125;
+&#125;</code></pre>
+
+
+
+<h2 id="4-4-可变参数模板和可变参数表达式"><a href="#4-4-可变参数模板和可变参数表达式" class="headerlink" title="4.4 可变参数模板和可变参数表达式"></a>4.4 可变参数模板和可变参数表达式</h2><h3 id="4-4-1-可变参数表达式"><a href="#4-4-1-可变参数表达式" class="headerlink" title="4.4.1 可变参数表达式"></a>4.4.1 可变参数表达式</h3><h3 id="4-4-2-可变参数指数"><a href="#4-4-2-可变参数指数" class="headerlink" title="4.4.2 可变参数指数"></a>4.4.2 可变参数指数</h3><h3 id="4-4-3-可变参数类模板"><a href="#4-4-3-可变参数类模板" class="headerlink" title="4.4.3 可变参数类模板"></a>4.4.3 可变参数类模板</h3><h3 id="4-4-4-可变参数推导指南"><a href="#4-4-4-可变参数推导指南" class="headerlink" title="4.4.4 可变参数推导指南"></a>4.4.4 可变参数推导指南</h3><h3 id="4-4-5-可变参数基类和-using"><a href="#4-4-5-可变参数基类和-using" class="headerlink" title="4.4.5 可变参数基类和 using"></a>4.4.5 可变参数基类和 using</h3><h2 id="4-5-小结"><a href="#4-5-小结" class="headerlink" title="4.5 小结"></a>4.5 小结</h2>
             </article>
             <hr>
             <div>
@@ -513,7 +632,7 @@ world</code></pre>
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "C++ Template-3 可变参数模板&nbsp;",
+        "C++ Template-4 可变参数模板&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
