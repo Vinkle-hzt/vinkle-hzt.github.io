@@ -177,7 +177,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.3k 字
+      3.2k 字
     </span>
   
 
@@ -187,7 +187,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      30
+      43
        分钟
     </span>
   
@@ -227,7 +227,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月24日 晚上
+                  本文最后更新于：2020年7月25日 下午
                 
               </p>
             
@@ -394,9 +394,9 @@ world</code></pre>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AddSpace</span></span>
 <span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
+  <span class="hljs-keyword">private</span>:
 	T <span class="hljs-keyword">const</span>&amp; ref;                  <span class="hljs-comment">// refer to argument passed in constructor</span>
-<span class="hljs-keyword">public</span>:
+  <span class="hljs-keyword">public</span>:
     AddSpace(T <span class="hljs-keyword">const</span>&amp; r): ref(r) &#123;&#125;
     <span class="hljs-keyword">friend</span> <span class="hljs-built_in">std</span>::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt; (<span class="hljs-built_in">std</span>::ostream&amp; os, AddSpace&lt;T&gt; s) 
     &#123;
@@ -437,15 +437,144 @@ v.emplace(<span class="hljs-string">"Tim"</span>, <span class="hljs-string">"Jov
     make_shared(Args&amp;&amp;... args);
     <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">thread</span></span>
 <span class="hljs-class">    &#123;</span>
-    <span class="hljs-keyword">public</span>:
+      <span class="hljs-keyword">public</span>:
     	<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> F, <span class="hljs-keyword">typename</span>... Args&gt;
-        <span class="hljs-keyword">explicit</span> thread&lt;
+        <span class="hljs-keyword">explicit</span> thread&lt;F&amp;&amp; f, Args&amp;&amp;... args);
+        ...
+    &#125;;
+    
+    <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Allocator = allocator&lt;T&gt;&gt;
+    class <span class="hljs-built_in">vector</span>
+    &#123;
+      <span class="hljs-keyword">public</span>:
+        <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Args&gt; reference emplace_back(Args&amp;&amp;...args);
+        ...
+    &#125;;
+&#125;</code></pre>
+
+<p>注意，之前对于常规的模板参数的规则也使用于可变参数模板参数。比如，如果参数是按值传递的，那么这个参数会被拷贝，类型会被 <em>decay</em>（数组变为指针），如果它是按引用传递的，那么参数是实参的引用，并且类型不会 <em>decay</em>。</p>
+<pre><code class="hljs c++"><span class="hljs-comment">// args are copies with decayed types:</span>
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... Args&gt; <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(Args... args)</span></span>;
+<span class="hljs-comment">// args are nondecayed references to passed objects:</span>
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... Args&gt; <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">bar</span><span class="hljs-params">(Args <span class="hljs-keyword">const</span>&amp;... args)</span></span>;</code></pre>
+
+<h2 id="4-4-可变参数模板和可变参数表达式"><a href="#4-4-可变参数模板和可变参数表达式" class="headerlink" title="4.4 可变参数模板和可变参数表达式"></a>4.4 可变参数模板和可变参数表达式</h2><p>除了上面的这些例子，参数包也可以用于其他地方，比如表达式，类模板，<code>using</code> 声明，推导指南。完整的列表<a href>参见 12.4.2 节（未写）</a>。</p>
+<h3 id="4-4-1-可变参数表达式"><a href="#4-4-1-可变参数表达式" class="headerlink" title="4.4.1 可变参数表达式"></a>4.4.1 可变参数表达式</h3><p>除了转发所有参数外，你还可以做别的事情，比如对他们进行计算。</p>
+<p>下面例子的函数现将参数包中的所有参数翻倍，然后把他们传递到 <code>print()</code> 函数中：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... T&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printDouble</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp;... args)</span></span>
+<span class="hljs-function"></span>&#123;
+    <span class="hljs-built_in">print</span>(args + args...);
+&#125;</code></pre>
+
+<p>如果你这样调用它：</p>
+<pre><code class="hljs c++">printDoubled(<span class="hljs-number">7.5</span>, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>(<span class="hljs-string">"hello"</span>), <span class="hljs-built_in">std</span>::<span class="hljs-built_in">complex</span>&lt;<span class="hljs-keyword">float</span>&gt;(<span class="hljs-number">4</span>,<span class="hljs-number">2</span>));</code></pre>
+
+<p>等价于下面的调用（除了构造函数方面不同）：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">print</span>(<span class="hljs-number">7.5</span> + <span class="hljs-number">7.5</span>, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>(<span class="hljs-string">"hello"</span>) + <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>(<span class="hljs-string">"hello"</span>),
+      <span class="hljs-built_in">std</span>::<span class="hljs-built_in">complex</span>&lt;<span class="hljs-keyword">float</span>&gt;(<span class="hljs-number">4</span>,<span class="hljs-number">2</span>) + <span class="hljs-built_in">std</span>::<span class="hljs-built_in">complex</span>&lt;<span class="hljs-keyword">float</span>&gt;(<span class="hljs-number">4</span>,<span class="hljs-number">2</span>));</code></pre>
+
+<p>如果你只想向所有参数 <code>+1</code>，省略号 <code>...</code> 不能紧跟在数值后面：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... T&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">addOne</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp;... args)</span></span>
+<span class="hljs-function"></span>&#123;
+    <span class="hljs-built_in">print</span>(args + <span class="hljs-number">1.</span>..); <span class="hljs-comment">// ERROR: 1... is a literal with too many decimal points</span>
+    <span class="hljs-built_in">print</span>(args + <span class="hljs-number">1</span> ...); <span class="hljs-comment">// OK</span>
+    <span class="hljs-built_in">print</span>((args + <span class="hljs-number">1</span>)...); <span class="hljs-comment">// OK</span>
+&#125;</code></pre>
+
+<p>编译期的表达式也可以像上面那样包含参数包。比如下面这个返回参数包所有参数是否是同一类型的函数模板：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span>.. TN&gt;
+<span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">isHomogeneous</span><span class="hljs-params">(T1, TN...)</span></span>
+<span class="hljs-function"></span>&#123;
+    <span class="hljs-keyword">return</span> (<span class="hljs-built_in">std</span>::is_same&lt;T1,TN&gt;::value &amp;&amp; ...); <span class="hljs-comment">// since C++17</span>
+&#125;</code></pre>
+
+<p>这是对折叠表达式（<a href="#4-2-折叠表达式">参见 4.2 节</a>）的一种应用：</p>
+<pre><code class="hljs c++">isHomogeneous(<span class="hljs-number">43</span>, <span class="hljs-number">-1</span>, <span class="hljs-string">"hello"</span>)</code></pre>
+
+<p>上面的语句被扩展为：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::is_same&lt;<span class="hljs-keyword">int</span>,<span class="hljs-keyword">int</span>&gt;::value &amp;&amp; <span class="hljs-built_in">std</span>::is_same&lt;<span class="hljs-keyword">int</span>,<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*&gt;::value</code></pre>
+
+<p>当然返回结果是 <code>false</code>。而对于：</p>
+<pre><code class="hljs c++">isHomogeneous(<span class="hljs-string">"hello"</span>, <span class="hljs-string">""</span>, <span class="hljs-string">"world"</span>, <span class="hljs-string">"!"</span>)</code></pre>
+
+<p>结果则是 <code>true</code>，因为所有参数的类型都被推导为 <code>char const*</code>（注意参数类型发生了 <em>decay</em>，因为它们是按值传递的）。</p>
+<h3 id="4-4-2-可变参数指数"><a href="#4-4-2-可变参数指数" class="headerlink" title="4.4.2 可变参数指数"></a>4.4.2 可变参数指数</h3><p>下面的例子中的函数通过使用一组可变下标来访问传递给第一个参数中对应的元素：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> C, <span class="hljs-keyword">typename</span>... Idx&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printElems</span><span class="hljs-params">(C <span class="hljs-keyword">const</span>&amp; coll, Idx... idx)</span></span>
+<span class="hljs-function"></span>&#123;
+    <span class="hljs-built_in">print</span>(coll[idx]...);
+&#125;</code></pre>
+
+<p>当调用：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; coll = &#123;<span class="hljs-string">"good"</span>, <span class="hljs-string">"times"</span>, <span class="hljs-string">"say"</span>, <span class="hljs-string">"bye"</span>&#125;;
+printElems(coll,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>);</code></pre>
+
+<p>等同于调用：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">print</span>(coll[<span class="hljs-number">2</span>], coll[<span class="hljs-number">0</span>], coll[<span class="hljs-number">3</span>]);</code></pre>
+
+<p>你也可以将非类型模板参数声明为参数包，例如：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span>... Idx, <span class="hljs-keyword">typename</span> C&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printIdx</span><span class="hljs-params">(C <span class="hljs-keyword">const</span>&amp; coll)</span></span>
+<span class="hljs-function"></span>&#123;
+    <span class="hljs-built_in">print</span>(coll[Idx]...);
+&#125;</code></pre>
+
+<p>可以这样调用：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; coll = &#123;<span class="hljs-string">"good"</span>, <span class="hljs-string">"times"</span>, <span class="hljs-string">"say"</span>, <span class="hljs-string">"bye"</span>&#125;;
+printIdx&lt;<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>&gt;(coll);</code></pre>
+
+<p>效果和前面的一个例子相同。</p>
+<h3 id="4-4-3-可变参数类模板"><a href="#4-4-3-可变参数类模板" class="headerlink" title="4.4.3 可变参数类模板"></a>4.4.3 可变参数类模板</h3><h3 id="4-4-4-可变参数推导指南"><a href="#4-4-4-可变参数推导指南" class="headerlink" title="4.4.4 可变参数推导指南"></a>4.4.4 可变参数推导指南</h3><h3 id="4-4-5-可变参数基类和-using"><a href="#4-4-5-可变参数基类和-using" class="headerlink" title="4.4.5 可变参数基类和 using"></a>4.4.5 可变参数基类和 using</h3><p>最后，思考下面的这个例子：</p>
+<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unordered_set&gt;</span></span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Customer</span></span>
+<span class="hljs-class">&#123;</span>
+  <span class="hljs-keyword">private</span>:
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> name;
+  <span class="hljs-keyword">public</span>:
+    Customer(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span>&amp; n) : name(n) &#123; &#125;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-title">getName</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span> </span>&#123; <span class="hljs-keyword">return</span> name; &#125;
+&#125;;
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">CustomerEq</span> </span>
+<span class="hljs-class">&#123;</span>
+    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span> <span class="hljs-params">(Customer <span class="hljs-keyword">const</span>&amp; c1, Customer <span class="hljs-keyword">const</span>&amp; c2)</span> <span class="hljs-keyword">const</span> </span>
+<span class="hljs-function">    </span>&#123;
+      <span class="hljs-keyword">return</span> c1.getName() == c2.getName();
     &#125;
+&#125;;
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">CustomerHash</span> </span>
+<span class="hljs-class">&#123;</span>
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span> <span class="hljs-params">(Customer <span class="hljs-keyword">const</span>&amp; c)</span> <span class="hljs-keyword">const</span> </span>
+<span class="hljs-function">    </span>&#123;
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">std</span>::hash&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;()(c.getName());
+    &#125;
+&#125;;
+
+<span class="hljs-comment">// define class that combines operator() for variadic base classes:</span>
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... Bases&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Overloader</span> :</span> Bases...
+&#123;
+    using Bases::operator()...;  // OK since C++17
+&#125;;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
+<span class="hljs-function"></span>&#123;
+  <span class="hljs-comment">// combine hasher and equality for customers in one type:</span>
+  <span class="hljs-keyword">using</span> CustomerOP = Overloader&lt;CustomerHash,CustomerEq&gt;;
+
+  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">unordered_set</span>&lt;Customer,CustomerHash,CustomerEq&gt; coll1;
+  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">unordered_set</span>&lt;Customer,CustomerOP,CustomerOP&gt; coll2;   
+  <span class="hljs-comment">//...</span>
 &#125;</code></pre>
 
 
 
-<h2 id="4-4-可变参数模板和可变参数表达式"><a href="#4-4-可变参数模板和可变参数表达式" class="headerlink" title="4.4 可变参数模板和可变参数表达式"></a>4.4 可变参数模板和可变参数表达式</h2><h3 id="4-4-1-可变参数表达式"><a href="#4-4-1-可变参数表达式" class="headerlink" title="4.4.1 可变参数表达式"></a>4.4.1 可变参数表达式</h3><h3 id="4-4-2-可变参数指数"><a href="#4-4-2-可变参数指数" class="headerlink" title="4.4.2 可变参数指数"></a>4.4.2 可变参数指数</h3><h3 id="4-4-3-可变参数类模板"><a href="#4-4-3-可变参数类模板" class="headerlink" title="4.4.3 可变参数类模板"></a>4.4.3 可变参数类模板</h3><h3 id="4-4-4-可变参数推导指南"><a href="#4-4-4-可变参数推导指南" class="headerlink" title="4.4.4 可变参数推导指南"></a>4.4.4 可变参数推导指南</h3><h3 id="4-4-5-可变参数基类和-using"><a href="#4-4-5-可变参数基类和-using" class="headerlink" title="4.4.5 可变参数基类和 using"></a>4.4.5 可变参数基类和 using</h3><h2 id="4-5-小结"><a href="#4-5-小结" class="headerlink" title="4.5 小结"></a>4.5 小结</h2>
+<h2 id="4-5-小结"><a href="#4-5-小结" class="headerlink" title="4.5 小结"></a>4.5 小结</h2>
             </article>
             <hr>
             <div>
