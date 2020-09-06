@@ -166,8 +166,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-22 19:30">
-      2020年7月22日 晚上
+    <time datetime="2020-09-06 19:00">
+      2020年9月6日 晚上
     </time>
   </div>
 
@@ -177,7 +177,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      3.2k 字
+      4k 字
     </span>
   
 
@@ -187,7 +187,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      43
+      54
        分钟
     </span>
   
@@ -227,7 +227,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年7月25日 下午
+                  本文最后更新于：2020年9月6日 晚上
                 
               </p>
             
@@ -526,7 +526,61 @@ printElems(coll,<span class="hljs-number">2</span>,<span class="hljs-number">0</
 printIdx&lt;<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>&gt;(coll);</code></pre>
 
 <p>效果和前面的一个例子相同。</p>
-<h3 id="4-4-3-可变参数类模板"><a href="#4-4-3-可变参数类模板" class="headerlink" title="4.4.3 可变参数类模板"></a>4.4.3 可变参数类模板</h3><h3 id="4-4-4-可变参数推导指南"><a href="#4-4-4-可变参数推导指南" class="headerlink" title="4.4.4 可变参数推导指南"></a>4.4.4 可变参数推导指南</h3><h3 id="4-4-5-可变参数基类和-using"><a href="#4-4-5-可变参数基类和-using" class="headerlink" title="4.4.5 可变参数基类和 using"></a>4.4.5 可变参数基类和 using</h3><p>最后，思考下面的这个例子：</p>
+<h3 id="4-4-3-可变参数类模板"><a href="#4-4-3-可变参数类模板" class="headerlink" title="4.4.3 可变参数类模板"></a>4.4.3 可变参数类模板</h3><p>可变参数模板可以是类模板。一个重要的例子是，通过任意数量的模板参数特例化类的相关成员类型：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... Elements&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Tuple</span>;</span>
+
+Tuple&lt;<span class="hljs-keyword">int</span>, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>, <span class="hljs-keyword">char</span>&gt; t; <span class="hljs-comment">// t can hold integer, string, ans character</span></code></pre>
+
+<p>这部分会在   <a href>25节（未写）</a>介绍。</p>
+<p>另外一个例子是可以用来特例化对象可能包含的类型：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>.. Types&gt;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Variant</span>;</span>
+
+Variant&lt;<span class="hljs-keyword">int</span>, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>, <span class="hljs-keyword">char</span>&gt; v; <span class="hljs-comment">// v can hold integer, string, or character</span></code></pre>
+
+<p>这部分会在 <a href>26节（未写）</a>介绍。</p>
+<p>你也可以将类定义成代表一组表的类型：</p>
+<pre><code class="hljs c++"><span class="hljs-comment">// type for arbitray number of indices:</span>
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span>...&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Indices</span>&#123;</span>
+&#125;;</code></pre>
+
+<p>这可以被用来定义一个 <code>print()</code> 函数来打印 <code>std::array</code> 和 <code>std::tuple</code> 中的元素，可以使用编译期的 <code>get&lt;&gt;()</code> 方法获取特定下标的元素：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span>... Idx&gt;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printByIdx</span><span class="hljs-params">(T t, Indices&lt;Idx...&gt;)</span></span>
+<span class="hljs-function"></span>&#123;
+    <span class="hljs-built_in">print</span>(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">get</span>&lt;Idx&gt;(t)...);
+&#125;</code></pre>
+
+<p>可以像下面这样使用这个模板：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>, 5&gt; arr = &#123;<span class="hljs-string">"Hello"</span>, <span class="hljs-string">"my"</span>, <span class="hljs-string">"new"</span>, <span class="hljs-string">"!"</span>, <span class="hljs-string">"World"</span>&#125;;
+printByIdx(arr, Indices&lt;<span class="hljs-number">0</span>, <span class="hljs-number">4</span>, <span class="hljs-number">3</span>&gt;());</code></pre>
+
+<p>或者像下面这样：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">auto</span> t = <span class="hljs-built_in">std</span>::make_tuple(<span class="hljs-number">12</span>, <span class="hljs-string">"monkeys"</span>, <span class="hljs-number">2.0</span>);
+printByIdx(t, Indices&lt;<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>&gt;());</code></pre>
+
+<p>这是<strong>迈向元编程(meta-programming)</strong>的第一步，在 <a href>8.1 节（未写）</a>和 <a href>23 节（未写）</a>会有介绍。</p>
+<h3 id="4-4-4-可变参数推导指南"><a href="#4-4-4-可变参数推导指南" class="headerlink" title="4.4.4 可变参数推导指南"></a>4.4.4 可变参数推导指南</h3><p>甚至推导指引（详见 <a href="[https://vinkle.top/2020/07/17/cpp-template-2/#2-9-%E7%B1%BB%E6%A8%A1%E6%9D%BF%E5%8F%82%E6%95%B0%E6%8E%A8%E5%AF%BC](https://vinkle.top/2020/07/17/cpp-template-2/#2-9-类模板参数推导)">2.9 节</a>）可以是可变参数的。比如在 C++ 标准库中，为 <code>std::array</code> 定义了如下的推导指引：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>
+&#123;
+    template&lt;typename T, typename... U&gt; array(T, U...)
+    	-&gt; <span class="hljs-built_in">array</span>&lt;<span class="hljs-keyword">enable_if_t</span>&lt;(is_same_v&lt;T, U&gt; &amp;&amp; ...), T&gt;,
+    		(<span class="hljs-number">1</span> + <span class="hljs-keyword">sizeof</span>...(U));
+&#125;</code></pre>
+
+<p>比如下面的初始化：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span> a&#123;<span class="hljs-number">42</span>, <span class="hljs-number">45</span>, <span class="hljs-number">77</span>&#125;;</code></pre>
+
+<p>将指引中的 <code>T</code> 推导成元素的类型，<code>U...</code> 也会被推导为剩余元素对应的类型。因此，元素的总数量是 <code>1 + sizeof...(U)</code> ：</p>
+<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span>&lt;<span class="hljs-keyword">int</span>, 3&gt; a&#123;<span class="hljs-number">42</span>, <span class="hljs-number">45</span>, <span class="hljs-number">77</span>&#125;;</code></pre>
+
+<p>对 <code>array</code> 的第一个元素的 <code>std::enable_if&lt;&gt;</code> 操作是一个折叠表达式（和 <a href="#4-4-1-可变参数表达式">4.4.1 节</a> 中的 <code>isHomogeneous()</code>相似），可以展开如下：</p>
+<pre><code class="hljs c++">is_same_v&lt;T, U1&gt; &amp;&amp; is_same_v&lt;T, U2&gt; &amp;&amp; is_same_v&lt;T, U3&gt; ...</code></pre>
+
+<p>如果结果不是 <code>true</code> （i.e. 所有元素类型不是全部相同的），推导指引会被丢弃而且总的类型推导会失败。这样，标准库确保了所有的类型必须是同一类型时推导指引才会推导成功。</p>
+<h3 id="4-4-5-可变参数基类和-using"><a href="#4-4-5-可变参数基类和-using" class="headerlink" title="4.4.5 可变参数基类和 using"></a>4.4.5 可变参数基类和 using</h3><p>最后，思考下面的这个例子：</p>
 <pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unordered_set&gt;</span></span>
 
@@ -572,9 +626,26 @@ printIdx&lt;<span class="hljs-number">2</span>,<span class="hljs-number">0</span
   <span class="hljs-comment">//...</span>
 &#125;</code></pre>
 
+<p>这里，我们首先定义了一个 <code>Customer</code> 类和一个独立的函数对象用来计算 <code>Customer</code> 对象的 hash 值并且比较。通过：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Bases&gt;
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Overloader</span> :</span> Bases...
+&#123;
+    using Bases::operator()...; // OK since C++17
+&#125;;</code></pre>
 
+<p>我们可以定义一个从个数不定的基类派生出一个类，为每个基类引入了 <code>operator()</code> 的声明。通过：</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">using</span> CustomerOP = Overloader&lt;CustomerHash, CustomerEq&gt;;</code></pre>
 
-<h2 id="4-5-小结"><a href="#4-5-小结" class="headerlink" title="4.5 小结"></a>4.5 小结</h2>
+<p>我们运用了这个特性从 <code>CustomerHash</code> 和 <code>CustomerEq</code> 中派生出了 <code>CustomerOP</code> 并且派生类中包含两个基类 <code>operator()</code> 的实现。</p>
+<p>在 <a href>26.4 节（未写）</a>介绍了另外一个运用此技术的应用。</p>
+<h2 id="4-5-小结"><a href="#4-5-小结" class="headerlink" title="4.5 小结"></a>4.5 小结</h2><ul>
+<li>通过使用参数包，模板可以有任意多个任意类型的参数。</li>
+<li>为了处理参数，你需要一个递归函数和一个非可变参数函数来终止递归。</li>
+<li>运算符 <code>sizeof...</code> 用来计算参数包中参数的个数。</li>
+<li>可变参数模板一个经典的应用时传递任意多个任意类型的参数。</li>
+<li>通过使用折叠表达式，你可以将运算应用到参数包中的所有参数。</li>
+</ul>
+
             </article>
             <hr>
             <div>
@@ -603,6 +674,23 @@ printIdx&lt;<span class="hljs-number">2</span>,<span class="hljs-number">0</span
               
                 <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
               
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/07/22/cpp-template-3/">
+                        <span class="hidden-mobile">C++ Template-3 非类型模板参数</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
               
             </div>
 
