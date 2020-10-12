@@ -697,7 +697,7 @@ RT <span class="hljs-built_in">max</span>(T1 a, T2 b)
     <span class="hljs-comment">// OOPS: uses max&lt;T&gt;() instead of max(int,int)</span>
 &#125;</code></pre>
 
-<h2 id="1-6-但是，不应该使用？"><a href="#1-6-但是，不应该使用？" class="headerlink" title="1.6. 但是，不应该使用？"></a>1.6. 但是，不应该使用？</h2><h3 id="1-6-1-按值传递还是按应用传递？"><a href="#1-6-1-按值传递还是按应用传递？" class="headerlink" title="1.6.1 按值传递还是按应用传递？"></a>1.6.1 按值传递还是按应用传递？</h3><p>我们声明的函数通常都是按值传递，而不是按引用传递。通常而言，建议将按引用传递除简单类型（比如<strong>基础类型(fundamental type)</strong>和 <code>std::string_view</code>）以外的类型，这样可以免除不必要的拷贝成本。</p>
+<h2 id="1-6-但是，难道我们不应该？"><a href="#1-6-但是，难道我们不应该？" class="headerlink" title="1.6. 但是，难道我们不应该？"></a>1.6. 但是，难道我们不应该？</h2><h3 id="1-6-1-按值传递还是按应用传递？"><a href="#1-6-1-按值传递还是按应用传递？" class="headerlink" title="1.6.1 按值传递还是按应用传递？"></a>1.6.1 按值传递还是按应用传递？</h3><p>我们声明的函数通常都是按值传递，而不是按引用传递。通常而言，建议将按引用传递除简单类型（比如<strong>基础类型(fundamental type)</strong>和 <code>std::string_view</code>）以外的类型，这样可以免除不必要的拷贝成本。</p>
 <p>但是出于以下原因，<strong>按值传递</strong>通常更好一些：</p>
 <ul>
 <li>语法简单。</li>
@@ -712,10 +712,10 @@ RT <span class="hljs-built_in">max</span>(T1 a, T2 b)
 <li>尽管传递 <em>string literal</em> 和 <em>raw array</em> 会产生一些问题，按时如果按照引用传递它们会产生更大的问题。</li>
 </ul>
 <p>后续会对此进行进一步讨论，<strong>除了某些不得不用按引用传递的情况，尽量使用按值传递。</strong></p>
-<h3 id="1-6-2-为什么不用-inline？"><a href="#1-6-2-为什么不用-inline？" class="headerlink" title="1.6.2 为什么不用 inline？"></a>1.6.2 为什么不用 inline？</h3><p>通常，函数模板不需要声明为 <code>inline</code>。不像普通的 <code>noninline</code> 函数，我们可以把 <code>noninline</code> 函数模板定义在同文件中，然后再多个编译单元里 <code>include</code> 这个头文件。</p>
+<h3 id="1-6-2-为什么不用-inline-呢？"><a href="#1-6-2-为什么不用-inline-呢？" class="headerlink" title="1.6.2 为什么不用 inline 呢？"></a>1.6.2 为什么不用 inline 呢？</h3><p>通常，函数模板不需要声明为 <code>inline</code>。不像普通的 <code>noninline</code> 函数，我们可以把 <code>noninline</code> 函数模板定义在同文件中，然后再多个编译单元里 <code>include</code> 这个头文件。</p>
 <p>唯一一个例外是模板对某些类型进行了<strong>全特化(full spcializations)</strong>，这时的结果代码不再是<strong>泛型(generic)</strong>的(所有的模板参数都已经被指定了)。后续会详细讨论。</p>
 <p>严格地从语言角度来看，<code>inline</code> 只意味着在程序中函数的定义可以出现很多次。不过它也给了编译器一个暗示，在调用该函数的地方函数应该被展开成 <code>inline</code> 的：这样做在某些情况下可以提高效率，但是在另一些情况下也可能降低效率。现代编译器在没有关键字 <code>inline</code> 暗示的情况下，通常也可以很好的决定是否将函数展开成 <code>inline</code> 的。当然，编译器在做决定的时候依然会将关键字 <code>inline</code> 纳入考虑因素。</p>
-<h3 id="1-6-3-为什么不用-constexpr？"><a href="#1-6-3-为什么不用-constexpr？" class="headerlink" title="1.6.3 为什么不用 constexpr？"></a>1.6.3 为什么不用 constexpr？</h3><p>从 C++11 开始，你可以通过关键字 <code>constexpr</code> 来在编译期进行某些运算。对于很多模板来说，这是有意义的。</p>
+<h3 id="1-6-3-为什么不用-constexpr-呢？"><a href="#1-6-3-为什么不用-constexpr-呢？" class="headerlink" title="1.6.3 为什么不用 constexpr 呢？"></a>1.6.3 为什么不用 constexpr 呢？</h3><p>从 C++11 开始，你可以通过关键字 <code>constexpr</code> 来在编译期进行某些运算。对于很多模板来说，这是有意义的。</p>
 <p>比如为了可以在编译期使用求最大值的函数，你需要将函数模板定义如下：</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
 <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">auto</span> <span class="hljs-title">max</span><span class="hljs-params">(T1 a, T2 b)</span></span>
