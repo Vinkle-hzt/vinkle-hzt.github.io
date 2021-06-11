@@ -1,46 +1,54 @@
+
+
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
-  <link rel="icon" type="image/png" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <meta name="theme-color" content="">
-  <meta name="description" content="vinkle&#39;s space">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Dijkstra 算法是一个最短路径算法，常用于解决非负有权图中的最短路径问题。本文通过示例介绍了 Dijkstra 算法，并给出了 C++ 的算法实现和一种优化策略。">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
+  
   <title>Dijkstra 算法 - vinkle&#39;s space</title>
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
   <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
   
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
   
+
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
 
 
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
 
 
 <link  rel="stylesheet" href="/css/main.css" />
@@ -48,8 +56,13 @@
 <!-- 自定义样式保持在最底部 -->
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"e29593c0eaefc83ba96301b9153d7d11","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
   <script  src="/js/utils.js" ></script>
-<meta name="generator" content="Hexo 4.2.1"></head>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -143,8 +156,14 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
       </ul>
@@ -152,25 +171,28 @@
   </div>
 </nav>
 
-    <div class="view intro-2" id="background" parallax=true
+    <div class="banner" id="banner" parallax=true
          style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Dijkstra 算法">
               
             </span>
 
             
-              
-  <div class="mt-3 post-meta">
-    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-13 10:34">
-      2020年7月13日 上午
-    </time>
-  </div>
-
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-07-13 10:34" pubdate>
+        2020年7月13日 上午
+      </time>
+    </span>
+  
+</div>
 
 <div class="mt-1">
   
@@ -194,14 +216,6 @@
 
   
   
-    
-      <!-- 不蒜子统计文章PV -->
-      <span id="busuanzi_container_page_pv" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="busuanzi_value_page_pv"></span> 次
-      </span>
-    
-  
 </div>
 
             
@@ -217,127 +231,56 @@
     
       
 
-<div class="container-fluid">
-  <div class="row">
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
     <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
         <div class="py-5" id="board">
-          <div class="post-content mx-auto" id="post">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Dijkstra 算法</h1>
             
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年7月14日 凌晨
-                
-              </p>
-            
-            <article class="markdown-body">
+            <div class="markdown-body">
               <p>Dijkstra 算法是一个最短路径算法，常用于解决非负有权图中的最短路径问题。本文通过示例介绍了 Dijkstra 算法，并给出了 C++ 的算法实现和一种优化策略。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h1 id="Dijkstra-算法"><a href="#Dijkstra-算法" class="headerlink" title="Dijkstra 算法"></a>Dijkstra 算法</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Dijkstra 算法通过保留目前为止所找到的每个顶点 $v\in V$从 $s$ 到 $v$ 的最短路径来工作的。初始时，起点 $s$ 的路径权重被赋为 $0\ (dis[s]=0)$，同时把其他路径的长度设为无穷大。当算法结束后，$dis[v]$ 存储的便是从 $s$ 到 $v$ 的最短路径，如果路径不存在，则 $dis[v] = \infty $。</p>
 <p>松弛操作是 $Dijkstra$ 算法的基础操作：如果存在一条从 $u$ 到 $v$ 的边，那么从 $s$ 到 $v$ 的一条新路径就是将边 $w(u,v) \in E$ 添加到从 $s$ 到 $u$ 的路径尾部，拓展出一条从 $s$ 到 $u$ 的路径。这条新路径的长度是 $dis[u] + w(u,v)$。如果这个值比已知的 $dis[v]$ 小，那么可以替换原先的 $dis[v]$，并将 $path[v]$ 的值更改为 $u$。松弛操作已知运行到所有的 $d[v]$ 都代表 $s$ 到 $v$ 的最短路径的长度值。</p>
 <h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>直接看介绍可能还不理解，我们可以看如下的图</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/1.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/1.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>假设起点 $s = 1$，我们将 $s$ 压入路径 $q$ 中， $vis[s] = 1(true)$ ,  $dis[s] = 0$，寻找路径中最近的点 $u$ 即 $u=1$ ，将 $u$ 扔出路径，此时 $u$ 点连通 $v = 2,4,6$ 三点，将 $\{2,4,6\}$ 压入路径 $q$ 中，计算 $w = w(u,v)+dis[u]$，根据 $dis[v] = min(dis[v],w)$ 更新 $dis$ ,此时$dis=\{0,2,\infty,6,\infty,9,\infty,\infty,\infty\}$ ,若 $dis[v]$ 更新，就使 $path[v] = w$ ，此时 $path = \{1,1,0,1,0,1,0,0\}$ 。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/2.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/2.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>第二次，我们查找路径中与起点 $s$ 距离最近的点$u$ ，此时 $u=2$，同样将 $u$ 扔出路径并将 $vis[u]=1$， 因为$u$ 点连通 $v = 3,4$ 且 $vis[v] = 0 (false)$，所以更新路径 $q=\{3,4,6\}$，更新 $dis=\{0,2,32,3,\infty,9,\infty,\infty\} $，更新$path=\{1,1,2,2,0,1,0,0\}$。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/3.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/3.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>同理，$u=4$，$vis[u]=1$，$q=\{3,5,6\}$，$dis=\{0,2,32,3,5,9,\infty,\infty\}$，$path=\{1,1,2,2,4,1,0,0\}$。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/4.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/4.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>同理，$u=5$，$vis[u]=1$，$q=\{3,6,7\}$，$dis=\{0,2,13,3,5,9,12,\infty\}$，$path=\{1,1,5,2,4,1,5,0\}$。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/5.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/5.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>同理，$u=6$，$vis[u]=1$，$q=\{3,7\}$，$dis=\{0,2,13,3,5,9,12,\infty\}$，$path=\{1,1,5,2,4,1,5,0\}$。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/6.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/6.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>同理，$u=7$，$vis[u]=1$，$q=\{3,8\}$，$dis=\{0,2,13,3,5,9,12,33\}$，$path=\{1,1,5,2,4,1,5,7\}$。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/7.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/7.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>同理，$u=3$，$vis[u]=1$，$q=\{8\}$，$dis=\{0,2,13,3,7,9,12,28\}$，$path=\{1,1,5,2,4,1,5,3\}$。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/8.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/8.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>最后$u=5$，$vis[u]=1$，$q=\{\}$ 为空，到此 $Dijkstra$ 算法顺利完成！</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/9.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/9.png" srcset="/img/loading.gif" lazyload alt></p>
 <h2 id="实现及优化"><a href="#实现及优化" class="headerlink" title="实现及优化"></a>实现及优化</h2><p>首先定义 $dis,vis,path,node$。</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">int</span> dis[N];
-<span class="hljs-keyword">bool</span> vis[N];
-<span class="hljs-keyword">int</span> path[N];
-
-stuct node
-&#123;
-    <span class="hljs-keyword">int</span> u, v, w;
-    node(<span class="hljs-keyword">int</span> _u, <span class="hljs-keyword">int</span> _v, <span class="hljs-keyword">int</span> _w):u(_u), v(_v), w(_w)&#123;&#125;
-    <span class="hljs-keyword">bool</span> <span class="hljs-keyword">operator</span>&lt;(<span class="hljs-keyword">const</span> node&amp; n) <span class="hljs-keyword">const</span>
-    &#123;
-        <span class="hljs-keyword">return</span> v &gt; n.v;
-    &#125;
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> dis[N];<br><span class="hljs-keyword">bool</span> vis[N];<br><span class="hljs-keyword">int</span> path[N];<br><br>stuct node<br>&#123;<br>    <span class="hljs-keyword">int</span> u, v, w;<br>    <span class="hljs-built_in">node</span>(<span class="hljs-keyword">int</span> _u, <span class="hljs-keyword">int</span> _v, <span class="hljs-keyword">int</span> _w):<span class="hljs-built_in">u</span>(_u), <span class="hljs-built_in">v</span>(_v), <span class="hljs-built_in">w</span>(_w)&#123;&#125;<br>    <span class="hljs-keyword">bool</span> <span class="hljs-keyword">operator</span>&lt;(<span class="hljs-keyword">const</span> node&amp; n) <span class="hljs-keyword">const</span><br>    &#123;<br>        <span class="hljs-keyword">return</span> v &gt; n.v;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>初始化 $dis,vis,path$</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)
-    &#123;
-        dis[N] = INT_MAX;
-    &#125;
-    <span class="hljs-built_in">memset</span>(vis,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span>(vis));
-    <span class="hljs-built_in">memset</span>(path,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span>(path));
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)<br>    &#123;<br>        dis[N] = INT_MAX;<br>    &#125;<br>    <span class="hljs-built_in">memset</span>(vis,<span class="hljs-number">0</span>,<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(vis));<br>    <span class="hljs-built_in">memset</span>(path,<span class="hljs-number">0</span>,<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(path));<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>因为有删除操作，为了减少复杂度，选择了用 <code>std::list&lt;&gt;</code> 来存储路径。</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">dijkstra</span><span class="hljs-params">(<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">vector</span>&lt;node&gt;&gt;&amp; vec, <span class="hljs-keyword">int</span> s)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-built_in">list</span>&lt;<span class="hljs-keyword">int</span>&gt; q;
-    init();
-    q.push_back(s);
-    dis[s] = <span class="hljs-number">0</span>;
-    path[s] = s;
-    <span class="hljs-keyword">while</span> (!q.empty())
-    &#123;
-        <span class="hljs-keyword">auto</span> k = q.<span class="hljs-built_in">begin</span>();
-        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> it = q.<span class="hljs-built_in">begin</span>(); it != q.<span class="hljs-built_in">end</span>(); it++)
-        &#123;
-            <span class="hljs-keyword">if</span> (dis[*it] &lt; dis[*k])
-                k = it;
-        &#125;
-        <span class="hljs-keyword">int</span> v = *k;
-        q.erase(k);
-        vis[v] = <span class="hljs-literal">true</span>;
-        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span>&amp; i : vec[v])
-        &#123;
-            <span class="hljs-keyword">if</span> (!vis[i.v] &amp;&amp; i.w + dis[v] &lt; dis[i.v])
-            &#123;
-                dis[i.v] = i.w + dis[v];
-                path[i.v] = v;
-                <span class="hljs-keyword">if</span>(<span class="hljs-built_in">find</span>(q.<span class="hljs-built_in">begin</span>(),q.<span class="hljs-built_in">end</span>(),i.v)==q.<span class="hljs-built_in">end</span>())
-                    q.push_back(i.v);
-            &#125;
-        &#125;
-    &#125;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">dijkstra</span><span class="hljs-params">(vector&lt;vector&lt;node&gt;&gt;&amp; vec, <span class="hljs-keyword">int</span> s)</span></span><br><span class="hljs-function"></span>&#123;<br>    list&lt;<span class="hljs-keyword">int</span>&gt; q;<br>    <span class="hljs-built_in">init</span>();<br>    q.<span class="hljs-built_in">push_back</span>(s);<br>    dis[s] = <span class="hljs-number">0</span>;<br>    path[s] = s;<br>    <span class="hljs-keyword">while</span> (!q.<span class="hljs-built_in">empty</span>())<br>    &#123;<br>        <span class="hljs-keyword">auto</span> k = q.<span class="hljs-built_in">begin</span>();<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> it = q.<span class="hljs-built_in">begin</span>(); it != q.<span class="hljs-built_in">end</span>(); it++)<br>        &#123;<br>            <span class="hljs-keyword">if</span> (dis[*it] &lt; dis[*k])<br>                k = it;<br>        &#125;<br>        <span class="hljs-keyword">int</span> v = *k;<br>        q.<span class="hljs-built_in">erase</span>(k);<br>        vis[v] = <span class="hljs-literal">true</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span>&amp; i : vec[v])<br>        &#123;<br>            <span class="hljs-keyword">if</span> (!vis[i.v] &amp;&amp; i.w + dis[v] &lt; dis[i.v])<br>            &#123;<br>                dis[i.v] = i.w + dis[v];<br>                path[i.v] = v;<br>                <span class="hljs-keyword">if</span>(<span class="hljs-built_in">find</span>(q.<span class="hljs-built_in">begin</span>(),q.<span class="hljs-built_in">end</span>(),i.v)==q.<span class="hljs-built_in">end</span>())<br>                    q.<span class="hljs-built_in">push_back</span>(i.v);<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 
 
 <p>因为在每次寻找离起点最近的点都要花费 $O(V)$ 的复杂度，所以考虑把点都存在堆中，在 C++ 中一般使用<code>std::priority_queue&lt;&gt;</code>优先队列，将每条边以 $\{u,v,w(u,v)+dis[u]\}$ 的形式压入队列中，队列顶端的元素即为边通向的顶点到起点距离的最小值，此时只要花费 $O(log(E))$ 的复杂度。总体的复杂度从 $O(V^2+E)$ 变为了 $O((E+V)log(E))$，当图为<strong>稀疏图</strong>时，使用堆的算法效率明显更高。</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">dijkstra</span><span class="hljs-params">(<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">vector</span>&lt;node&gt;&gt;&amp; vec, <span class="hljs-keyword">int</span> s)</span></span>
-<span class="hljs-function"></span>&#123;
-    init();
-    priority_queue&lt;node&gt; q;
-    q.push(node(s,s,<span class="hljs-number">0</span>));
-    <span class="hljs-keyword">while</span> (!q.empty())
-    &#123;
-        node k = q.top();
-        q.pop();
-        <span class="hljs-keyword">if</span>(vis[k.v]) <span class="hljs-keyword">continue</span>;
-        vis[k.v] = <span class="hljs-literal">true</span>;
-        dis[k.v] = k.w;
-        path[k.v] = k.u;
-        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp; i : vec[k.v])
-        &#123;
-            q.push(node(i.u, i.v, i.w + dis[i.u]));
-        &#125;
-    &#125;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">dijkstra</span><span class="hljs-params">(vector&lt;vector&lt;node&gt;&gt;&amp; vec, <span class="hljs-keyword">int</span> s)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-built_in">init</span>();<br>    priority_queue&lt;node&gt; q;<br>    q.<span class="hljs-built_in">push</span>(<span class="hljs-built_in">node</span>(s,s,<span class="hljs-number">0</span>));<br>    <span class="hljs-keyword">while</span> (!q.<span class="hljs-built_in">empty</span>())<br>    &#123;<br>        node k = q.<span class="hljs-built_in">top</span>();<br>        q.<span class="hljs-built_in">pop</span>();<br>        <span class="hljs-keyword">if</span>(vis[k.v]) <span class="hljs-keyword">continue</span>;<br>        vis[k.v] = <span class="hljs-literal">true</span>;<br>        dis[k.v] = k.w;<br>        path[k.v] = k.u;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp; i : vec[k.v])<br>        &#123;<br>            q.<span class="hljs-built_in">push</span>(<span class="hljs-built_in">node</span>(i.u, i.v, i.w + dis[i.u]));<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 
-            </article>
+            </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
@@ -353,19 +296,23 @@ stuct node
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
-                    
                       <a class="hover-with-bg" href="/tags/%E5%9B%BE%E8%AE%BA/">图论</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
                     
                   </div>
                 
               </div>
               
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
               
               
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
                     
                     
                       <a href="/2020/07/15/union-find/">
@@ -374,8 +321,8 @@ stuct node
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
-                  </div>
-                  <div class="post-next col-6">
+                  </article>
+                  <article class="post-next col-6">
                     
                     
                       <a href="/2020/07/09/cpp-template-1/">
@@ -384,13 +331,39 @@ stuct node
                         <i class="iconfont icon-arrowright"></i>
                       </a>
                     
-                  </div>
+                  </article>
                 </div>
               
             </div>
 
             
-          </div>
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="SOHUCS" sid='http://yoursite.com/2020/07/13/Dijkstra/'></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#SOHUCS', function() {
+      var appid = 'cyvv8wewD';
+      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+      } else {
+        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
+          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
+        });
+      }
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
         </div>
       </div>
     </div>
@@ -398,7 +371,7 @@ stuct node
       <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
         <div id="toc">
   <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
+  <div class="toc-body" id="toc-body"></div>
 </div>
 
       </div>
@@ -410,16 +383,15 @@ stuct node
 
 
     
-  </main>
 
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
@@ -440,21 +412,16 @@ stuct node
     </div>
   </div>
 </div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
     
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
   <div class="statistics">
     
     
@@ -480,29 +447,61 @@ stuct node
   </div>
 
 
-    
+  
 
-    
-  </div>
+  
 </footer>
 
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
 <!-- Plugins -->
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
 
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
@@ -511,95 +510,15 @@ stuct node
 
 
 
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
   <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: 'article.markdown-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 0,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "Dijkstra 算法&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
-      placement: "right",
-      visible: "hover",
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
       
-    };
-    var el = "h1,h2,h3,h4,h5,h6".split(",");
-    var res = [];
-    for (item of el) {
-      res.push(".markdown-body > " + item)
-    }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
+      typing(title)
+      
+    })(window, document);
   </script>
 
 
@@ -641,14 +560,9 @@ stuct node
       };
     </script>
 
-    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.1.4/es5/tex-svg.js" ></script>
 
   
-
-
-
-
-
 
 
 
@@ -682,6 +596,10 @@ stuct node
 
 
 
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
 
 
 </body>

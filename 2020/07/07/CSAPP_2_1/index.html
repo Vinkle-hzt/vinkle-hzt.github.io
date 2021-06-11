@@ -1,46 +1,54 @@
+
+
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
-  <link rel="icon" type="image/png" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <meta name="theme-color" content="">
-  <meta name="description" content="vinkle&#39;s space">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="简述了计算机信息的储存方式、十六进制表示法，布尔代数和C语言中的位运算、逻辑运算和移位操作三类运算符。">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
+  
   <title>CSAPP-2.1 信息表示和处理-信息储存 - vinkle&#39;s space</title>
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
   <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
   
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
   
+
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
 
 
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
 
 
 <link  rel="stylesheet" href="/css/main.css" />
@@ -48,8 +56,13 @@
 <!-- 自定义样式保持在最底部 -->
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"e29593c0eaefc83ba96301b9153d7d11","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
   <script  src="/js/utils.js" ></script>
-<meta name="generator" content="Hexo 4.2.1"></head>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -143,8 +156,14 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
       </ul>
@@ -152,25 +171,28 @@
   </div>
 </nav>
 
-    <div class="view intro-2" id="background" parallax=true
+    <div class="banner" id="banner" parallax=true
          style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="CSAPP-2.1 信息表示和处理-信息储存">
               
             </span>
 
             
-              
-  <div class="mt-3 post-meta">
-    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-07 22:58">
-      2020年7月7日 晚上
-    </time>
-  </div>
-
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-07-07 22:58" pubdate>
+        2020年7月7日 晚上
+      </time>
+    </span>
+  
+</div>
 
 <div class="mt-1">
   
@@ -194,14 +216,6 @@
 
   
   
-    
-      <!-- 不蒜子统计文章PV -->
-      <span id="busuanzi_container_page_pv" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="busuanzi_value_page_pv"></span> 次
-      </span>
-    
-  
 </div>
 
             
@@ -217,34 +231,30 @@
     
       
 
-<div class="container-fluid">
-  <div class="row">
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
     <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
         <div class="py-5" id="board">
-          <div class="post-content mx-auto" id="post">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CSAPP-2.1 信息表示和处理-信息储存</h1>
             
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年7月8日 下午
-                
-              </p>
-            
-            <article class="markdown-body">
+            <div class="markdown-body">
               <p>简述了计算机信息的储存方式、十六进制表示法，布尔代数和C语言中的位运算、逻辑运算和移位操作三类运算符。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="2-1-信息储存"><a href="#2-1-信息储存" class="headerlink" title="2.1 信息储存"></a>2.1 信息储存</h2><p>​        大多数计算机使用8位的块，或者<strong>字节(byte)</strong>，作为最小的可寻址的内存单位，而不是访问内存中单独的位。机器级的程序将内存视为一个非常大的字节数组，称为<strong>虚拟内存(virtual memory)</strong>。内存的每个字节都由一个唯一的数字来标识，称为它的<strong>地址(address)</strong>，所有可能的地址的集合就称为<strong>虚拟地址空间(virtual address space)。</strong>虚拟地址空间只是一个展现给机器级程序的概念性映像，实际的实现是将动态随机访问存储器(DRAM)、闪存、磁盘存储器、特殊硬件和操作系统软件结合起来，为程序提供一个看上去统一的字节数组。</p>
 <h3 id="十六进制表示法"><a href="#十六进制表示法" class="headerlink" title="十六进制表示法"></a>十六进制表示法</h3><p>​        一个字节有8位组成。在二进制表示法中，它的值域是$00000000_2\sim 11111111_2$。如果看成十进制整数，它的值域就是$0_{10}\sim255_{10}$。两种符合表示法对于表述位模式都不是很方便所以引入了<strong>十六进制(hexadecimal)</strong>表示法。用十六进制书写，一个字节的值域为$00_{16}\sim FF_{16}$。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/csapp-2-1/1.png" srcset="/img/loading.gif" alt="十六进制表示法"></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/csapp-2-1/1.png" srcset="/img/loading.gif" lazyload alt="十六进制表示法"></p>
 <p>​        在C语言中，以 <code>0x</code>或 <code>0X</code>开头的数字常量为被认为是十六进制的值。</p>
 <h3 id="字数据的大小"><a href="#字数据的大小" class="headerlink" title="字数据的大小"></a>字数据的大小</h3><p>​        每台计算机都有一个<strong>字长(word size)</strong>，指明指针数据的标称大小(nominal size)。因为，虚拟地址是以这样的一个字节来编码的，所以字长决定的最重要的系统参数就是虚拟地址空间的最大大小。也就是说，对于一个字长为 $w$位对的机器而言，虚拟地址的范围为$0$~$2^w-1$，程序最多访问$2^w$个字节。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/csapp-2-1/2.png" srcset="/img/loading.gif" alt="基本C数据类型的典型大小"></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/csapp-2-1/2.png" srcset="/img/loading.gif" lazyload alt="基本C数据类型的典型大小"></p>
 <h3 id="寻址和字节顺序"><a href="#寻址和字节顺序" class="headerlink" title="寻址和字节顺序"></a>寻址和字节顺序</h3><p>​        对于跨越多字节的程序对象，我们必须建立两个原则：这个对象的地址是什么，以及在内存中如何排列这些字节。在几乎所有的机器上，多字节对象都被存储为连续的字节序列，对象的地址为所使用字节中最小的地址。</p>
 <p>​        排列表示一个对象的字节有两个通用的规则。考虑一个$w$位的整数，其位表示为$[x_{w-1},x_{w-2},···，x_1,x_0]$，其中$x_{w-1}$是最高有效位，而$x_0$是最低有效位。假设$w$是8的倍数，这些为就能被分组成为字节，其中最高有效字节包含位$[x_{w-1},x_{w-2},···,x_{w-8}]$，而最低有效字节包含位$[x_7,x_6,x_5,x_4,x_3,x_2,x_1,x_0]$，其他字节包含中间的位。某些机器选择在内存中按照从最低有效字节的顺序储存。前一种规则——最低有效字节在最前面的方式，称为<strong>小端法(little endian)</strong>。后一种规则——最高有效字节在最前面的方式，称为<strong>大端法(big endian)</strong>。</p>
 <p>​        假设变量 x的类型为 <code>int</code>，位于地址 <code>0x100</code>处，它的十六进制值为 <code>0x01234567</code>。地址范围<code>0x100</code>~<code>0x103</code>的字节顺序依赖于机器的类型：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/csapp-2-1/3.png" srcset="/img/loading.gif" alt="大端法和小端法"></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/csapp-2-1/3.png" srcset="/img/loading.gif" lazyload alt="大端法和小端法"></p>
 <p>​        对于大多数应用程序员来说，其机器所使用的的字节顺序是完全不可见的。无论为哪种类型的机器所编译的程序都会得到同样的结果。不过有时候，字节顺序会成为问题。首先是在不同类型的机器之间通过网络传送二进制数据是，一个常见的问题是当小端法机器及其产生的数据被发送到大端法机器（或者反过来），接受程序会发现，字里的字节成了反序的，为了避免这类问题，网络应用程序的代码编写必须遵守已建立的关于字节顺序的规则，以确保发送方机器将它的内部表示转换为网络标准，而接收方则将网络标准转换为它的内部表示。</p>
 <p>第二种情况是，当阅读表示证书数据的字节序列是字节顺序也很重要。</p>
 <p>第三种情况是，当编写规避正常的类型的程序时，字节顺序很重要。在C语言中，可以通过<strong>强制类型转换(cast)</strong>或<strong>联合(union)</strong>来允许以一种数据类型引用对象，而这种数据类型与创建这个对象是定义的数据类型不同。大多数应用编程都强烈不推荐这种编码技巧，但是他们对系统级编程来说是非常有用，甚至是必需的。</p>
@@ -253,14 +263,14 @@
 <p>​        计算机系统的一个基本概念就是，从机器的角度来看，程序仅仅只是字节序列。机器没有关于原始程序的任何信息，除了可能有些用来帮助调试的辅助表以外。</p>
 <h3 id="布尔代数简介"><a href="#布尔代数简介" class="headerlink" title="布尔代数简介"></a>布尔代数简介</h3><p>​        二进制是计算机编码、存储和操作信息的核心，所以围绕数值0和1的研究已经演化出了丰富的数学知识体系。</p>
 <p>​        最简单的布尔代数实在二元集合${0,1}$基础上的定义，布尔运算  $\sim$ 对应于逻辑运算 NOT，在命题逻辑中用符号 $\neg$ 表示。也就是说，$P$ 不为真时，$\neg P$ 为真，反之亦然。 相应地， 当 $P$ 等于0时，$\sim P$ 等于 1，反之亦然。布尔运算 $\&amp;$ 对应于逻辑运算 AND， 在命题逻辑中用符号 $\wedge$ 表示。当 $P$ 和 $Q$ 都为真时，我们说 $P\wedge Q$ 为真。相应的，只有当 $p=1$ 且 $q=1$ 时，$p\&amp; q$ 才等于1。布尔运算 $|$ 对应与逻辑运算 OR， 在命题逻辑中用符号 $\vee$ 表示。 当 $P$ 或者 $Q$ 为真时，我们说 $ P\vee Q$ 成立。相应地，当 $p=1$ 或者 $q=1$ 时，$p| q$ 等于1。布尔运算 $\hat{}$ 对应逻辑运算异或，在命题逻辑中用符号 $\oplus$ 表示。 当 $P$ 或者 $Q$ 为真但不同时为真时，我们说 $ P\oplus Q$ 成立。当 $p=1$ 且 $q=0$，或者 $p=0$ 且 $q=1$， $p\hat{} q$ 等于1。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/csapp-2-1/4.png" srcset="/img/loading.gif" alt="布尔代数的运算"></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/csapp-2-1/4.png" srcset="/img/loading.gif" lazyload alt="布尔代数的运算"></p>
 <p>我们可以将上述4个布尔运算扩展到<strong>位向量</strong>的运算，位向量就是固定长度为$w$、由0和1组成的串。位向量的运算可以定义成参数的每个对应元素之间的运算。假设 $a$ 和 $b$ 分别表示位向量 $[a_{w-1},a_{w-2},···,a_0]$ 和 $[b_{w-1},b_{w-2},···,b_0]$。 我们将 $a\&amp;b$ 也定义为一个长度为 $w$ 的位向量，其中第 $i$ 个元素等于 $a_i\&amp; b_i$，$0\leqslant i &lt; w$。可以用类似的方式将运算 $|$ 、$\hat{}$ 和 $\sim$ 拓展到位运算上。</p>
 <p>位向量是一个很有用的应有就是表示有限集合。我们可以用位向量 $[a_{w-1},a_{w-2},···,a_0]$ 编码任何子集 $A\subseteq {0,1,···,w-1 }$，其中 $a_i = 1$ 当且仅当 $i\in{A}$。</p>
 <h3 id="C语言中的位级运算"><a href="#C语言中的位级运算" class="headerlink" title="C语言中的位级运算"></a>C语言中的位级运算</h3><p>​        C语言的布尔运算符号：<code>|</code> OR（或），<code>&amp;</code>  AND（与），<code>~</code> NOT（取反），<code>^</code> EXCLUSIVE-OR（异或）。</p>
 <h3 id="C语言中的逻辑运算"><a href="#C语言中的逻辑运算" class="headerlink" title="C语言中的逻辑运算"></a>C语言中的逻辑运算</h3><p>​        C语言的逻辑运算符号<code>||</code>、<code>&amp;&amp;</code>、<code>!</code>，分别对应命题逻辑中的OR、AND 和 NOT。</p>
 <h3 id="C语言中的移位操作"><a href="#C语言中的移位操作" class="headerlink" title="C语言中的移位操作"></a>C语言中的移位操作</h3><p>​        C语言提供了一组移位运算符<code>&lt;&lt;</code>、<code>&gt;&gt;</code>，向左或者向右移位模式。对于左移<code>x &lt;&lt; k</code>来说，x 向左移动 $k$ 位，并在右端补 $k$ 个 0。对于右移<code>x &gt;&gt; k</code>来说，机器支持两种形式的右移：<strong>逻辑右移</strong>和<strong>算术右移</strong>。逻辑右移就是在左端补 $k$ 个 0。算术右移是在左端补 $k$ 个最高有效位的值。</p>
 
-            </article>
+            </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
@@ -282,11 +292,15 @@
                 
               </div>
               
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
               
               
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
                     
                     
                       <a href="/2020/07/09/cpp-template-1/">
@@ -295,8 +309,8 @@
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
-                  </div>
-                  <div class="post-next col-6">
+                  </article>
+                  <article class="post-next col-6">
                     
                     
                       <a href="/2020/07/07/cpp_virtual_function/">
@@ -305,13 +319,39 @@
                         <i class="iconfont icon-arrowright"></i>
                       </a>
                     
-                  </div>
+                  </article>
                 </div>
               
             </div>
 
             
-          </div>
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="SOHUCS" sid='http://yoursite.com/2020/07/07/CSAPP_2_1/'></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#SOHUCS', function() {
+      var appid = 'cyvv8wewD';
+      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+      } else {
+        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
+          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
+        });
+      }
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
         </div>
       </div>
     </div>
@@ -319,7 +359,7 @@
       <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
         <div id="toc">
   <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
+  <div class="toc-body" id="toc-body"></div>
 </div>
 
       </div>
@@ -331,16 +371,15 @@
 
 
     
-  </main>
 
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
@@ -361,21 +400,16 @@
     </div>
   </div>
 </div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
     
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
   <div class="statistics">
     
     
@@ -401,29 +435,61 @@
   </div>
 
 
-    
+  
 
-    
-  </div>
+  
 </footer>
 
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
 <!-- Plugins -->
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
 
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
@@ -432,95 +498,15 @@
 
 
 
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
   <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: 'article.markdown-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 0,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "CSAPP-2.1 信息表示和处理-信息储存&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
-      placement: "right",
-      visible: "hover",
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
       
-    };
-    var el = "h1,h2,h3,h4,h5,h6".split(",");
-    var res = [];
-    for (item of el) {
-      res.push(".markdown-body > " + item)
-    }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
+      typing(title)
+      
+    })(window, document);
   </script>
 
 
@@ -562,14 +548,9 @@
       };
     </script>
 
-    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.1.4/es5/tex-svg.js" ></script>
 
   
-
-
-
-
-
 
 
 
@@ -603,6 +584,10 @@
 
 
 
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
 
 
 </body>

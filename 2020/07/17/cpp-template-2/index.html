@@ -1,46 +1,54 @@
+
+
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
-  <link rel="icon" type="image/png" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <meta name="theme-color" content="">
-  <meta name="description" content="vinkle&#39;s space">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="运用大量例子介绍了类模板。你可以学习到如何声明和定义类模板，如何使用类模板，如何特化和偏特化类模板，类模板的参数推导等相关的知识。">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
+  
   <title>C++ Template-2 类模板 - vinkle&#39;s space</title>
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
   <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
   
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
   
+
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
 
 
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
 
 
 <link  rel="stylesheet" href="/css/main.css" />
@@ -48,8 +56,13 @@
 <!-- 自定义样式保持在最底部 -->
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"e29593c0eaefc83ba96301b9153d7d11","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
   <script  src="/js/utils.js" ></script>
-<meta name="generator" content="Hexo 4.2.1"></head>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -143,8 +156,14 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
       </ul>
@@ -152,25 +171,28 @@
   </div>
 </nav>
 
-    <div class="view intro-2" id="background" parallax=true
+    <div class="banner" id="banner" parallax=true
          style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="C++ Template-2 类模板">
               
             </span>
 
             
-              
-  <div class="mt-3 post-meta">
-    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-17 13:30">
-      2020年7月17日 下午
-    </time>
-  </div>
-
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-07-17 13:30" pubdate>
+        2020年7月17日 下午
+      </time>
+    </span>
+  
+</div>
 
 <div class="mt-1">
   
@@ -194,14 +216,6 @@
 
   
   
-    
-      <!-- 不蒜子统计文章PV -->
-      <span id="busuanzi_container_page_pv" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="busuanzi_value_page_pv"></span> 次
-      </span>
-    
-  
 </div>
 
             
@@ -217,72 +231,30 @@
     
       
 
-<div class="container-fluid">
-  <div class="row">
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
     <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
         <div class="py-5" id="board">
-          <div class="post-content mx-auto" id="post">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">C++ Template-2 类模板</h1>
             
-              <p class="note note-info">
-                
-                  本文最后更新于：2021年1月15日 下午
-                
-              </p>
-            
-            <article class="markdown-body">
+            <div class="markdown-body">
               <p>运用大量例子介绍了类模板。你可以学习到如何声明和定义类模板，如何使用类模板，如何特化和偏特化类模板，类模板的参数推导等相关的知识。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <p>这<strong>不是</strong>本系列第一篇文章，推荐阅读完前面的文章再看本文，以下是本系列文章目录。</p>
-<p><a href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">1. 函数模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF">1. 函数模板</a></p>
 <p><a href="#2-类模板">2. 类模板 （本文）</a></p>
-<p><a href="https://vinkle.top/2020/07/22/cpp-template-3/#3-1-%E7%B1%BB%E6%A8%A1%E6%9D%BF%E7%9A%84%E9%9D%9E%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0" target="_blank" rel="noopener">3. 非类型模板参数</a></p>
-<p><a href="https://vinkle.top/2020/09/06/cpp-template-4/#4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">4. 可变参数模板</a></p>
-<p><a href="https://vinkle.top/2020/10/12/cpp-template-5/#5-%E5%9F%BA%E7%A1%80%E6%8A%80%E6%9C%AF" target="_blank" rel="noopener">5. 基础技术</a></p>
-<p><a href="https://vinkle.top/2021/01/15/cpp-template-6" target="_blank" rel="noopener">6. 移动语意与 enable_if&lt;&gt;</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/22/cpp-template-3/#3-1-%E7%B1%BB%E6%A8%A1%E6%9D%BF%E7%9A%84%E9%9D%9E%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0">3. 非类型模板参数</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/09/06/cpp-template-4/#4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF">4. 可变参数模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/10/12/cpp-template-5/#5-%E5%9F%BA%E7%A1%80%E6%8A%80%E6%9C%AF">5. 基础技术</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2021/01/15/cpp-template-6">6. 移动语意与 enable_if&lt;&gt;</a></p>
 <h1 id="2-类模板"><a href="#2-类模板" class="headerlink" title="2. 类模板"></a>2. 类模板</h1><p>跟函数类似，类也可以被实例化成一个或者多个类型。这个特性的典型例子就是可以用于管理特性类型元素的<strong>容器类(container classes)</strong>。通过使用类模板，你可以实现适用于多个模板的容器类，在本章中，我们将以<strong>栈(stack)</strong>为示例介绍类模板的使用。</p>
 <h2 id="2-1-Stack-类模板的实现"><a href="#2-1-Stack-类模板的实现" class="headerlink" title="2.1. Stack 类模板的实现"></a>2.1. Stack 类模板的实现</h2><p>我们可以像函数模板一样声明和定义 <code>Stack&lt;&gt;</code></p>
-<pre><code class="hljs c++"><span class="hljs-comment">//stack1.hpp</span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;vector&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span>
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt; elems;     <span class="hljs-comment">// elements</span>
-
-<span class="hljs-keyword">public</span>:
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span>
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span>
-    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span>
-    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>
-<span class="hljs-function">    </span>&#123;                         <span class="hljs-comment">// return whether the stack is empty</span>
-        <span class="hljs-keyword">return</span> elems.empty();
-    &#125;
-&#125;;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T&gt;::push(T <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    elems.push_back(elem);    <span class="hljs-comment">// append copy of passed elem</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T&gt;::pop()
-&#123;
-    assert(!elems.empty());
-    elems.pop_back();         <span class="hljs-comment">// remove last element</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-T <span class="hljs-keyword">const</span>&amp; Stack&lt;T&gt;::top() <span class="hljs-keyword">const</span>
-&#123;
-    assert(!elems.empty());
-    <span class="hljs-keyword">return</span> elems.back();      <span class="hljs-comment">// return copy of last element</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//stack1.hpp</span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;vector&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span><br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">private</span>:<br>    std::vector&lt;T&gt; elems;     <span class="hljs-comment">// elements</span><br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span><br>    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span><br>    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span><br><span class="hljs-function">    </span>&#123;                         <span class="hljs-comment">// return whether the stack is empty</span><br>        <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">empty</span>();<br>    &#125;<br>&#125;;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T&gt;::<span class="hljs-built_in">push</span>(T <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    elems.<span class="hljs-built_in">push_back</span>(elem);    <span class="hljs-comment">// append copy of passed elem</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T&gt;::<span class="hljs-built_in">pop</span>()<br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    elems.<span class="hljs-built_in">pop_back</span>();         <span class="hljs-comment">// remove last element</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br>T <span class="hljs-keyword">const</span>&amp; Stack&lt;T&gt;::<span class="hljs-built_in">top</span>() <span class="hljs-keyword">const</span><br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">back</span>();      <span class="hljs-comment">// return copy of last element</span><br>&#125;<br><br></code></pre></td></tr></table></figure>
 
 <p>如你所见，这个类模板是通过 C++ 标准库中的 <code>vector&lt;&gt;</code> 来实现的。这样我们就不必自己实现内存管理，拷贝构造和拷贝赋值运算符了，从而可以专注于这个类模板的接口实现上面。</p>
 <h3 id="2-1-1-声明类模板"><a href="#2-1-1-声明类模板" class="headerlink" title="2.1.1 声明类模板"></a>2.1.1 声明类模板</h3><p>声明类模板和声明函数模板类似：正在定义之前，你必须先声明一个或多个作为模板类型参数的标志符。同样，这个标志符通常用 <code>T</code> 表示</p>
@@ -296,458 +268,143 @@ T <span class="hljs-keyword">const</span>&amp; Stack&lt;T&gt;::top() <span class
 <p><em>…</em></p>
 <p><em>};</em></p>
 <p>在类模板内部，<code>T</code> 可以像普通类型一样被用来声明成员变量和成员函数。在这个例子中，<code>T</code> 被用来声明 <code>vector</code>中元素的类型，用于声明成员函数 <code>push()</code> 的参数类型，也用于声明了成员函数 <code>top()</code> 的返回类型：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt; elems;     <span class="hljs-comment">// elements</span>
-
-<span class="hljs-keyword">public</span>:
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span>
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span>
-    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span>
-    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>
-<span class="hljs-function">    </span>&#123;                         <span class="hljs-comment">// return whether the stack is empty</span>
-        <span class="hljs-keyword">return</span> elems.empty();
-    &#125;
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">private</span>:<br>    std::vector&lt;T&gt; elems;     <span class="hljs-comment">// elements</span><br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span><br>    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span><br>    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span><br><span class="hljs-function">    </span>&#123;                         <span class="hljs-comment">// return whether the stack is empty</span><br>        <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">empty</span>();<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>这个类的类型是 <code>Stack&lt;T&gt;</code>， 其中 <code>T</code> 是模板参数。因此，你必须在你声明 <code>Stack&lt;T&gt;</code> 时，除非可以推断出模板参数的类型，否则必须使用 <code>Stack&lt;T&gt;</code>。不过，在类模板中使用不带模板参数的类型名的类（如 <code>Stack</code>），说明了这个成员类的模板参数和类模板的模板参数类型相同。</p>
 <p>如果你需要定义自己的拷贝构造和拷贝复制运算符，通常应该定义成这样子：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-    ...
-    Stack(Stack <span class="hljs-keyword">const</span>&amp;);              	<span class="hljs-comment">//copy constructor</span>
-    Stack&amp; <span class="hljs-keyword">operator</span>=(Stack <span class="hljs-keyword">const</span>&amp;);		<span class="hljs-comment">//assignment operator</span>
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br>    ...<br>    <span class="hljs-built_in">Stack</span>(Stack <span class="hljs-keyword">const</span>&amp;);              	<span class="hljs-comment">//copy constructor</span><br>    Stack&amp; <span class="hljs-keyword">operator</span>=(Stack <span class="hljs-keyword">const</span>&amp;);		<span class="hljs-comment">//assignment operator</span><br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>它和下面的定义时等价的：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-    ...
-    Stack(Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;); 				<span class="hljs-comment">//copy constructor</span>
-    Stack&lt;T&gt;&amp; <span class="hljs-keyword">operator</span>=(Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;);	<span class="hljs-comment">//assignment operator</span>
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br>    ...<br>    <span class="hljs-built_in">Stack</span>(Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;); 				<span class="hljs-comment">//copy constructor</span><br>    Stack&lt;T&gt;&amp; <span class="hljs-keyword">operator</span>=(Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;);	<span class="hljs-comment">//assignment operator</span><br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>但是一般 <code>&lt;T&gt;</code> 暗示要对一些特殊的模板参数做一些特定处理，所以最好还是使用第一种方式。</p>
 <p>但是，如果在类模板外，就需要这样定义：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">bool</span> Stack&lt;T&gt;::<span class="hljs-keyword">operator</span>==(Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp; lhs, Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp; rhs);</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">bool</span> Stack&lt;T&gt;::<span class="hljs-keyword">operator</span>==(Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp; lhs, Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp; rhs);<br></code></pre></td></tr></table></figure>
 
 <p>注意在 <code>Stack</code> 只适用于仅需要类名称而不是类类型的地方。这和声明构造函数和析构函数的情况相同。</p>
 <p>同样注意，不像非模板类，你不可以在函数内部或者块作用域内声明和定义类模板。总之，模板只能定义在 global/namespace 作用域中（细节后续再讲）。</p>
 <h3 id="2-1-2-成员函数的实现"><a href="#2-1-2-成员函数的实现" class="headerlink" title="2.1.2 成员函数的实现"></a>2.1.2 成员函数的实现</h3><p>定义类模板的成员函数时，你必须显示指出他是一个模板，而且你必须使用类模板的所有类型限制。因此，要像下面这样定义 <code>Stack&lt;T&gt;</code> 中的成员函数 <code>push()</code>:</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T&gt;::push(T <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    elems.push_back(elem);    <span class="hljs-comment">// append copy of passed elem</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T&gt;::<span class="hljs-built_in">push</span>(T <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    elems.<span class="hljs-built_in">push_back</span>(elem);    <span class="hljs-comment">// append copy of passed elem</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>这里调用了<code>vector</code> 类型成员 <code>push_back()</code> 方法，它用于在 <code>vector</code> 尾部追加一个元素。</p>
 <p>注意 <code>vector</code> 的 <code>pop_back()</code> 方法只是删除掉尾部的元素，并不会返回这一元素。这主要是为了<strong>异常安全(exception safety)</strong>。实现一个异常安全并且能够返回被删除元素的 <code>pop()</code> 方法是不可能的。不过如果忽略掉这一风险，我们依然可以实现一个返回被删除元素的 <code>pop()</code>。为了达到这一目的，我们只需要用 <code>T</code> 定义一个和 <code>vector</code> 元素有相同类型的局部变量就可以了：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-T Stack&lt;T&gt;::pop ()
-&#123;
-    assert(!elems.empty());
-    T elem = elems.back();  <span class="hljs-comment">// save copy of last element</span>
-    elems.pop_back(); 		<span class="hljs-comment">// remove last element</span>
-    <span class="hljs-keyword">return</span> elem; 			<span class="hljs-comment">// return copy of saved element</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br>T Stack&lt;T&gt;::<span class="hljs-built_in">pop</span> ()<br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    T elem = elems.<span class="hljs-built_in">back</span>();  <span class="hljs-comment">// save copy of last element</span><br>    elems.<span class="hljs-built_in">pop_back</span>(); 		<span class="hljs-comment">// remove last element</span><br>    <span class="hljs-keyword">return</span> elem; 			<span class="hljs-comment">// return copy of saved element</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>由于 <code>vector</code> 的 <code>back()</code>（ 返回其最后一个元素）和 <code>pop_back()</code>（ 删除最后一个元素）方法在 <code>vector</code> 为空的时候行为未定义，因此需要对 <code>vector</code> 是否为空进行测试。在程序中我们<strong>断言(assert)</strong> <code>vector</code> 不能为空，这样可以确保不会对空的 <code>Stack</code> 调用 <code>pop()</code> 方法。在 <code>top()</code> （返回但是不删除首元素）中也是如此：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-T <span class="hljs-keyword">const</span>&amp; Stack&lt;T&gt;::top() <span class="hljs-keyword">const</span>
-&#123;
-    assert(!elems.empty());
-    <span class="hljs-keyword">return</span> elems.back();      <span class="hljs-comment">// return copy of last element</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br>T <span class="hljs-keyword">const</span>&amp; Stack&lt;T&gt;::<span class="hljs-built_in">top</span>() <span class="hljs-keyword">const</span><br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">back</span>();      <span class="hljs-comment">// return copy of last element</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>当然，如同其他成员函数一样，你也可以把类模板的成员函数以内联函数的形式实现在类模板的内部，比如：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-    ...
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>
-<span class="hljs-function">    </span>&#123;
-        elems.push_back(elem);    <span class="hljs-comment">// append copy of passed elem</span>
-    &#125;
-    ...
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br>    ...<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span><br><span class="hljs-function">    </span>&#123;<br>        elems.<span class="hljs-built_in">push_back</span>(elem);    <span class="hljs-comment">// append copy of passed elem</span><br>    &#125;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="2-2-Stack-类模板的使用"><a href="#2-2-Stack-类模板的使用" class="headerlink" title="2.2. Stack 类模板的使用"></a>2.2. Stack 类模板的使用</h2><p>在 C++17 之前，在使用类模板的时候都需要显式地指明模板参数，下面的例子展示了该如何使用 <code>Stack&lt;&gt;</code> 类模板：</p>
-<pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"stack1.hpp"</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  Stack&lt;<span class="hljs-keyword">int</span>&gt;         intStack;       <span class="hljs-comment">// stack of ints</span>
-  Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; stringStack;    <span class="hljs-comment">// stack of strings</span>
-
-  <span class="hljs-comment">// manipulate int stack</span>
-  intStack.push(<span class="hljs-number">7</span>);
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; intStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-
-  <span class="hljs-comment">// manipulate string stack</span>
-  stringStack.push(<span class="hljs-string">"hello"</span>);
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; stringStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-  stringStack.pop();
-&#125;</code></pre>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;stack1.hpp&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  Stack&lt;<span class="hljs-keyword">int</span>&gt;         intStack;       <span class="hljs-comment">// stack of ints</span><br>  Stack&lt;std::string&gt; stringStack;    <span class="hljs-comment">// stack of strings</span><br><br>  <span class="hljs-comment">// manipulate int stack</span><br>  intStack.<span class="hljs-built_in">push</span>(<span class="hljs-number">7</span>);<br>  std::cout &lt;&lt; intStack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br><br>  <span class="hljs-comment">// manipulate string stack</span><br>  stringStack.<span class="hljs-built_in">push</span>(<span class="hljs-string">&quot;hello&quot;</span>);<br>  std::cout &lt;&lt; stringStack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>  stringStack.<span class="hljs-built_in">pop</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>通过声明 <code>Stack&lt;int&gt;</code> 类型，在类模板内部 <code>int</code> 会被用作类型 <code>T</code>。因此，被创建的对象 <code>intStack</code>会使用一个存储<code>int</code> 类型的 <code>vector</code>，所用调用的成员函数都会被用 <code>int</code> 实例化。同样的，对于用 <code>Stack&lt;std::string&gt;</code> 定义的对象，它会使用一个存储 <code>std::string</code> 的 <code>vector</code>，所有调用的成员函数也会被 <code>std::string</code> 实例化。</p>
 <p><strong>注意，模板（成员）函数只有在调用时才会被实例化。</strong>对于类模板来说，成员函数只有被调用时才会实例化。这样节省了时间和空间的消耗，也允许了对类模板进行局部使用，<a href="#2-3-类模板的局部使用">在 2.3 节会讨论到</a>。</p>
 <p>在这个例子中，默认构造函数，<code>push()</code> 和 <code>top()</code> 被实例化为 <code>int</code> 和 <code>std::string</code>。但是， <code>pop()</code> 仅被实例化为 <code>std::string</code>。如果类模板有静态成员，对于每一个用到类模板的类型，相应的静态成员也只会被实例化一次。</p>
 <p>被实例化的类模板类型可以向常规类型一样使用。你可以使用 <code>const</code> 或者 <code>volatile</code> 来修饰它，也可以创建相应的数组和引用。你可以通过 <code>typedef</code> 和 <code>using</code> 将他作为类型定义的一部分（<a href="#2-8-类型别名">2.8 节会讨论到</a>）或者可以用它来实例化其他的模板类型，比如：</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(Stack&lt;<span class="hljs-keyword">int</span>&gt; <span class="hljs-keyword">const</span>&amp; s)</span> 	 <span class="hljs-comment">// 参数 s 类型是 Stack&lt;int&gt;</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">using</span> IntStack = Stack&lt;<span class="hljs-keyword">int</span>&gt;; <span class="hljs-comment">//IntStack 是 Stack&lt;int&gt; 的别名</span>
-    Stack&lt;<span class="hljs-keyword">int</span>&gt; istack[<span class="hljs-number">10</span>];		 <span class="hljs-comment">//istack 是大小为 10 的 Stack&lt;int&gt; 类型数组</span>
-    IntStack istack2[<span class="hljs-number">10</span>];   	 <span class="hljs-comment">//istack2 同样是大小为 10 的 Stack&lt;int&gt; 类型数组</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(Stack&lt;<span class="hljs-keyword">int</span>&gt; <span class="hljs-keyword">const</span>&amp; s)</span> 	 <span class="hljs-comment">// 参数 s 类型是 Stack&lt;int&gt;</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">using</span> IntStack = Stack&lt;<span class="hljs-keyword">int</span>&gt;; <span class="hljs-comment">//IntStack 是 Stack&lt;int&gt; 的别名</span><br>    Stack&lt;<span class="hljs-keyword">int</span>&gt; istack[<span class="hljs-number">10</span>];		 <span class="hljs-comment">//istack 是大小为 10 的 Stack&lt;int&gt; 类型数组</span><br>    IntStack istack2[<span class="hljs-number">10</span>];   	 <span class="hljs-comment">//istack2 同样是大小为 10 的 Stack&lt;int&gt; 类型数组</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>模板参数可以使任意类型，比如指向 <code>float</code> 的指针，甚至是存储 <code>int</code> 的 <code>stack</code>：</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">float</span>*&gt;     floatPtrStack; <span class="hljs-comment">// 存储 float 的 stack</span>
-Stack&lt;Stack&lt;<span class="hljs-keyword">int</span>&gt;&gt; intStackStack; <span class="hljs-comment">// 存储存储 int 的 stack 的 stack</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">float</span>*&gt;     floatPtrStack; <span class="hljs-comment">// 存储 float 的 stack</span><br>Stack&lt;Stack&lt;<span class="hljs-keyword">int</span>&gt;&gt; intStackStack; <span class="hljs-comment">// 存储存储 int 的 stack 的 stack</span><br></code></pre></td></tr></table></figure>
 
 <p>模板参数唯一要求是：他要支持模板中此类型所有相关的操作。</p>
 <p>在 C++11 之前，在两个相邻的模板尖括号之前必须要有空格</p>
-<pre><code class="hljs c++">Stack&lt;Stack&lt;<span class="hljs-keyword">int</span>&gt; &gt; intStackStack; <span class="hljs-comment">// OK with all C++ versions</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;Stack&lt;<span class="hljs-keyword">int</span>&gt; &gt; intStackStack; <span class="hljs-comment">// OK with all C++ versions</span><br></code></pre></td></tr></table></figure>
 
 <p>如果你不这么做，<code>&gt;&gt;</code> 会被解析成调用 <code>&gt;&gt;</code> 运算符，这会导致语法错误：</p>
-<pre><code class="hljs c++">Stack&lt;Stack&lt;<span class="hljs-keyword">int</span>&gt;&gt; intStackStack;  <span class="hljs-comment">// ERROR before C++11</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;Stack&lt;<span class="hljs-keyword">int</span>&gt;&gt; intStackStack;  <span class="hljs-comment">// ERROR before C++11</span><br></code></pre></td></tr></table></figure>
 
 <p>这种旧行为使用的原因是，它可以帮助编译器在第一次 pass 源码时，不依赖语意就能对源代码进行正确的标记。但是，漏掉空格是一个很典型的 <code>bug</code>，需要有相关的错误信息，所以对代码语意分析已经被越来越多地考虑进来。因此，从 C++11 开始，通过 “angle bracket hack”技术（<a href>13.3.1 节（未写）会讨论到</a>），两个相邻的模板尖括号之间就不需要在用空格隔开了。</p>
 <h2 id="2-3-类模板的局部使用"><a href="#2-3-类模板的局部使用" class="headerlink" title="2.3. 类模板的局部使用"></a>2.3. 类模板的局部使用</h2><p>一个类模板通常会对用来实例化的模板参数进行多种操作（包含构造函数和析构函数）。这可能会让你以为，要为模板参数提供所有被模板成员函数用到的操作。但是事实不是这样：模板参数只需要提供那些会被用到的操作（而不是可能会被用到的操作）。</p>
 <p>比如 <code>Stack&lt;&gt;</code> 类可能提供了一个成员函数 <code>PrintOn()</code> 来打印整个 stack 的内容，它会调用 <code>operator &lt;&lt;</code> 来依次打印每一个元素：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
-<span class="hljs-class">&#123;</span>
-    ...
-	<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printOn</span><span class="hljs-params">()</span> <span class="hljs-params">(<span class="hljs-built_in">std</span>::ostream&amp; strm)</span> <span class="hljs-keyword">const</span> </span>
-<span class="hljs-function">    </span>&#123;
-		<span class="hljs-keyword">for</span> (T <span class="hljs-keyword">const</span>&amp; elem : elems) 
-    	&#123;
-			strm &lt;&lt; elem &lt;&lt; <span class="hljs-string">' '</span>; <span class="hljs-comment">// call &lt;&lt; for each element</span>
-		&#125;
-	&#125;
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span><br><span class="hljs-class">&#123;</span><br>    ...<br>	<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printOn</span><span class="hljs-params">()</span> <span class="hljs-params">(std::ostream&amp; strm)</span> <span class="hljs-keyword">const</span> </span><br><span class="hljs-function">    </span>&#123;<br>		<span class="hljs-keyword">for</span> (T <span class="hljs-keyword">const</span>&amp; elem : elems) <br>    	&#123;<br>			strm &lt;&lt; elem &lt;&lt; <span class="hljs-string">&#x27; &#x27;</span>; <span class="hljs-comment">// call &lt;&lt; for each element</span><br>		&#125;<br>	&#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>你仍然可以使用那些没有提供 <code>operator &lt;&lt;</code> 运算符的元素：</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-built_in">std</span>::pair&lt; <span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>&gt;&gt; ps; <span class="hljs-comment">// std::pair&lt;&gt; 没有定义 operator&lt;&lt;</span>
-ps.push(&#123;<span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;); <span class="hljs-comment">// OK</span>
-ps.push(&#123;<span class="hljs-number">6</span>, <span class="hljs-number">7</span>&#125;); <span class="hljs-comment">// OK</span>
-<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; ps.top().first &lt;&lt; <span class="hljs-string">'\n'</span>;  <span class="hljs-comment">// OK</span>
-<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; ps.top().second &lt;&lt; <span class="hljs-string">'\n'</span>; <span class="hljs-comment">// OK</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;std::pair&lt; <span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>&gt;&gt; ps; <span class="hljs-comment">// std::pair&lt;&gt; 没有定义 operator&lt;&lt;</span><br>ps.<span class="hljs-built_in">push</span>(&#123;<span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;); <span class="hljs-comment">// OK</span><br>ps.<span class="hljs-built_in">push</span>(&#123;<span class="hljs-number">6</span>, <span class="hljs-number">7</span>&#125;); <span class="hljs-comment">// OK</span><br>std::cout &lt;&lt; ps.<span class="hljs-built_in">top</span>().first &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;  <span class="hljs-comment">// OK</span><br>std::cout &lt;&lt; ps.<span class="hljs-built_in">top</span>().second &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>; <span class="hljs-comment">// OK</span><br></code></pre></td></tr></table></figure>
 
 <p>只有在调用 <code>printOn()</code> 的时候，才会导致错误，因为它无法为这一类型实例化出对 <code>operator&lt;&lt;</code> 的调用：</p>
-<pre><code class="hljs c++">ps.printOn(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>); <span class="hljs-comment">// ERROR: 此元素类型不支持 operator&lt;&lt;</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">ps.<span class="hljs-built_in">printOn</span>(std::cout); <span class="hljs-comment">// ERROR: 此元素类型不支持 operator&lt;&lt;</span><br></code></pre></td></tr></table></figure>
 
 <h3 id="2-3-1-Concept"><a href="#2-3-1-Concept" class="headerlink" title="2.3.1 Concept"></a>2.3.1 Concept</h3><p>这样就有一个问题：我们如何才能知道为了实例化一个模板需要哪些操作？名词 <strong><em>concept</em></strong> 通常被用来表示一组反复被模板库要求的限制条件。例如 C++ 标准库是基于这样一些 concepts 的：<strong>可随机进入的迭代器(random access iterator)</strong>和<strong>可默认构造的(default constructible)</strong>。</p>
 <p>目前（C++17），concepts 还只是或多或少的出现在文档当中（比如代码注释）。这会导致严重的问题，因为不遵守这些限制会导致让人难以理解的错误信息（<a href>参考 9.4 节（未写）</a>）。近年来有一些方法和尝试，试图在语言特性层面支持对 <em>concepts</em> 的定义和检查。但是直到 C++17，还没有哪一种方法得以被标准化。从 C++11 开始，你至少可以通过关键字 <code>static_assert</code> 和其它一些预定义的 <em>type traits</em> 来做一些简单的检查。比如：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span>
-<span class="hljs-class">&#123;</span>
-	<span class="hljs-keyword">static_assert</span>(<span class="hljs-built_in">std</span>::is_default_constructible&lt;T&gt;::value,
-	<span class="hljs-string">"Class C requires default-constructible elements"</span>);
-...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span><br><span class="hljs-class">&#123;</span><br>	<span class="hljs-built_in"><span class="hljs-keyword">static_assert</span></span>(std::is_default_constructible&lt;T&gt;::value,<br>	<span class="hljs-string">&quot;Class C requires default-constructible elements&quot;</span>);<br>...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>即使没有这个 <code>static_assert</code>，如果需要 <code>T</code> 的默认构造函数的话，依然会遇到编译错误。只不过这个错误信息可能会包含整个模板实例化过程中所有的历史信息，从实例化被触发的地方直到模板定义中引发错误的地方（<a href>参见 9.4 节（未写）</a>）。</p>
 <p>然而还有更复杂的情况需要检查，比如模板类型 <code>T</code> 的实例需要提供一个特殊的成员函数，或者需要能够通过<code>operator &lt;</code> 进行比较。这一类情况的详细例子<a href>请参见 19.6.3 节（未写）</a>。</p>
-<p>C++20 增加对 <em>Concept</em> 的支持，笔者能力有限就不叙述了，请自行查阅 <a href="https://en.cppreference.com/w/cpp/language/constraints" target="_blank" rel="noopener">cpp reference</a> 了解。</p>
+<p>C++20 增加对 <em>Concept</em> 的支持，笔者能力有限就不叙述了，请自行查阅 <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/constraints">cpp reference</a> 了解。</p>
 <h2 id="2-4-友元"><a href="#2-4-友元" class="headerlink" title="2.4. 友元"></a>2.4. 友元</h2><p>相比于通过 <code>printOn()</code> 来打印 stack 的内容，更好的办法是去重载 stack 的 <code>operator &lt;&lt;</code> 运算符。而且和非模板类的情况一样，<code>operator&lt;&lt;</code> 应该被实现为非成员函数，在其实现中可以调用 <code>printOn()</code>：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
-<span class="hljs-class">&#123;</span>
-	...
-	<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printOn</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::ostream&amp; strm)</span> <span class="hljs-keyword">const</span> </span>
-<span class="hljs-function">    </span>&#123;
-        ...
-    &#125;
-    <span class="hljs-keyword">friend</span> <span class="hljs-built_in">std</span>::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt;(<span class="hljs-built_in">std</span>::ostream&amp; strm,
-                                    Stack&lt;T&gt;<span class="hljs-keyword">const</span>&amp; s) 
-    &#123;
-        s.printOn(strm);
-        <span class="hljs-keyword">return</span> strm;
-    &#125;
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span><br><span class="hljs-class">&#123;</span><br>	...<br>	<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printOn</span><span class="hljs-params">(std::ostream&amp; strm)</span> <span class="hljs-keyword">const</span> </span><br><span class="hljs-function">    </span>&#123;<br>        ...<br>    &#125;<br>    <span class="hljs-keyword">friend</span> std::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt;(std::ostream&amp; strm,<br>                                    Stack&lt;T&gt;<span class="hljs-keyword">const</span>&amp; s) <br>    &#123;<br>        s.<span class="hljs-built_in">printOn</span>(strm);<br>        <span class="hljs-keyword">return</span> strm;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>注意在这里 <code>Stack&lt;&gt;</code> 的 <code>operator&lt;&lt;</code> 并不是一个函数模板（对于在模板类内定义这一情况），而是在需要的时候，随类模板实例化出来的一个常规函数。</p>
 <p>但是如果想要在类外定义友元函数的话，就比较复杂了。实际上，我们有两种选择：</p>
 <ol>
 <li><p>我们可以隐式地定义一个新的函数模板，并使用不同的模板参数，比如 <code>U</code> ：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-    ...
-    <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> U&gt;
-    <span class="hljs-keyword">friend</span> <span class="hljs-built_in">std</span>::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt;(<span class="hljs-built_in">std</span>::ostream&amp;, Stack&lt;U&gt; <span class="hljs-keyword">const</span>&amp;);
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br>    ...<br>    <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> U&gt;<br>    <span class="hljs-keyword">friend</span> std::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt;(std::ostream&amp;, Stack&lt;U&gt; <span class="hljs-keyword">const</span>&amp;);<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>无论是继续使用 <code>T</code> 抑或省略模板参数声明，<strong>都不可行</strong>（因为内部的 <code>T</code> 覆盖了外部的 <code>T</code>，或者在当前命名空间域内定义了一个非模板函数）。</p>
 </li>
 <li><p>也可以现将 <code>Stack&lt;T&gt;</code> 的输出运算符声明为一个模板，这需要我们先要对 <code>Stack&lt;T&gt;</code> 进行声明：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>;</span>
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-built_in">std</span>::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt;(<span class="hljs-built_in">std</span>::ostream&amp;, Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;);</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>;</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br>std::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt;(std::ostream&amp;, Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;);<br></code></pre></td></tr></table></figure>
 
 <p>接着我们就可以为这一模板函数声明为 <code>Stack&lt;T&gt;</code> 的友元：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
-<span class="hljs-class">&#123;</span>
-    ...
-    <span class="hljs-keyword">friend</span> <span class="hljs-built_in">std</span>::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt; &lt;T&gt; (<span class="hljs-built_in">std</span>::ostream&amp;, Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;);
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span><br><span class="hljs-class">&#123;</span><br>    ...<br>    <span class="hljs-keyword">friend</span> std::ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt; &lt;T&gt; (std::ostream&amp;, Stack&lt;T&gt; <span class="hljs-keyword">const</span>&amp;);<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>注意这里在 <code>operator&lt;&lt;</code> 后面用了 <code>&lt;T&gt;</code>，这相当于声明了一个特化的非成员函数模板作为友元。如果没有 <code>T</code> 就相当于定义了一个新的非模板函数。<a href>具体细节请见 12.5.2 节（未写）</a>。</p>
 </li>
 </ol>
 <p>无论如何，你依然可以使用这个没有定义 <code>operator&lt;&lt;</code> 的类模板，只是你在调用 <code>operator&lt;&lt;</code> 的时候会遇到错误：</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-built_in">std</span>::pair&lt; <span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>&gt;&gt; ps; <span class="hljs-comment">// std::pair&lt;&gt; has no operator&lt;&lt; defined</span>
-ps.push(&#123;<span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;); <span class="hljs-comment">// OK</span>
-ps.push(&#123;<span class="hljs-number">6</span>, <span class="hljs-number">7</span>&#125;); <span class="hljs-comment">// OK</span>
-<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; ps.top().first &lt;&lt; <span class="hljs-string">'\n'</span>; <span class="hljs-comment">// OK</span>
-<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; ps.top().second &lt;&lt; <span class="hljs-string">'\n'</span>; <span class="hljs-comment">// OK</span>
-<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; ps &lt;&lt; ’\n’; <span class="hljs-comment">// ERROR: operator&lt;&lt; not supported for element type</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;std::pair&lt; <span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>&gt;&gt; ps; <span class="hljs-comment">// std::pair&lt;&gt; has no operator&lt;&lt; defined</span><br>ps.<span class="hljs-built_in">push</span>(&#123;<span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;); <span class="hljs-comment">// OK</span><br>ps.<span class="hljs-built_in">push</span>(&#123;<span class="hljs-number">6</span>, <span class="hljs-number">7</span>&#125;); <span class="hljs-comment">// OK</span><br>std::cout &lt;&lt; ps.<span class="hljs-built_in">top</span>().first &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>; <span class="hljs-comment">// OK</span><br>std::cout &lt;&lt; ps.<span class="hljs-built_in">top</span>().second &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>; <span class="hljs-comment">// OK</span><br>std::cout &lt;&lt; ps &lt;&lt; ’\n’; <span class="hljs-comment">// ERROR: operator&lt;&lt; not supported for element type</span><br></code></pre></td></tr></table></figure>
 
-<h2 id="2-5-类模板特化"><a href="#2-5-类模板特化" class="headerlink" title="2.5. 类模板特化"></a>2.5. 类模板特化</h2><p>你可以对类模板的确定的模板参数进行特化。这和重载函数模板类似（<a href="https://vinkle.top/2020/07/09/cpp-template-1/#1-5-重载函数模板" target="_blank" rel="noopener">参考1.5节</a>），类模板特化允许你对一特定的类型进行优化，或者修正类模板对于一特定类型实例化后的一些行为。不过，如果你优化了类模板，你必须也优化所有成员函数。虽然允许值特例化类模板的一个成员函数，不过一旦你这么做的话，你就无法再特化其他成员了。</p>
+<h2 id="2-5-类模板特化"><a href="#2-5-类模板特化" class="headerlink" title="2.5. 类模板特化"></a>2.5. 类模板特化</h2><p>你可以对类模板的确定的模板参数进行特化。这和重载函数模板类似（<a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/09/cpp-template-1/#1-5-重载函数模板">参考1.5节</a>），类模板特化允许你对一特定的类型进行优化，或者修正类模板对于一特定类型实例化后的一些行为。不过，如果你优化了类模板，你必须也优化所有成员函数。虽然允许值特例化类模板的一个成员函数，不过一旦你这么做的话，你就无法再特化其他成员了。</p>
 <p>为了特化一个类模板，你必须在类声明之前加上 <code>template &lt;&gt;</code>， 并且显式地指出需要特化的类型。这些特化的类型作为模板参数，并且必须紧跟在类名之后：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>&lt;std::string&gt;</span>
-<span class="hljs-class">&#123;</span>
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>&lt;</span>std::string&gt;<br>&#123;<br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>对于这些特化的模板，所有的成员函数都应该被定义为“常规”成员函数，也就是说，所有出现 <code>T</code> 的地方都需要被替换为特化的类型：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">void</span> Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;::push(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    elems.push_back(elem); <span class="hljs-comment">//append copy of passed elem</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">void</span> Stack&lt;std::string&gt;::<span class="hljs-built_in">push</span>(std::string <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    elems.<span class="hljs-built_in">push_back</span>(elem); <span class="hljs-comment">//append copy of passed elem</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>下面是一个用 <code>std::string</code> 特化 <code>Stack&lt;&gt;</code> 类模板的完整例子：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"stack1.hpp"</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;deque&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span>
-
-<span class="hljs-keyword">template</span> &lt;&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>&lt;std::string&gt;</span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">deque</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; elems; <span class="hljs-comment">// elements</span>
-
-<span class="hljs-keyword">public</span>:
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span>&amp;)</span></span>;  <span class="hljs-comment">// push element</span>
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;                     <span class="hljs-comment">// pop element</span>
-    <span class="hljs-function"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span> &amp;<span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>; <span class="hljs-comment">// return top element</span>
-    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>
-<span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return whether the stack is empty</span>
-        <span class="hljs-keyword">return</span> elems.empty();
-    &#125;
-&#125;;
-
-<span class="hljs-keyword">void</span> Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;::push(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    elems.push_back(elem); <span class="hljs-comment">// append copy of passed elem</span>
-&#125;
-
-<span class="hljs-keyword">void</span> Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;::pop()
-&#123;
-    assert(!elems.empty());
-    elems.pop_back(); <span class="hljs-comment">// remove last element</span>
-&#125;
-
-<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span> &amp;Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;::top() <span class="hljs-keyword">const</span>
-&#123;
-    assert(!elems.empty());
-    <span class="hljs-keyword">return</span> elems.back(); <span class="hljs-comment">// return copy of last element</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;stack1.hpp&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;deque&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span><br><br><span class="hljs-keyword">template</span> &lt;&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>&lt;</span>std::string&gt;<br>&#123;<br><span class="hljs-keyword">private</span>:<br>    std::deque&lt;std::string&gt; elems; <span class="hljs-comment">// elements</span><br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(std::string <span class="hljs-keyword">const</span>&amp;)</span></span>;  <span class="hljs-comment">// push element</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;                     <span class="hljs-comment">// pop element</span><br>    <span class="hljs-function">std::string <span class="hljs-keyword">const</span> &amp;<span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>; <span class="hljs-comment">// return top element</span><br>    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span><br><span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return whether the stack is empty</span><br>        <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">empty</span>();<br>    &#125;<br>&#125;;<br><br><span class="hljs-keyword">void</span> Stack&lt;std::string&gt;::<span class="hljs-built_in">push</span>(std::string <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    elems.<span class="hljs-built_in">push_back</span>(elem); <span class="hljs-comment">// append copy of passed elem</span><br>&#125;<br><br><span class="hljs-keyword">void</span> Stack&lt;std::string&gt;::<span class="hljs-built_in">pop</span>()<br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    elems.<span class="hljs-built_in">pop_back</span>(); <span class="hljs-comment">// remove last element</span><br>&#125;<br><br>std::string <span class="hljs-keyword">const</span> &amp;Stack&lt;std::string&gt;::<span class="hljs-built_in">top</span>() <span class="hljs-keyword">const</span><br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">back</span>(); <span class="hljs-comment">// return copy of last element</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>在这个例子中，特化的类在向 <code>push()</code> 传递参数的时候运用了引用语意，对于 <code>std::string</code> 这一类型很有意义，提升了性能（其实最好使用 <em>forwarding reference</em> ， <a href>6.1 节（未写）我们会讨论到</a>）。</p>
 <p>另外一个不同是使用了 <code>deque</code> 而不是 <code>vector</code> 来存储 stack 里面的元素。虽然这么做在这里没有好处，但是它确实说明了模板特例化之后的实现可能和类模板原始的实现有很大不同。</p>
 <h2 id="2-6-偏特化"><a href="#2-6-偏特化" class="headerlink" title="2.6. 偏特化"></a>2.6. 偏特化</h2><p>类模板可以被<strong>偏特化(partial specialization)</strong>。你可以为某些特殊情况提供特殊的实现，不过使用这必须定义某些模板参数。例如，我们可以定义一个特化的 <code>Stack&lt;&gt;</code> 类来专门处理指针：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"stack1.hpp"</span></span>
-
-<span class="hljs-comment">// partial specialization of class Stack&lt;&gt; for pointers:</span>
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>&lt;T*&gt;</span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T*&gt; elems; <span class="hljs-comment">// elements</span>
-
-<span class="hljs-keyword">public</span>:
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T*)</span></span>;  <span class="hljs-comment">// push element</span>
-    <span class="hljs-function">T* <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;       <span class="hljs-comment">// pop element</span>
-    <span class="hljs-function">T* <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>; <span class="hljs-comment">// return top element</span>
-    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>
-<span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return whether the stack is empty</span>
-        <span class="hljs-keyword">return</span> elems.empty();
-    &#125;
-&#125;;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T*&gt;::push(T *elem)
-&#123;
-    elems.push_back(elem); <span class="hljs-comment">// append copy of passed elem</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-T* Stack&lt;T*&gt;::pop()
-&#123;
-    assert(!elems.empty());
-    T* p = elems.back();
-    elems.pop_back(); <span class="hljs-comment">// remove last element</span>
-    <span class="hljs-keyword">return</span> p;         <span class="hljs-comment">// and return it (unlike in the general case)</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-T* Stack&lt;T*&gt;::top() <span class="hljs-keyword">const</span>
-&#123;
-    assert(!elems.empty());
-    <span class="hljs-keyword">return</span> elems.back(); <span class="hljs-comment">// return copy of last element</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;stack1.hpp&quot;</span></span><br><br><span class="hljs-comment">// partial specialization of class Stack&lt;&gt; for pointers:</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>&lt;</span>T*&gt;<br>&#123;<br><span class="hljs-keyword">private</span>:<br>    std::vector&lt;T*&gt; elems; <span class="hljs-comment">// elements</span><br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T*)</span></span>;  <span class="hljs-comment">// push element</span><br>    <span class="hljs-function">T* <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;       <span class="hljs-comment">// pop element</span><br>    <span class="hljs-function">T* <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>; <span class="hljs-comment">// return top element</span><br>    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span><br><span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return whether the stack is empty</span><br>        <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">empty</span>();<br>    &#125;<br>&#125;;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T*&gt;::<span class="hljs-built_in">push</span>(T *elem)<br>&#123;<br>    elems.<span class="hljs-built_in">push_back</span>(elem); <span class="hljs-comment">// append copy of passed elem</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br>T* Stack&lt;T*&gt;::<span class="hljs-built_in">pop</span>()<br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    T* p = elems.<span class="hljs-built_in">back</span>();<br>    elems.<span class="hljs-built_in">pop_back</span>(); <span class="hljs-comment">// remove last element</span><br>    <span class="hljs-keyword">return</span> p;         <span class="hljs-comment">// and return it (unlike in the general case)</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br>T* Stack&lt;T*&gt;::<span class="hljs-built_in">top</span>() <span class="hljs-keyword">const</span><br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">back</span>(); <span class="hljs-comment">// return copy of last element</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>通过</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>&lt;T*&gt; &#123;</span> &#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span>&lt;</span>T*&gt; &#123; &#125;;<br></code></pre></td></tr></table></figure>
 
 <p>我们定义了一个类模板，它的参数依旧是 <code>T</code>，但是被特化为处理指针的类模板 (<code>Stack&lt;T*&gt;</code>)。</p>
 <p>同样注意，特化后的函数接口可能会有些许不同。在这个例子中， <code>pop()</code> 返回的是一个指针，因此如果这个指针是通过 <code>new</code> 创建的，使用者可以对这个被删除的值使用 <code>delete</code>：</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>*&gt; ptrStack; <span class="hljs-comment">// stack of pointers (specialimplementation)</span>
-ptrStack.push(<span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>&#123;<span class="hljs-number">42</span>&#125;);
-<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; *ptrStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-<span class="hljs-keyword">delete</span> ptrStack.pop();</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>*&gt; ptrStack; <span class="hljs-comment">// stack of pointers (specialimplementation)</span><br>ptrStack.<span class="hljs-built_in">push</span>(<span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>&#123;<span class="hljs-number">42</span>&#125;);<br>std::cout &lt;&lt; *ptrStack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br><span class="hljs-keyword">delete</span> ptrStack.<span class="hljs-built_in">pop</span>();<br></code></pre></td></tr></table></figure>
 
 <h3 id="多模板参数的偏特化"><a href="#多模板参数的偏特化" class="headerlink" title="多模板参数的偏特化"></a>多模板参数的偏特化</h3><p>类模板也可以特化多个模板参数的关系。比如下面这个类模板：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span> </span>
-<span class="hljs-class">&#123;</span>
-	...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span> </span><br><span class="hljs-class">&#123;</span><br>	...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>如下的特化都是可以的：</p>
-<pre><code class="hljs c++"><span class="hljs-comment">// partial specialization: both template parameters have same type</span>
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>&lt;T,T&gt; </span>
-<span class="hljs-class">&#123;</span>
-	...
-&#125;;
-<span class="hljs-comment">// partial specialization: second type is int</span>
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>&lt;T,int&gt; </span>
-<span class="hljs-class">&#123;</span>
-	...
-&#125;;
-<span class="hljs-comment">// partial specialization: both template parameters are pointer types</span>
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>&lt;T1*,T2*&gt; </span>
-<span class="hljs-class">&#123;</span>
-	...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// partial specialization: both template parameters have same type</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>&lt;</span>T,T&gt; <br>&#123;<br>	...<br>&#125;;<br><span class="hljs-comment">// partial specialization: second type is int</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>&lt;</span>T,<span class="hljs-keyword">int</span>&gt; <br>&#123;<br>	...<br>&#125;;<br><span class="hljs-comment">// partial specialization: both template parameters are pointer types</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>&lt;</span>T1*,T2*&gt; <br>&#123;<br>	...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>下面的例子展示了各种类模板被使用的情况：</p>
-<pre><code class="hljs c++">MyClass&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">float</span>&gt; mif;   <span class="hljs-comment">// uses MyClass&lt;T1,T2&gt;</span>
-MyClass&lt;<span class="hljs-keyword">float</span>, <span class="hljs-keyword">float</span>&gt; mff; <span class="hljs-comment">// uses MyClass&lt;T,T&gt;</span>
-MyClass&lt;<span class="hljs-keyword">float</span>, <span class="hljs-keyword">int</span>&gt; mfi;   <span class="hljs-comment">// uses MyClass&lt;T,int&gt;</span>
-MyClass&lt;<span class="hljs-keyword">int</span>*, <span class="hljs-keyword">float</span>*&gt; mp;  <span class="hljs-comment">// uses MyClass&lt;T1*,T2*&gt;</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++">MyClass&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">float</span>&gt; mif;   <span class="hljs-comment">// uses MyClass&lt;T1,T2&gt;</span><br>MyClass&lt;<span class="hljs-keyword">float</span>, <span class="hljs-keyword">float</span>&gt; mff; <span class="hljs-comment">// uses MyClass&lt;T,T&gt;</span><br>MyClass&lt;<span class="hljs-keyword">float</span>, <span class="hljs-keyword">int</span>&gt; mfi;   <span class="hljs-comment">// uses MyClass&lt;T,int&gt;</span><br>MyClass&lt;<span class="hljs-keyword">int</span>*, <span class="hljs-keyword">float</span>*&gt; mp;  <span class="hljs-comment">// uses MyClass&lt;T1*,T2*&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>如果有不止一个特化的模板匹配程度相同的话，这个定义就是有歧义的：</p>
-<pre><code class="hljs c++">MyClass&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>&gt; m; <span class="hljs-comment">// ERROR: matches MyClass&lt;T,T&gt; and MyClass&lt;T,int&gt;</span>
-MyClass&lt;<span class="hljs-keyword">int</span>*, <span class="hljs-keyword">int</span>*&gt; m; <span class="hljs-comment">// ERROR: matches MyClass&lt;T,T&gt; and MyClass&lt;T1*,T2*&gt;</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">MyClass&lt;<span class="hljs-keyword">int</span>, <span class="hljs-keyword">int</span>&gt; m; <span class="hljs-comment">// ERROR: matches MyClass&lt;T,T&gt; and MyClass&lt;T,int&gt;</span><br>MyClass&lt;<span class="hljs-keyword">int</span>*, <span class="hljs-keyword">int</span>*&gt; m; <span class="hljs-comment">// ERROR: matches MyClass&lt;T,T&gt; and MyClass&lt;T1*,T2*&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>为了消除第二个歧义，你可以提供一个额外一个偏特化的版本处理相同类型的指针：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>&lt;T*, T*&gt;</span>
-<span class="hljs-class">&#123;</span>
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>&lt;</span>T*, T*&gt;<br>&#123;<br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>更多关于偏特化的信息，<a href>请参见 16.4 节（未写）</a>。</p>
 <h2 id="2-7-缺省类模板参数"><a href="#2-7-缺省类模板参数" class="headerlink" title="2.7. 缺省类模板参数"></a>2.7. 缺省类模板参数</h2><p>就像函数模板一样，你也可以给类模板的模板参数指定默认值。例如，在 <code>Stack&lt;&gt;</code> 类中你可以定义用来容纳元素的容器的类型作为第二个模板参数，使用 <code>std::vector&lt;&gt;</code> 作为默认值：</p>
-<pre><code class="hljs c++"><span class="hljs-comment">//stack3.hpp</span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;vector&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span>
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont = <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt;&gt;
-class Stack 
-&#123;
-<span class="hljs-keyword">private</span>:
-    Cont elems;                <span class="hljs-comment">// elements</span>
-    
-<span class="hljs-keyword">public</span>:
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>;  <span class="hljs-comment">// push element</span>
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;                <span class="hljs-comment">// pop element</span>
-    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;      <span class="hljs-comment">// return top element</span>
-    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span> <span class="hljs-comment">// return whether the stack is empty</span></span>
-<span class="hljs-function">    </span>&#123;       
-        <span class="hljs-keyword">return</span> elems.empty();
-    &#125;
-&#125;;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T,Cont&gt;::push (T <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    elems.push_back(elem);     <span class="hljs-comment">// append copy of passed elem</span>
-&#125;
-
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T,Cont&gt;::pop ()
-&#123;
-    assert(!elems.empty());
-    elems.pop_back();          <span class="hljs-comment">// remove last element</span>
-&#125;
-
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont&gt;
-T <span class="hljs-keyword">const</span>&amp; Stack&lt;T,Cont&gt;::top () <span class="hljs-keyword">const</span>
-&#123;
-    assert(!elems.empty());
-    <span class="hljs-keyword">return</span> elems.back();       <span class="hljs-comment">// return copy of last element</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//stack3.hpp</span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;vector&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span><br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont = std::vector&lt;T&gt;&gt;<br>class Stack <br>&#123;<br><span class="hljs-keyword">private</span>:<br>    Cont elems;                <span class="hljs-comment">// elements</span><br>    <br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>;  <span class="hljs-comment">// push element</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;                <span class="hljs-comment">// pop element</span><br>    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;      <span class="hljs-comment">// return top element</span><br>    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span> <span class="hljs-comment">// return whether the stack is empty</span></span><br><span class="hljs-function">    </span>&#123;       <br>        <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">empty</span>();<br>    &#125;<br>&#125;;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T,Cont&gt;::<span class="hljs-built_in">push</span> (T <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    elems.<span class="hljs-built_in">push_back</span>(elem);     <span class="hljs-comment">// append copy of passed elem</span><br>&#125;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T,Cont&gt;::<span class="hljs-built_in">pop</span> ()<br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    elems.<span class="hljs-built_in">pop_back</span>();          <span class="hljs-comment">// remove last element</span><br>&#125;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont&gt;<br>T <span class="hljs-keyword">const</span>&amp; Stack&lt;T,Cont&gt;::<span class="hljs-built_in">top</span> () <span class="hljs-keyword">const</span><br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    <span class="hljs-keyword">return</span> elems.<span class="hljs-built_in">back</span>();       <span class="hljs-comment">// return copy of last element</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>注意现在有两个模板参数，因此每个成员函数的定义也应该包含两个模板参数：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T,Cont&gt;::push (T <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    elems.push_back(elem);     <span class="hljs-comment">// append copy of passed elem</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T,Cont&gt;::<span class="hljs-built_in">push</span> (T <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    elems.<span class="hljs-built_in">push_back</span>(elem);     <span class="hljs-comment">// append copy of passed elem</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>你可以想之前一样使用 <code>Stack&lt;&gt;</code>。如果你只提供第一个模板参数的类型，那么 <code>vector</code> 会用来处理 <code>Stack&lt;&gt;</code> 中的元素：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont = <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt;&gt;
-class Stack 
-&#123;
-<span class="hljs-keyword">private</span>:
-	Cont elems; <span class="hljs-comment">// elements</span>
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Cont = std::vector&lt;T&gt;&gt;<br>class Stack <br>&#123;<br><span class="hljs-keyword">private</span>:<br>	Cont elems; <span class="hljs-comment">// elements</span><br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>另外，你也可以指定 stack 使用的容器的类型：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"stack3.hpp"</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;deque&gt;</span></span>
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  <span class="hljs-comment">// stack of ints:</span>
-  Stack&lt;<span class="hljs-keyword">int</span>&gt; intStack;
-
-  <span class="hljs-comment">// stack of doubles using a std::deque&lt;&gt; to manage the elements</span>
-  Stack&lt;<span class="hljs-keyword">double</span>, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">deque</span>&lt;<span class="hljs-keyword">double</span>&gt;&gt; dblStack;
-
-  <span class="hljs-comment">// manipulate int stack</span>
-  intStack.push(<span class="hljs-number">7</span>);
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; intStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-  intStack.pop();
-
-  <span class="hljs-comment">// manipulate double stack</span>
-  dblStack.push(<span class="hljs-number">42.42</span>);
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; dblStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-  dblStack.pop();
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;stack3.hpp&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;deque&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  <span class="hljs-comment">// stack of ints:</span><br>  Stack&lt;<span class="hljs-keyword">int</span>&gt; intStack;<br><br>  <span class="hljs-comment">// stack of doubles using a std::deque&lt;&gt; to manage the elements</span><br>  Stack&lt;<span class="hljs-keyword">double</span>, std::deque&lt;<span class="hljs-keyword">double</span>&gt;&gt; dblStack;<br><br>  <span class="hljs-comment">// manipulate int stack</span><br>  intStack.<span class="hljs-built_in">push</span>(<span class="hljs-number">7</span>);<br>  std::cout &lt;&lt; intStack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>  intStack.<span class="hljs-built_in">pop</span>();<br><br>  <span class="hljs-comment">// manipulate double stack</span><br>  dblStack.<span class="hljs-built_in">push</span>(<span class="hljs-number">42.42</span>);<br>  std::cout &lt;&lt; dblStack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>  dblStack.<span class="hljs-built_in">pop</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>通过 <code>Stack&lt;double, std::deque&lt;double&gt;&gt;</code></p>
 <p>你定义了存储  <code>double</code> 类型的 <em>stack</em>，其使用的容器是 <code>std::deque&lt;&gt;</code>。</p>
@@ -755,14 +412,10 @@ class Stack
 <h3 id="Typedefs-and-Alias-Declarations"><a href="#Typedefs-and-Alias-Declarations" class="headerlink" title="Typedefs and Alias Declarations"></a>Typedefs and Alias Declarations</h3><p>你有两种方式可以为模板定义一个新名称：</p>
 <ol>
 <li><p>使用关键字 <code>typedef</code>：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">typedef</span> Stack&lt;<span class="hljs-keyword">int</span>&gt; IntStack; <span class="hljs-comment">//typedef</span>
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(IntStack <span class="hljs-keyword">const</span>&amp; s)</span></span>; <span class="hljs-comment">//s is stack of ints</span>
-IntStack istack[<span class="hljs-number">10</span>];         <span class="hljs-comment">//istack is array of 10 stacks of ints</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">typedef</span> Stack&lt;<span class="hljs-keyword">int</span>&gt; IntStack; <span class="hljs-comment">//typedef</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(IntStack <span class="hljs-keyword">const</span>&amp; s)</span></span>; <span class="hljs-comment">//s is stack of ints</span><br>IntStack istack[<span class="hljs-number">10</span>];         <span class="hljs-comment">//istack is array of 10 stacks of ints</span><br></code></pre></td></tr></table></figure>
 </li>
 <li><p>通过使用关键字 <code>using</code>（C++11 开始）：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">using</span> IntStack = Stack&lt;<span class="hljs-keyword">int</span>&gt;; <span class="hljs-comment">//alias declaration</span>
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(IntStack <span class="hljs-keyword">const</span>&amp; s)</span></span>; <span class="hljs-comment">//s is stack of ints</span>
-IntStack istack[<span class="hljs-number">10</span>];         <span class="hljs-comment">//istack is array of 10 stacks of ints</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">using</span> IntStack = Stack&lt;<span class="hljs-keyword">int</span>&gt;; <span class="hljs-comment">//alias declaration</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(IntStack <span class="hljs-keyword">const</span>&amp; s)</span></span>; <span class="hljs-comment">//s is stack of ints</span><br>IntStack istack[<span class="hljs-number">10</span>];         <span class="hljs-comment">//istack is array of 10 stacks of ints</span><br></code></pre></td></tr></table></figure>
 
 <p>按照 [<strong><em>DosReisMarcusAliasTemplates</em></strong>] 的说法，这一过程叫做 <strong><em>alias declaration</em></strong>。</p>
 </li>
@@ -772,165 +425,98 @@ IntStack istack[<span class="hljs-number">10</span>];         <span class="hljs-
 <p>由于使用 <strong><em>alias declaration</em></strong> （使用 <code>using</code>，新的名称在 <code>=</code> 符号的左侧）可读性更好，所以我们优先使用这种方法。</p>
 <h3 id="Alias-Templates"><a href="#Alias-Templates" class="headerlink" title="Alias Templates"></a>Alias Templates</h3><p>不同于 <code>typedef</code>，<strong><em>alias declaration</em></strong> 可以被模板化。这样就可以为一组类型取一个方便的名称。这一特性从 C++11 开始生效，被称为 <strong><em>alias templates</em></strong>。</p>
 <p>下面例子中的 <strong><em>alias template</em></strong> <code>DequeStack</code> 是被模板参数 <code>T</code> 参数化的，代表 <code>Stack</code> 中的元素存储在 <code>std::deque</code> 容器中：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">using</span> DequeStack = Stack&lt;T, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">deque</span>&lt;T&gt;&gt;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">using</span> DequeStack = Stack&lt;T, std::deque&lt;T&gt;&gt;;<br></code></pre></td></tr></table></figure>
 
 <p>因此，类模板和 <strong><em>alias templates</em></strong> 都是可以被参数化的类型。同样的，<strong><em>alias template</em></strong> 只是简单地给一个已经存在的类型一个新名字，原来的类型名还是可以使用的。<code>DequeStack&lt;int&gt;</code> 和 <code>Stack&lt;int, std::deque&lt;int&gt;&gt;</code> 代表了同一个类型。</p>
 <p>再次注意，模板只可以被定义在 <em>global/namespace scope</em> 或者在类的声明之中。</p>
 <h3 id="Alias-Templates-for-Member-Types"><a href="#Alias-Templates-for-Member-Types" class="headerlink" title="Alias Templates for Member Types"></a>Alias Templates for Member Types</h3><p>使用 <strong><em>alias templates</em></strong> 可以很方便的给类模板的成员类型一个<strong>快捷名称(short cut)</strong>：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MyType</span></span>
-<span class="hljs-class">&#123;</span>
-    <span class="hljs-keyword">typedef</span> ... iterator;
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MyType</span></span><br><span class="hljs-class">&#123;</span><br>    <span class="hljs-keyword">typedef</span> ... iterator;<br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>或者</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MyType</span></span>
-<span class="hljs-class">&#123;</span>
-    <span class="hljs-keyword">using</span> iterator = ...;
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MyType</span></span><br><span class="hljs-class">&#123;</span><br>    <span class="hljs-keyword">using</span> iterator = ...;<br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>之后，下面这样的定义:</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">using</span> MyTypeIterator = <span class="hljs-keyword">typename</span> MyType&lt;T&gt;::iterator;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">using</span> MyTypeIterator = <span class="hljs-keyword">typename</span> MyType&lt;T&gt;::iterator;<br></code></pre></td></tr></table></figure>
 
 <p>允许我们使用  <code>MyTypeIterator&lt;int&gt; pos;</code> 来取代 <code>typename MyType&lt;T&gt;::iterator pos;</code>。</p>
 <h3 id="Type-Traits-Sufflix-t"><a href="#Type-Traits-Sufflix-t" class="headerlink" title="Type Traits Sufflix_t"></a>Type Traits Sufflix_t</h3><p>从 C++14 开始，标准库使用这一技术为所有的 <em>type trait</em> 定义了一个<strong>快捷名称(short cut)</strong>。比如能用这种写法</p>
-<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-keyword">add_const_t</span>&lt;T&gt; <span class="hljs-comment">// since C++14</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::<span class="hljs-keyword">add_const_t</span>&lt;T&gt; <span class="hljs-comment">// since C++14</span><br></code></pre></td></tr></table></figure>
 
 <p>来替代</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">typename</span> <span class="hljs-built_in">std</span>::add_const&lt;T&gt;::type <span class="hljs-comment">// since C++11</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">typename</span> std::add_const&lt;T&gt;::type <span class="hljs-comment">// since C++11</span><br></code></pre></td></tr></table></figure>
 
 <p>标准库做了如下的定义：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>
-&#123;
-    <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-    <span class="hljs-keyword">using</span> <span class="hljs-keyword">add_const_t</span> = <span class="hljs-keyword">typename</span> add_const&lt;T&gt;::type;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">namespace</span> std<br>&#123;<br>    <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br>    <span class="hljs-keyword">using</span> <span class="hljs-keyword">add_const_t</span> = <span class="hljs-keyword">typename</span> add_const&lt;T&gt;::type;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="2-9-类模板参数推导"><a href="#2-9-类模板参数推导" class="headerlink" title="2.9. 类模板参数推导"></a>2.9. 类模板参数推导</h2><p>在 C++17 之前，使用类模板时必须显式地支持所有模板参数的类型（除非它们有默认值）。C++17 开始，这一要求就没有那么严格了。如果类模板的构造函数可以推导出所有的参数类型（不含有默认值的），就不必需要显式地指明模板参数的类型了。</p>
 <p>比如在前面的例子中，你可以使用拷贝构造函数而不指定模板参数的参数类型：</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>&gt; intStack1;             <span class="hljs-comment">// stack of strings</span>
-Stack&lt;<span class="hljs-keyword">int</span>&gt; intStack2 = intStack1; <span class="hljs-comment">// OK in all versions</span>
-Stack intStack3 = intStack1;      <span class="hljs-comment">// OK since C++17</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>&gt; intStack1;             <span class="hljs-comment">// stack of strings</span><br>Stack&lt;<span class="hljs-keyword">int</span>&gt; intStack2 = intStack1; <span class="hljs-comment">// OK in all versions</span><br>Stack intStack3 = intStack1;      <span class="hljs-comment">// OK since C++17</span><br></code></pre></td></tr></table></figure>
 
 <p>通过提供一个接受初始参数的构造函数，就可以推导出 stack 元素的类型。例如我们可以定义一个可以被一个参数初始化的 stack：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt; elems; <span class="hljs-comment">// elements</span>
-<span class="hljs-keyword">public</span>:
-	Stack () = <span class="hljs-keyword">default</span>;
-	Stack (T <span class="hljs-keyword">const</span>&amp; elem) <span class="hljs-comment">// initialize stack with one element</span>
-		: elems(&#123;elem&#125;) &#123;&#125;
-	...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">private</span>:<br>	std::vector&lt;T&gt; elems; <span class="hljs-comment">// elements</span><br><span class="hljs-keyword">public</span>:<br>	<span class="hljs-built_in">Stack</span> () = <span class="hljs-keyword">default</span>;<br>	<span class="hljs-built_in">Stack</span> (T <span class="hljs-keyword">const</span>&amp; elem) <span class="hljs-comment">// initialize stack with one element</span><br>		: <span class="hljs-built_in">elems</span>(&#123;elem&#125;) &#123;&#125;<br>	...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>然后你就可以像这样声明一个 stack：</p>
-<pre><code class="hljs c++">Stack intStack = <span class="hljs-number">0</span>; <span class="hljs-comment">// 被推导为 Stack&lt;int&gt;，从 C++17 开始</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack intStack = <span class="hljs-number">0</span>; <span class="hljs-comment">// 被推导为 Stack&lt;int&gt;，从 C++17 开始</span><br></code></pre></td></tr></table></figure>
 
 <p>通过用整数 <code>0</code> 来初始化 <code>Stack</code> 类型时，模板参数 <code>T</code> 被推导为 <code>int</code>，这样就实例化出一个 <code>Stack&lt;int&gt;</code>。</p>
 <p>注意下面这些细节：</p>
 <ul>
 <li><p>由于定义了接受 <code>int</code> 类型的模板构造函数，你需要请求一个默认的构造函数及其默认行为，这是因为默认构造函数只有在其他构造函数没有定义时才会生成，方法如下：</p>
-  <pre><code class="hljs c++">Stack() = <span class="hljs-keyword">default</span>;</code></pre>
+  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">Stack</span>() = <span class="hljs-keyword">default</span>;<br></code></pre></td></tr></table></figure>
 </li>
-<li><p>参数 <code>elem</code> 传递给 <code>elems</code> 时用大括号 <code>{}</code> 包裹起来，通过<strong>初始化列表(initializer list)</strong>的方式只用一个参数初始化 <code>vector</code> 类型的 <code>elems</code>: </p>
-<pre><code class="hljs c++">: elems(&#123;elem&#125;);</code></pre>
+<li><p>参数 <code>elem</code> 传递给 <code>elems</code> 时用大括号 <code>&#123;&#125;</code> 包裹起来，通过<strong>初始化列表(initializer list)</strong>的方式只用一个参数初始化 <code>vector</code> 类型的 <code>elems</code>: </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">: <span class="hljs-built_in">elems</span>(&#123;elem&#125;);<br></code></pre></td></tr></table></figure>
 
 <p>这是因为 <code>vector</code> 类型没有用一个参数直接初始化元素的构造函数。</p>
 </li>
 </ul>
 <p>注意，不同于函数模板，类模板参数可能无法部分推导其类型（通过显式地指明其中一部分模板参数的类型）。<a href>参见 15.12 节（未写）</a>。</p>
 <h3 id="类模板对字符串常量的参数推导："><a href="#类模板对字符串常量的参数推导：" class="headerlink" title="类模板对字符串常量的参数推导："></a>类模板对字符串常量的参数推导：</h3><p>原则上，你甚至可以通过字符串常量来初始化 stack：</p>
-<pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">"bottom"</span>; <span class="hljs-comment">// 被推导为 Stack&lt;char const[7]&gt;，从 C++17 开始</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">&quot;bottom&quot;</span>; <span class="hljs-comment">// 被推导为 Stack&lt;char const[7]&gt;，从 C++17 开始</span><br></code></pre></td></tr></table></figure>
 
 <p><strong>但是</strong>，这会带来一大堆问题：一般，当通过引用来传递模板类型 <code>T</code> 的参数是，这个参数类型不会被 <em>decay</em> (将 raw array 转换为相应的 raw pointer)。这说明我们的确定义了这个类型的 <code>Stack</code>:</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>[<span class="hljs-number">7</span>]&gt;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>[<span class="hljs-number">7</span>]&gt;<br></code></pre></td></tr></table></figure>
 
 <p>当使用 <code>T</code> 的时候都会被实例化为 <code>char const[7]</code>。这样我们就不能放入不同长度的字符串了，因为这是不同的类型。详细的讨论<a href>参见 7.4 节（未写）</a>。</p>
 <p>但是，如果我们按值传递模板参数 <code>T</code> 的话，参数类型就会被 <em>decay</em> ，也就是将 <em>raw array</em> 转换为相应的 <em>raw pointer</em> 。这样，调用带有模板参数 <code>T</code> 的构造函数就会将模板参数 <code>T</code> 的类型推导成 <code>char const*</code>，模板也被推导为 <code>Stack&lt;char const*&gt;</code>。</p>
 <p>基于以上原因，可能有必要讲构造函数声明成按值传递参数的形式：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt; elems; <span class="hljs-comment">// elements</span>
-<span class="hljs-keyword">public</span>:
-	Stack (T elem) <span class="hljs-comment">// initialize stack with one element by value</span>
-		: elems(&#123;elem&#125;) &#123;&#125; <span class="hljs-comment">// to decay on class tmpl arg deduction</span>
-	...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">private</span>:<br>	std::vector&lt;T&gt; elems; <span class="hljs-comment">// elements</span><br><span class="hljs-keyword">public</span>:<br>	<span class="hljs-built_in">Stack</span> (T elem) <span class="hljs-comment">// initialize stack with one element by value</span><br>		: <span class="hljs-built_in">elems</span>(&#123;elem&#125;) &#123;&#125; <span class="hljs-comment">// to decay on class tmpl arg deduction</span><br>	...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>这样下面的初始化方式就可以正常运行：</p>
-<pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">"bottom"</span>; <span class="hljs-comment">// Stack&lt;char const*&gt; deduced since C++17</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">&quot;bottom&quot;</span>; <span class="hljs-comment">// Stack&lt;char const*&gt; deduced since C++17</span><br></code></pre></td></tr></table></figure>
 
 <p>在这个例子中，我们最好使用 <em>move</em> 将临时变量 <code>elem</code> 添加至 stack 中，避免不必要的拷贝：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;T&gt; elems; <span class="hljs-comment">// elements</span>
-<span class="hljs-keyword">public</span>:
-	Stack (T elem) <span class="hljs-comment">// initialize stack with one element by value</span>
-		: elems(&#123;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(elem)&#125;) &#123;&#125; 
-	...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">private</span>:<br>	std::vector&lt;T&gt; elems; <span class="hljs-comment">// elements</span><br><span class="hljs-keyword">public</span>:<br>	<span class="hljs-built_in">Stack</span> (T elem) <span class="hljs-comment">// initialize stack with one element by value</span><br>		: <span class="hljs-built_in">elems</span>(&#123;std::<span class="hljs-built_in">move</span>(elem)&#125;) &#123;&#125; <br>	...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h3 id="推导指引-Deduction-Guides"><a href="#推导指引-Deduction-Guides" class="headerlink" title="推导指引(Deduction Guides)"></a>推导指引(Deduction Guides)</h3><p>除了将构造函数声明成按值传递，还有一个解决方案：因为在容器中处理 <em>raw pointers</em> 可能会导致很多问题，我们应该禁止容器类将类型自动推导成 <em>raw character pointers</em>。</p>
 <p>我们可以通过定义推导指引来提供额外的模板参数推导规则，或者修改已有的模板参数推导规则。例如，你可以定义当一个字符串常量或者 C 类型字符串被传递时，stack 类型被实例化为 <code>std::string</code>：</p>
-<pre><code class="hljs c++">Stack(<span class="hljs-keyword">char</span> cosnt*) -&gt; Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">Stack</span>(<span class="hljs-keyword">char</span> cosnt*) -&gt; Stack&lt;std::string&gt;;<br></code></pre></td></tr></table></figure>
 
 <p>这个指引语句也必须出现在模板类定义的 <em>scope(namespace)</em> 内。通常它紧跟着模板类的定义。<code>-&gt;</code> 后面的类型被称为<strong>推导指引(deduction guide)</strong>的 <em>guided type</em>。</p>
 <p>现在，根据这个定义</p>
-<pre><code class="hljs c++">Stack stringStackStack stringStack&#123;<span class="hljs-string">"bottom"</span>&#125;; 
-<span class="hljs-comment">// OK: Stack&lt;std::string&gt; deduced since C++17</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack stringStackStack stringStack&#123;<span class="hljs-string">&quot;bottom&quot;</span>&#125;; <br><span class="hljs-comment">// OK: Stack&lt;std::string&gt; deduced since C++17</span><br></code></pre></td></tr></table></figure>
 
 <p>stack 被推导为 <code>Stack&lt;std::string&gt;</code>。但是，下面的语句仍旧是无效的：</p>
-<pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">"bottom"</span>; 
-<span class="hljs-comment">// Stack&lt;std::string&gt; deduced, but still not valid</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack stringStack = <span class="hljs-string">&quot;bottom&quot;</span>; <br><span class="hljs-comment">// Stack&lt;std::string&gt; deduced, but still not valid</span><br></code></pre></td></tr></table></figure>
 
 <p>模板参数类型被推导为 <code>std::string</code>，也实例化出了 <code>Stack&lt;std::string&gt;</code>：</p>
-<pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt; elems; <span class="hljs-comment">// elements</span>
-<span class="hljs-keyword">public</span>:
-	Stack (<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span>&amp; elem) <span class="hljs-comment">// initialize stack with one element</span>
-		: elems(&#123;elem&#125;) &#123;&#125;
-	...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span> </span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">private</span>:<br>	std::vector&lt;std::string&gt; elems; <span class="hljs-comment">// elements</span><br><span class="hljs-keyword">public</span>:<br>	<span class="hljs-built_in">Stack</span> (std::string <span class="hljs-keyword">const</span>&amp; elem) <span class="hljs-comment">// initialize stack with one element</span><br>		: <span class="hljs-built_in">elems</span>(&#123;elem&#125;) &#123;&#125;<br>	...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>但是根据语言规则，除了 <code>std::string</code>，你不能对字符串常量使用拷贝初始化（用 <code>=</code> 初始化）来初始化一个对象。因此你必须用如下的初始化方式：</p>
-<pre><code class="hljs c++">Stack stringStack&#123;<span class="hljs-string">"bottom"</span>&#125;; <span class="hljs-comment">// Stack&lt;std::string&gt; deduced and valid</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack stringStack&#123;<span class="hljs-string">&quot;bottom&quot;</span>&#125;; <span class="hljs-comment">// Stack&lt;std::string&gt; deduced and valid</span><br></code></pre></td></tr></table></figure>
 
 <p>跟类模板参数推导类似，在声明 <code>stringStack</code> 的类型是 <code>Stack&lt;std::string&gt;</code> 之后，下面的初始化声明了同一个类型（调用拷贝构造函数）而不是用类型为 <code>Stack&lt;std::string&gt;</code> 的元素对 stack 进行初始化（推导出的类型不会是 <code>Stack&lt;std::string&gt;</code>）：</p>
-<pre><code class="hljs c++">Stack stack2&#123;stringStack&#125;;    <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span>
-<span class="hljs-function">Stack <span class="hljs-title">stack3</span><span class="hljs-params">(stringStack)</span></span>;    <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span>
-Stack stack4 = &#123;stringStack&#125;; <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack stack2&#123;stringStack&#125;;    <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span><br><span class="hljs-function">Stack <span class="hljs-title">stack3</span><span class="hljs-params">(stringStack)</span></span>;    <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span><br>Stack stack4 = &#123;stringStack&#125;; <span class="hljs-comment">// Stack&lt;std::string&gt; deduced</span><br></code></pre></td></tr></table></figure>
 
 <p>更多内容，<a href>参见 15.12 节（未写）</a>。</p>
 <h2 id="2-10-模板聚合"><a href="#2-10-模板聚合" class="headerlink" title="2.10. 模板聚合"></a>2.10. 模板聚合</h2><p>聚合类（<em>classes/structs</em> which没有用户定义的显式的或者是继承的构造函数，没有 private 或者 protected 的非静态成员，没有虚函数，没有 virtual, private, or protected 方式继承的父类）也可以是模板。例如：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ValueWithComment</span> </span>
-<span class="hljs-class">&#123;</span>
-	T value;
-	<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> comment;
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ValueWithComment</span> </span><br><span class="hljs-class">&#123;</span><br>	T value;<br>	std::string comment;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>定义了一个成员 <code>value</code> 的类型被参数化了的聚合类。可以像定义其它类模板的对象一样定义一个聚合类的对象：</p>
-<pre><code class="hljs c++">ValueWithComment&lt;<span class="hljs-keyword">int</span>&gt; vc;
-vc.value = <span class="hljs-number">42</span>;
-vc.comment = <span class="hljs-string">"initial value"</span>;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++">ValueWithComment&lt;<span class="hljs-keyword">int</span>&gt; vc;<br>vc.value = <span class="hljs-number">42</span>;<br>vc.comment = <span class="hljs-string">&quot;initial value&quot;</span>;<br></code></pre></td></tr></table></figure>
 
 <p>从C++17 开始，可以为聚合类的类模板定义推导指引：</p>
-<pre><code class="hljs c++">ValueWithComment(<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*, <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*) 
-    -&gt; ValueWithComment&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;;
-ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span class="hljs-string">"initial value"</span>&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">ValueWithComment</span>(<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*, <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>*) <br>    -&gt; ValueWithComment&lt;std::string&gt;;<br>ValueWithComment vc2 = &#123;<span class="hljs-string">&quot;hello&quot;</span>, <span class="hljs-string">&quot;initial value&quot;</span>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>没有“推导指引”的话，就不能使用上述初始化方法，因为 <code>ValueWithComment</code> 没有相应的构造函数来完成相关类型推导。</p>
 <p>标准库的 <code>std::array&lt;&gt;</code> 类也是一个聚合类，其元素类型和尺寸都是被参数化的。C++17 也给它定义了“推导指引”，<a href>在 4.4.4 节（未写）会做进一步讨论</a>。</p>
@@ -946,7 +532,7 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
 <li>模板只可以被定义在 <em>global/namespace scope</em> 或者在类的声明之中。</li>
 </ul>
 
-            </article>
+            </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
@@ -972,11 +558,15 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
                 
               </div>
               
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
               
               
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
                     
                     
                       <a href="/2020/07/22/cpp-template-3/">
@@ -985,8 +575,8 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
-                  </div>
-                  <div class="post-next col-6">
+                  </article>
+                  <article class="post-next col-6">
                     
                     
                       <a href="/2020/07/15/union-find/">
@@ -995,13 +585,39 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
                         <i class="iconfont icon-arrowright"></i>
                       </a>
                     
-                  </div>
+                  </article>
                 </div>
               
             </div>
 
             
-          </div>
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="SOHUCS" sid='http://yoursite.com/2020/07/17/cpp-template-2/'></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#SOHUCS', function() {
+      var appid = 'cyvv8wewD';
+      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+      } else {
+        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
+          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
+        });
+      }
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
         </div>
       </div>
     </div>
@@ -1009,7 +625,7 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
       <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
         <div id="toc">
   <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
+  <div class="toc-body" id="toc-body"></div>
 </div>
 
       </div>
@@ -1021,16 +637,15 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
 
 
     
-  </main>
 
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
@@ -1051,21 +666,16 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
     </div>
   </div>
 </div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
     
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
   <div class="statistics">
     
     
@@ -1091,29 +701,61 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
   </div>
 
 
-    
+  
 
-    
-  </div>
+  
 </footer>
 
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
 <!-- Plugins -->
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
 
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
@@ -1122,95 +764,15 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
 
 
 
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
   <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: 'article.markdown-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 0,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "C++ Template-2 类模板&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
-      placement: "right",
-      visible: "hover",
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
       
-    };
-    var el = "h1,h2,h3,h4,h5,h6".split(",");
-    var res = [];
-    for (item of el) {
-      res.push(".markdown-body > " + item)
-    }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
+      typing(title)
+      
+    })(window, document);
   </script>
 
 
@@ -1252,14 +814,9 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
       };
     </script>
 
-    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.1.4/es5/tex-svg.js" ></script>
 
   
-
-
-
-
-
 
 
 
@@ -1293,6 +850,10 @@ ValueWithComment vc2 = &#123;<span class="hljs-string">"hello"</span>, <span cla
 
 
 
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
 
 
 </body>

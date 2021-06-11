@@ -1,0 +1,683 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="移动语意(move semantics)是 C++11 中引入的一个重要特性。本章将会介绍移动语意的特性， enable_if&amp;lt;&amp;gt; 的使用和对于 concept 的简单介绍。">
+  <meta name="author" content="Vinkle">
+  <meta name="keywords" content="">
+  
+  <title>按值传递还是按引用传递 - vinkle&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"e29593c0eaefc83ba96301b9153d7d11","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Vinkle's space</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="按值传递还是按引用传递">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-06-09 22:49" pubdate>
+        2021年6月9日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      53
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">按值传递还是按引用传递</h1>
+            
+            <div class="markdown-body">
+              <p><strong>移动语意(move semantics)</strong>是 C++11 中引入的一个重要特性。本章将会介绍移动语意的特性， <code>enable_if&lt;&gt;</code> 的使用和对于 <em>concept</em> 的简单介绍。</p>
+<span id="more"></span>
+
+<p>这<strong>不是</strong>本系列第一篇文章，推荐阅读完前面的文章再看本文，以下是本系列文章目录。</p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF">1. 函数模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/17/cpp-template-2/#2-%E7%B1%BB%E6%A8%A1%E6%9D%BF">2. 类模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/22/cpp-template-3/#3-1-%E7%B1%BB%E6%A8%A1%E6%9D%BF%E7%9A%84%E9%9D%9E%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0">3. 非类型模板参数</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/09/06/cpp-template-4/#4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF">4. 可变参数模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/10/12/cpp-template-5/#5-%E5%9F%BA%E7%A1%80%E6%8A%80%E6%9C%AF">5. 基础技术</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2021/01/15/cpp-template-6/#6-移动语意和-enable-if-lt-gt">6. 移动语意与 enable_if&lt;&gt;</a></p>
+<p><a href="#7-按值传递还是按引用传递">7.按值传递还是按引用传递</a></p>
+<h1 id="7-按值传递还是按引用传递"><a href="#7-按值传递还是按引用传递" class="headerlink" title="7. 按值传递还是按引用传递"></a>7. 按值传递还是按引用传递</h1><p>C++ 语言初期就提供了按值传递和按引用传递，但是如何选择传递方式并不好判断：一般对于 nontrivial 类型按引用传递开销会更小但是会更加复杂。C++11 添加了移动语意，因此我们现在有三种不同的方式按引用传递：</p>
+<ol>
+<li><p><code>X const&amp;</code>（常量左值引用）</p>
+<p>改参数引用了被传递的对象，并且该参数不能被更改。</p>
+</li>
+<li><p><code>X&amp;</code>（非常量左值引用）</p>
+<p>改参数引用了被传递的对象，并且该参数可以被更改。</p>
+</li>
+<li><p><code>X&amp;&amp;</code>（右值引用）</p>
+<p>改参数通过移动语意引用了被传递的对象，并且该参数可以被修改或者被”窃取“。</p>
+</li>
+</ol>
+<p>根据已有的类型决定如何声明传递参数已经很复杂了。在模板中，类型是不知道的，因此选择合适的传递机制会更加困难。</p>
+<p>然而，在 [1.6.1节](<a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/09/cpp-template-1/#1-6-1-按值传递还是按应用传递？">C++ Template-1 函数模板 - vinkle’s space</a>)我们鼓励在函数模板中按值传递参数，除非遇到以下特殊情况：</p>
+<ul>
+<li>对象不允许被拷贝。</li>
+<li>参数被用于返回数据。</li>
+<li>模板是为了转发参数到另外地方，并且保持原参数的所有性质。</li>
+<li>可以获得显著的性能提升。</li>
+</ul>
+<p>本章讨论了在模板中声明传递参数的几种方式，鼓励在通常情况下按值传递，并对按引用传递的特殊情况展开讨论。同时，还讨论了处理字符串常量和其他原始数组中存在的问题。</p>
+<p>在阅读本章时，最好能够熟悉<a href>附录B（未写）</a>中的术语(lvalue, rvalue, prvalue, xvalue, etc.)。</p>
+<h2 id="7-1-按值传递"><a href="#7-1-按值传递" class="headerlink" title="7.1 按值传递"></a>7.1 按值传递</h2><p>当值传递参数时，原则上来说，每个参数都必须被拷贝。因此，每个参数都是传递参数的一个拷贝。对于类来说，对象产生拷贝是由拷贝构造函数来初始化的。</p>
+<p>调用拷贝函数可能会有很大开销。但是，有一些方法可以避免按值传递中拷贝产生的巨大开销：实际上，通过移动语意，编译器在拷贝对象时会优化拷贝行为，即使对复杂的对象进行拷贝，产生的开销也很小。</p>
+<p>比如下面这个按值传递参数的函数模板：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printV</span><span class="hljs-params">(T arg)</span></span>&#123;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>当对<code>int</code>类型调用该函数模板时，实例化后的代码是：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printV</span><span class="hljs-params">(<span class="hljs-keyword">int</span> arg)</span></span>&#123;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>参数<code>arg</code>是任何传递对象的拷贝，无论该对象是字符，常量还是函数的返回值。</p>
+<p>如果对<code>std::string</code>类型调用该函数模板：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::string s = <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">printV</span>(s);<br></code></pre></td></tr></table></figure>
+
+<p>模板参数<code>T</code>会被实例化为<code>std::string</code>，因此我们得到：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printV</span><span class="hljs-params">(std::string arg)</span></span>&#123;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>同样，当传递字符串时，<code>arg</code>变成了字符串的拷贝。此时，该拷贝是由<code>string</code>类的拷贝构造函数生成的，这可能是一个开销很大的操作，因为原则上来说这个拷贝操作会进行深拷贝，它需要创建它独自的内存去存储这些值。</p>
+<p>但是，不是所有情况会调用拷贝构造函数。考虑下面这种情况：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">std::string <span class="hljs-title">returnString</span><span class="hljs-params">()</span></span>;<br>std::string s = <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">printV</span>(s);                 <span class="hljs-comment">// copy constructor</span><br><span class="hljs-built_in">printV</span>(std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot;hi&quot;</span>)); <span class="hljs-comment">// coping usually optimized away(if not, move constructor)</span><br><span class="hljs-built_in">printV</span>(<span class="hljs-built_in">returnString</span>());    <span class="hljs-comment">// coping usually optimized away(if not, move constructor)</span><br><span class="hljs-built_in">printV</span>(std::<span class="hljs-built_in">move</span>(s));      <span class="hljs-comment">// move constructor</span><br></code></pre></td></tr></table></figure>
+
+<p>在第一次调用时我们传递的是 <em>lvalue*，会使用拷贝构造函数。但是，在第二次和第三次调用中，当直接调用对于 *prvalue</em> 的函数模板，编译器通常会优化传递参数因此并不会有拷贝构造函数的调用。注意，从 C++17 开始，改优化是被要求的，在 C++17 之前，编译器不会完全优化拷贝，至少会尝试使用移动语意去使拷贝更加廉价。在最后的调用中，当传递 <em>xvalue</em>，我们通过一个我们不再需要使用<code>s</code>的信号，强制调用了移动构造函数。</p>
+<p>综上所述，调用声明为按值传递的函数<code>printV()</code>时，只有在我们传递 <em>lvalue</em>（对象在使用之前被创建，而且我们并没有使用<code>std::move()</code>去传递它）会产生较大开销。不幸的是，该情况是非常常见的。因为我们通常是先创建一个对象，再去传递这个对象（通过一些操作后）给其他函数。</p>
+<h3 id="按值传递会导致类型退化"><a href="#按值传递会导致类型退化" class="headerlink" title="按值传递会导致类型退化"></a>按值传递会导致类型退化</h3><p>对于按值传递，我们还必须提到这一特性：当通过按值传递的方式传递参数时，该参数的类型会退化。这意味的<strong>原始数组(raw array)</strong>会转化为指针，而且参数的<code>const</code>或<code>volatile</code>修饰符也会被移除（就如同用值初始化一个<code>auto</code>的对象一样）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printV</span><span class="hljs-params">(T arg)</span></span>&#123;<br>    ...<br>&#125;<br>std::string <span class="hljs-keyword">const</span> c = <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">printV</span>(c);                  <span class="hljs-comment">// c decays so that arg has type std::string</span><br><br><span class="hljs-built_in">printV</span>(<span class="hljs-string">&quot;hi&quot;</span>);               <span class="hljs-comment">// decays to pointer so that arg has type char const*</span><br><br><span class="hljs-keyword">int</span> arr[<span class="hljs-number">4</span>];<br><span class="hljs-built_in">printV</span>(arr);                <span class="hljs-comment">// decays to pointer so that arg has type int*</span><br></code></pre></td></tr></table></figure>
+
+<p>因此，当我们传递字符串常量<code>&quot;hi&quot;</code>时，他的类型<code>char const[3]</code>退化为<code>char const*</code> ，此时模板被实例化为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printV</span><span class="hljs-params">(<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>* arg)</span></span>&#123;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这一行为继承自C语言，既有优点也有缺点。通常它简化了传递字符串常量的处理，但是其缺陷是内部的<code>printV()</code>不能够对指针和原始数组进行区分。我们会在 <a href>7.4 节</a>对如何处理字符串常量和其他原始数组进行讨论。</p>
+<h2 id="7-2-按引用传递"><a href="#7-2-按引用传递" class="headerlink" title="7.2 按引用传递"></a>7.2 按引用传递</h2><p>现在，我们来讨论一下按引用传递参数有什么不同。无论哪种情况，按引用传递都不会有对象的拷贝生成（因为该参数是传递参数的引用）。而且，传递的参数不会退化。但是，在有些情况下，是不能够按引用传递的，即使可以使用按引用传递，参数的类型上也会出现一些问题。</p>
+<h3 id="7-2-1-按常量引用传递"><a href="#7-2-1-按常量引用传递" class="headerlink" title="7.2.1 按常量引用传递"></a>7.2.1 按常量引用传递</h3><p>为了避免任何（不必要）的拷贝，当传递一个非临时对象是，我们可以使用常量引用。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printR</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; arg)</span></span>&#123;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>通过这个声明，传递的参数不会产生拷贝（无论拷贝的开销大不大）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">std::string <span class="hljs-title">returnString</span><span class="hljs-params">()</span></span>;<br>std::string s = <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">printR</span>(s);                 <span class="hljs-comment">// no copy</span><br><span class="hljs-built_in">printR</span>(std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot;hi&quot;</span>)); <span class="hljs-comment">// no copy</span><br><span class="hljs-built_in">printR</span>(<span class="hljs-built_in">returnString</span>());    <span class="hljs-comment">// no copy</span><br><span class="hljs-built_in">printR</span>(std::<span class="hljs-built_in">move</span>(s));      <span class="hljs-comment">// no copy</span><br></code></pre></td></tr></table></figure>
+
+<p>甚至通过引用传递<code>int</code>类型，虽然不能够提升性能，但也不会产生拷贝。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> i = <span class="hljs-number">42</span>;<br><span class="hljs-built_in">printR</span>(i);  <span class="hljs-comment">// passes reference instead of just copying i</span><br></code></pre></td></tr></table></figure>
+
+<p>会使得<code>printR()</code>被实例化为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printR</span><span class="hljs-params">(<span class="hljs-keyword">int</span> <span class="hljs-keyword">const</span>&amp; arg)</span></span>&#123;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在底层上，按引用传递参数是通过传递该参数的地址实现的。地址被简洁编码，因此地址在调用者和被调用者之间的传递非常高效。但是，当编译器编译调用者代码时，传递地址会产生一些困惑：被调用者会如何处理这个地址？理论上被调用者可以改变所有可以通过改地址得到的值。这意味着，编译器必须假设在调用后，所有被缓存（通常，在机器的寄存器中）的值都会无效。而重新载入这些值会产生极大的开销。你可能认为我们传递常引用时，编译器会推断不会有改变产生。不幸的是，这并不存在，因为调用者可以通过自己的非常引用去修改引用的对象。</p>
+<p>对于<code>inline</code>函数，这一情况会好一些：如果编译器可以展开<code>inline</code>的调用，它就可以通过调用者和被调用者的信息去推断被传递的地址中的值是否改变。函数模板通常非常简短，通常可以被<code>inline</code>展开。但是，如果函数模板中有一些复杂的算法，那么它就大概率不会被<code>inline</code>。</p>
+<h4 id="按引用传递不会退化"><a href="#按引用传递不会退化" class="headerlink" title="按引用传递不会退化"></a>按引用传递不会退化</h4><p>按引用传递的参数不会退化，这意味着原始数组不会被转化为指针，而且<code>const</code>和<code>volatile</code>修饰符也不会被移除。但是，因为调用参数是被声明为<code>T const&amp;</code>，模板参数<code>T</code>本身不会被推导为<code>const</code>变量。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printR</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; arg)</span></span>&#123;<br>    ,,,<br>&#125;<br><br>std::string <span class="hljs-keyword">const</span> c = <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">printR</span>(c);     <span class="hljs-comment">// T deduced as std::string, arg is std::string const&amp;</span><br>    <br><span class="hljs-built_in">printR</span>(<span class="hljs-string">&quot;hi&quot;</span>);  <span class="hljs-comment">// T deduced as char[3], arg is char const(&amp;)[3]</span><br><br><span class="hljs-keyword">int</span> arr[<span class="hljs-number">4</span>];<br><span class="hljs-built_in">printR</span>(arr);   <span class="hljs-comment">// T deduced as int[4], arg is in const(&amp;)[4]</span><br></code></pre></td></tr></table></figure>
+
+<p>注意，在<code>printR()</code>中的<code>T</code>对象的类型并不是<code>const</code>类型。</p>
+<h3 id="7-2-2-按非常量引用传递"><a href="#7-2-2-按非常量引用传递" class="headerlink" title="7.2.2 按非常量引用传递"></a>7.2.2 按非常量引用传递</h3><p>当你想要用传递的参数来返回变量时（i.e. 当你想要使用 <em>out</em> 或是 <em>inout</em> 参数时），你必须使用非常量引用（除非你更期望通过指针来传递）。同样的，这样可以使得传递参数时并不会有对象的拷贝产生。调用函数模板的参数直接引用了传递参数。</p>
+<p>考虑下面这个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">outR</span><span class="hljs-params">(T&amp; arg)</span></span>&#123;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>注意对临时变量(prvalue)或者通过<code>std::move()</code>传递的现有对象(xvalue)来调用<code>outR()</code>通常不被允许：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">std::string <span class="hljs-title">returnString</span><span class="hljs-params">()</span></span>;<br>std::string s = <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">outR</span>(s);                 <span class="hljs-comment">// OK: T deduced as std::string, arg is std::string</span><br><span class="hljs-built_in">outR</span>(std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot;hi&quot;</span>)); <span class="hljs-comment">// ERROR: not allowed to pass a temporary(prvalue)</span><br><span class="hljs-built_in">outR</span>(<span class="hljs-built_in">returnString</span>());    <span class="hljs-comment">// ERROR: not allowed to pass a temporary(prvalue)</span><br><span class="hljs-built_in">outR</span>(std:<span class="hljs-built_in">move</span>(s));       <span class="hljs-comment">// ERROR: not allowed to pass an xvalue</span><br></code></pre></td></tr></table></figure>
+
+<p>你可以修改传递的对象，比如修改<code>array</code>的<code>size</code>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">outR</span><span class="hljs-params">(T&amp; arg)</span></span>&#123;<br>    <span class="hljs-keyword">if</span> (std::is_array&lt;T&gt;::value)&#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;got array of &quot;</span> &lt;&lt; std:extent&lt;T&gt;::value &lt;&lt; <span class="hljs-string">&quot; elems\n&quot;</span>;<br>    &#125;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>如果你传递的是一个<code>const</code>参数，<code>arg</code>可能会被推导为常量引用，此时传递的是 rvalue，但是期望的是 lvalue:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::string <span class="hljs-keyword">const</span> c = <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">outR</span>(c);                   <span class="hljs-comment">// OK: T deduced as std::string</span><br><span class="hljs-built_in">outR</span>(<span class="hljs-built_in">returnConstString</span>()); <span class="hljs-comment">// OK: same if returnConstString() return const string</span><br><span class="hljs-built_in">outR</span>(std::<span class="hljs-built_in">move</span>(c));        <span class="hljs-comment">// OK: T deduced as std::string const</span><br><span class="hljs-built_in">outR</span>(<span class="hljs-string">&quot;hi&quot;</span>);                <span class="hljs-comment">// OK: T deduced as char const[3]</span><br></code></pre></td></tr></table></figure>
+
+<p>当然，在该情况下任何对传递参数进行修改的操作都会引发错误。在函数调用语句中，传递<code>const</code>对象是可以的，但是如果该函数模板被全实例化后（可能会发生在接下来的编译过程中），任何修改值的操作会引发错误（这可能会发生在模板调用的深层逻辑上；参见 <a href>9.3 节（未写）</a>）。</p>
+<p>如果你想要禁止像非常引用传递常量对象，你可以这么做：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">outR</span><span class="hljs-params">(T&amp; arg)</span></span>&#123;<br>    <span class="hljs-built_in"><span class="hljs-keyword">static_assert</span></span>(!std:is_const&lt;T&gt;::value,<br>                 <span class="hljs-string">&quot;out parameter of foo&lt;T&gt;(T&amp;) is const&quot;</span>);<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>也可以使用<code>std::enable_if&lt;&gt;</code>（参见 <a target="_blank" rel="noopener" href="https://vinkle.top/2021/01/15/cpp-template-6/#6-3-使用-enable-if-lt-gt-禁用模板">6.3 节</a>）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T,<br>         <span class="hljs-keyword">typename</span> = std::<span class="hljs-keyword">enable_if_t</span>&lt;!std::is_const&lt;T&gt;::value&gt;<br><span class="hljs-keyword">void</span> <span class="hljs-built_in">outR</span>(T&amp; arg)&#123;<br>	...             <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>如果编译器支持的话，也可以使用 concept（参见 <a target="_blank" rel="noopener" href="https://vinkle.top/2021/01/15/cpp-template-6/#6-5-使用-concepts-简化-enable-if-lt-gt-表达式">6.5 节</a>）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">requires</span> !<span class="hljs-function">std::is_const_v&lt;T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">outR</span><span class="hljs-params">(T&amp; arg)</span></span>&#123;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-2-3-按转发传递"><a href="#7-2-3-按转发传递" class="headerlink" title="7.2.3 按转发传递"></a>7.2.3 按转发传递</h3><p>使用通过引用调用函数的一个原因是能够完美转发参数（参见 <a target="_blank" rel="noopener" href="https://vinkle.top/2021/01/15/cpp-template-6/#6-1-完美转发">6.1 节</a>）。但是注意使用转发引用的时候，如果模板参数被定义为一个 rvalue 引用，就有一些特殊的规则。考虑下面的这个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">passR</span><span class="hljs-params">(T&amp;&amp; arg)</span></span>&#123;   <span class="hljs-comment">// arg declared as forwarding reference</span><br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>你可以传递任何类型的参数给转发引用，而且因为是按引用传递，并不会有参数的拷贝：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::string s =  <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">passR</span>(s);                 <span class="hljs-comment">// OK: T deduced as std::string&amp; (also the type of arg)</span><br><span class="hljs-built_in">passR</span>(std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot;hi&quot;</span>)); <span class="hljs-comment">// OK: T deduced as std::string, arg is std::string&amp;&amp;</span><br><span class="hljs-built_in">passR</span>(<span class="hljs-built_in">returnString</span>());    <span class="hljs-comment">// OK: T deduced as std::string, arg is std::string&amp;&amp;</span><br><span class="hljs-built_in">passR</span>(std::<span class="hljs-built_in">move</span>(s));      <span class="hljs-comment">// OK: T deduced as std::string, arg is std::string&amp;&amp;</span><br><span class="hljs-built_in">passR</span>(arr);               <span class="hljs-comment">// OK: T deduced as std::string, arg is std::string&amp;&amp;</span><br></code></pre></td></tr></table></figure>
+
+<p>但是，有一些特殊的类型推导：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::string <span class="hljs-keyword">const</span> c = <span class="hljs-string">&quot;hi&quot;</span>;<br><span class="hljs-built_in">passR</span>(c);       <span class="hljs-comment">// OK: T deduced as std::string const&amp;;</span><br><span class="hljs-built_in">passR</span>(<span class="hljs-string">&quot;hi&quot;</span>);    <span class="hljs-comment">// OK: T deduced as char const(&amp;)[3](also the type of arg);</span><br><span class="hljs-keyword">int</span> arr[<span class="hljs-number">4</span>];<br><span class="hljs-built_in">passR</span>(arr);     <span class="hljs-comment">// OK: T deduced as int const(&amp;)[4](also the type of arg);</span><br></code></pre></td></tr></table></figure>
+
+<p>在上面的几种情况下，从<code>passR()</code>中的内部参数<code>arg</code>的类型可以知道我们传递的参数是一个 rvalue（使用移动语意）或者是一个（非）常量 lvalue。这是唯一可以通过只传递一个参数就可以区分以上三种情况的方法。</p>
+<p>看上去将参数声明为转发引用总是完美的。但是，天下没有免费的午餐。</p>
+<p>比如，由于转发引用是唯一可以将模板参数<code>T</code>推导为引用类型的方法。因此，当使用<code>T</code>去声明一个未初始化的局部对象时可能会产生错误：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">passR</span><span class="hljs-params">(T&amp;&amp; arg)</span></span>&#123; <span class="hljs-comment">// arg is a forwarding reference</span><br>    T x;  <span class="hljs-comment">// for passed lvalues, x is a reference, which requires an initializer</span><br>    ...<br>&#125;<br><br><span class="hljs-built_in">passR</span>(<span class="hljs-number">42</span>); <span class="hljs-comment">// OK: T deduced as int</span><br><span class="hljs-keyword">int</span> i;<br><span class="hljs-built_in">passR</span>(i);  <span class="hljs-comment">// ERROR: T deduced as int&amp;, which makes the declaration of x in passR() invalid</span><br></code></pre></td></tr></table></figure>
+
+<p>参见 <a href>15.6.2 节（未写）</a>进一步了解如何处理这种情况。</p>
+<h2 id="7-3-std-ref-和std-cref的使用"><a href="#7-3-std-ref-和std-cref的使用" class="headerlink" title="7.3 std::ref()和std::cref的使用"></a>7.3 <code>std::ref()</code>和<code>std::cref</code>的使用</h2><p>从 C++11 开始，你可以让调用者决定函数模板参数是否要按值或者引用传递。当模板被声明为按值传递参数时，调用者可以使用<code>std::cref()</code>和<code>std::ref()</code>（定义在头文件<code>&lt;functional&gt;</code>中）来按引用传递参数。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printT</span><span class="hljs-params">(T arg)</span></span>&#123;<br>    ...<br>&#125;<br><br>std::string s = <span class="hljs-string">&quot;hello&quot;</span>;<br><span class="hljs-built_in">printT</span>(s);              <span class="hljs-comment">// pass by value</span><br><span class="hljs-built_in">printT</span>(std::<span class="hljs-built_in">cref</span>(s));   <span class="hljs-comment">// pass s &quot;as if by reference&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>但是，注意<code>std::cref()</code>并不会改变模板中处理参数的方式。但是，它使用了一个 trick：它让传递的参数<code>s</code>的行为像一个引用一样。实际上，它包装(wrap)了一个 <code>std::reference_warpper&lt;&gt;</code> 类型的对象，这个对象引用了原始对象，并且可以按值传递这个对象。这个包装器(wrapper)只支持：隐形地类型转换为原始类型，返回原始对象。因此，如果你对传递的对象操作合法，你可以使用引用包装器。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;functional&gt;</span>  <span class="hljs-comment">// for std::cref()</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printString</span><span class="hljs-params">(std::string <span class="hljs-keyword">const</span>&amp; s)</span></span><br><span class="hljs-function"></span>&#123;<br>  std::cout &lt;&lt; s &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printT</span> <span class="hljs-params">(T arg)</span></span><br><span class="hljs-function"></span>&#123;<br>  <span class="hljs-built_in">printString</span>(arg);        <span class="hljs-comment">// might convert arg back to std::string</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  std::string s = <span class="hljs-string">&quot;hello&quot;</span>;<br>  <span class="hljs-built_in">printT</span>(s);               <span class="hljs-comment">// print s passed by value</span><br>  <span class="hljs-built_in">printT</span>(std::<span class="hljs-built_in">cref</span>(s));    <span class="hljs-comment">// print s passed ``as if by reference&#x27;&#x27;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>最后一次按值传递的调用将一个类型为<code>std::reference_wrapper&lt;string const&gt;</code> 参数传递给 <code>arg</code>，它后面会转换回它潜在的类型 <code>std::string</code>。</p>
+<p>注意编译器必须要知道隐式转换为原类型这一操作是必要的。由于这个原因，<code>std::ref()</code>和<code>std::cref()</code>只会在你通过泛型代码将对象传递给非泛型函数时才会有预期的表现。例如，直接尝试输出具有泛型类型<code>T</code>的传递对象会导致错误，因为没有针对<code>std::reference_warpper&lt;&gt;</code>类型的输出运算符：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printV</span><span class="hljs-params">(T arg)</span></span>&#123;<br>    std::cout &lt;&lt; arg &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>&#125;<br>...<br>std::string s = <span class="hljs-string">&quot;hello&quot;</span>;<br><span class="hljs-built_in">printV</span>(s);              <span class="hljs-comment">// OK</span><br><span class="hljs-built_in">printV</span>(std::<span class="hljs-built_in">cref</span>(s));   <span class="hljs-comment">// ERROR: no operator&lt;&lt; for reference wrapper defined</span><br></code></pre></td></tr></table></figure>
+
+<p>同样，下面的代码也会出现错误，因为你不能对 <code>char const*</code>或<code>std::string</code>类型的 reference wrapper 进行比较：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">isless</span><span class="hljs-params">(T1 arg1, T2 arg2)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> arg1 &lt; arg2;<br>&#125;<br>...<br>std::string s = <span class="hljs-string">&quot;hello&quot;</span>;<br><span class="hljs-keyword">if</span> (<span class="hljs-built_in">isless</span>(std::<span class="hljs-built_in">cref</span>(s), <span class="hljs-string">&quot;world&quot;</span>)) ... <span class="hljs-comment">//ERROR</span><br><span class="hljs-keyword">if</span> (<span class="hljs-built_in">isless</span>(std::<span class="hljs-built_in">cref</span>(s), std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot;world&quot;</span>))) ... <span class="hljs-comment">//ERROR</span><br></code></pre></td></tr></table></figure>
+
+<p> 如果给<code>arg1</code>和<code>arg2</code>同样类型<code>T</code>也不会编译成功：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">isless</span><span class="hljs-params">(T arg1, T arg2)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> arg1 &lt; arg2;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>因为这时编译器推导<code>arg1</code>和<code>arg2</code>类型<code>T</code>时会得到两个冲突的类型。</p>
+<h2 id="7-4-处理字符串字面量常量与原始数组"><a href="#7-4-处理字符串字面量常量与原始数组" class="headerlink" title="7.4 处理字符串字面量常量与原始数组"></a>7.4 处理字符串字面量常量与原始数组</h2><h3 id="7-4-1-字符串字面常量和原始数组的特殊实现"><a href="#7-4-1-字符串字面常量和原始数组的特殊实现" class="headerlink" title="7.4.1 字符串字面常量和原始数组的特殊实现"></a>7.4.1 字符串字面常量和原始数组的特殊实现</h3><h2 id="7-5-处理返回值"><a href="#7-5-处理返回值" class="headerlink" title="7.5 处理返回值"></a>7.5 处理返回值</h2><h2 id="7-6-模板参数声明推荐"><a href="#7-6-模板参数声明推荐" class="headerlink" title="7.6 模板参数声明推荐"></a>7.6 模板参数声明推荐</h2><h2 id="7-7-小结"><a href="#7-7-小结" class="headerlink" title="7.7 小结"></a>7.7 小结</h2>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/C/">C++</a>
+                    
+                      <a class="hover-with-bg" href="/categories/C/Template/">Template</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/C/">C++</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/">泛型编程</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="SOHUCS" sid='http://yoursite.com/2021/06/09/cpp-template-7/'></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#SOHUCS', function() {
+      var appid = 'cyvv8wewD';
+      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+      } else {
+        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
+          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
+        });
+      }
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.1.4/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?e29593c0eaefc83ba96301b9153d7d11";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

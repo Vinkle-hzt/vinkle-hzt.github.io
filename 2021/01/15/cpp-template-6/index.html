@@ -1,46 +1,54 @@
+
+
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
-  <link rel="icon" type="image/png" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <meta name="theme-color" content="">
-  <meta name="description" content="vinkle&#39;s space">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="移动语意(move semantics)是 C++11 中引入的一个重要特性。本章将会介绍移动语意的特性， enable_if&amp;lt;&amp;gt; 的使用和对于 concept 的简单介绍。">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
+  
   <title>C++ Template-6 移动语意和 enable_if&lt;&gt; - vinkle&#39;s space</title>
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
   <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
   
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
   
+
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
 
 
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
 
 
 <link  rel="stylesheet" href="/css/main.css" />
@@ -48,8 +56,13 @@
 <!-- 自定义样式保持在最底部 -->
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"e29593c0eaefc83ba96301b9153d7d11","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
   <script  src="/js/utils.js" ></script>
-<meta name="generator" content="Hexo 4.2.1"></head>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -143,8 +156,14 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
       </ul>
@@ -152,32 +171,35 @@
   </div>
 </nav>
 
-    <div class="view intro-2" id="background" parallax=true
+    <div class="banner" id="banner" parallax=true
          style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="C++ Template-6 移动语意和 enable_if<>">
               
             </span>
 
             
-              
-  <div class="mt-3 post-meta">
-    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2021-01-15 17:03">
-      2021年1月15日 下午
-    </time>
-  </div>
-
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-01-15 17:03" pubdate>
+        2021年1月15日 下午
+      </time>
+    </span>
+  
+</div>
 
 <div class="mt-1">
   
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      5.2k 字
+      5.3k 字
     </span>
   
 
@@ -187,20 +209,12 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      72
+      74
        分钟
     </span>
   
 
   
-  
-    
-      <!-- 不蒜子统计文章PV -->
-      <span id="busuanzi_container_page_pv" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="busuanzi_value_page_pv"></span> 次
-      </span>
-    
   
 </div>
 
@@ -217,30 +231,26 @@
     
       
 
-<div class="container-fluid">
-  <div class="row">
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
     <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
         <div class="py-5" id="board">
-          <div class="post-content mx-auto" id="post">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">C++ Template-6 移动语意和 enable_if&lt;&gt;</h1>
             
-              <p class="note note-info">
-                
-                  本文最后更新于：2021年1月15日 下午
-                
-              </p>
-            
-            <article class="markdown-body">
+            <div class="markdown-body">
               <p><strong>移动语意(move semantics)</strong>是 C++11 中引入的一个重要特性。本章将会介绍移动语意的特性， <code>enable_if&lt;&gt;</code> 的使用和对于 <em>concept</em> 的简单介绍。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <p>这<strong>不是</strong>本系列第一篇文章，推荐阅读完前面的文章再看本文，以下是本系列文章目录。</p>
-<p><a href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">1. 函数模板</a></p>
-<p><a href="https://vinkle.top/2020/07/17/cpp-template-2/#2-%E7%B1%BB%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">2. 类模板</a></p>
-<p><a href="https://vinkle.top/2020/07/22/cpp-template-3/#3-1-%E7%B1%BB%E6%A8%A1%E6%9D%BF%E7%9A%84%E9%9D%9E%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0" target="_blank" rel="noopener">3. 非类型模板参数</a></p>
-<p><a href="https://vinkle.top/2020/09/06/cpp-template-4/#4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">4. 可变参数模板</a></p>
-<p><a href="https://vinkle.top/2020/10/12/cpp-template-5/#5-%E5%9F%BA%E7%A1%80%E6%8A%80%E6%9C%AF" target="_blank" rel="noopener">5. 基础技术</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF">1. 函数模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/17/cpp-template-2/#2-%E7%B1%BB%E6%A8%A1%E6%9D%BF">2. 类模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/22/cpp-template-3/#3-1-%E7%B1%BB%E6%A8%A1%E6%9D%BF%E7%9A%84%E9%9D%9E%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0">3. 非类型模板参数</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/09/06/cpp-template-4/#4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF">4. 可变参数模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/10/12/cpp-template-5/#5-%E5%9F%BA%E7%A1%80%E6%8A%80%E6%9C%AF">5. 基础技术</a></p>
 <p><a href="#6-移动语意和-enable-if-lt-gt">6. 移动语意与 enable_if&lt;&gt;（本文）</a></p>
 <h1 id="6-移动语意和-enable-if-lt-gt"><a href="#6-移动语意和-enable-if-lt-gt" class="headerlink" title="6.移动语意和 enable_if&lt;&gt;"></a>6.移动语意和 enable_if&lt;&gt;</h1><p><strong>移动语意(move semantics)</strong>是 C++11 中引入的一个重要特性。在进行拷贝和赋值时，可通过将源对象的内部资源通过 move(“steal”) 到目标对象的方法（而不是拷贝的方法）来提升效率。要注意，这样做的前提是源对象不再需要它内部的值或者状态（因为原对象将要被丢弃）。</p>
 <p>移动语意对于模板的设计具有重大意义，而且泛型代码中也引入了一些特殊规则来支持移动语意。本章节将会介绍移动语意的这些特性。</p>
@@ -251,69 +261,18 @@
 <li>可以使用移动语义的对象转发后依然可以使用移动语义。</li>
 </ul>
 <p>如果不使用模板的话，我们需要为这三种情况分别编写代码以达到转发的功能。例如，要在调用函数 <code>f()</code> 时将它的参数转发到函数 <code>g()</code>：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">X</span> &#123;</span>
-  <span class="hljs-comment">//...</span>
-&#125;;
-
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X&amp;)</span> </span>&#123;
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"g() for variable\n"</span>;
-&#125;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X <span class="hljs-keyword">const</span>&amp;)</span> </span>&#123;
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"g() for constant\n"</span>;
-&#125;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X&amp;&amp;)</span> </span>&#123;
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"g() for movable object\n"</span>;
-&#125;
-
-<span class="hljs-comment">// let f() forward argument val to g():</span>
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span> <span class="hljs-params">(X&amp; val)</span> </span>&#123;
-  g(val);             <span class="hljs-comment">// val is non-const lvalue =&gt; calls g(X&amp;)</span>
-&#125;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span> <span class="hljs-params">(X <span class="hljs-keyword">const</span>&amp; val)</span> </span>&#123;
-  g(val);             <span class="hljs-comment">// val is const lvalue =&gt; calls g(X const&amp;)</span>
-&#125;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span> <span class="hljs-params">(X&amp;&amp; val)</span> </span>&#123;
-  g(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(val));  <span class="hljs-comment">// val is non-const  lvalue =&gt; needs std::move() to call g(X&amp;&amp;)</span>
-&#125;
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  X v;              <span class="hljs-comment">// create variable</span>
-  X <span class="hljs-keyword">const</span> c;        <span class="hljs-comment">// create constant</span>
-
-  f(v);             <span class="hljs-comment">// f() for nonconstant object calls f(X\&amp;)  =&gt;  calls g(X\&amp;)</span>
-  f(c);             <span class="hljs-comment">// f() for constant object calls f(X const\&amp;) =&gt;  calls g(X const\&amp;)</span>
-  f(X());           <span class="hljs-comment">// f() for temporary calls f(X\&amp;\&amp;)  =&gt;  calls g(X\&amp;\&amp;)</span>
-  f(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(v));  <span class="hljs-comment">// f() for movable variable calls f(X\&amp;\&amp;)  =&gt; calls g(X\&amp;\&amp;)</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">X</span> &#123;</span><br>  <span class="hljs-comment">//...</span><br>&#125;;<br><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X&amp;)</span> </span>&#123;<br>  std::cout &lt;&lt; <span class="hljs-string">&quot;g() for variable\n&quot;</span>;<br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X <span class="hljs-keyword">const</span>&amp;)</span> </span>&#123;<br>  std::cout &lt;&lt; <span class="hljs-string">&quot;g() for constant\n&quot;</span>;<br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X&amp;&amp;)</span> </span>&#123;<br>  std::cout &lt;&lt; <span class="hljs-string">&quot;g() for movable object\n&quot;</span>;<br>&#125;<br><br><span class="hljs-comment">// let f() forward argument val to g():</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span> <span class="hljs-params">(X&amp; val)</span> </span>&#123;<br>  <span class="hljs-built_in">g</span>(val);             <span class="hljs-comment">// val is non-const lvalue =&gt; calls g(X&amp;)</span><br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span> <span class="hljs-params">(X <span class="hljs-keyword">const</span>&amp; val)</span> </span>&#123;<br>  <span class="hljs-built_in">g</span>(val);             <span class="hljs-comment">// val is const lvalue =&gt; calls g(X const&amp;)</span><br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span> <span class="hljs-params">(X&amp;&amp; val)</span> </span>&#123;<br>  <span class="hljs-built_in">g</span>(std::<span class="hljs-built_in">move</span>(val));  <span class="hljs-comment">// val is non-const  lvalue =&gt; needs std::move() to call g(X&amp;&amp;)</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  X v;              <span class="hljs-comment">// create variable</span><br>  X <span class="hljs-keyword">const</span> c;        <span class="hljs-comment">// create constant</span><br><br>  <span class="hljs-built_in">f</span>(v);             <span class="hljs-comment">// f() for nonconstant object calls f(X\&amp;)  =&gt;  calls g(X\&amp;)</span><br>  <span class="hljs-built_in">f</span>(c);             <span class="hljs-comment">// f() for constant object calls f(X const\&amp;) =&gt;  calls g(X const\&amp;)</span><br>  <span class="hljs-built_in">f</span>(<span class="hljs-built_in">X</span>());           <span class="hljs-comment">// f() for temporary calls f(X\&amp;\&amp;)  =&gt;  calls g(X\&amp;\&amp;)</span><br>  <span class="hljs-built_in">f</span>(std::<span class="hljs-built_in">move</span>(v));  <span class="hljs-comment">// f() for movable variable calls f(X\&amp;\&amp;)  =&gt; calls g(X\&amp;\&amp;)</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>这里定义了三种不同的 <code>f()</code> 用来将它的参数转发给函数 <code>g()</code>。</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(X&amp; val)</span></span>&#123;
-    g(val);            <span class="hljs-comment">// val is non-const lvalue =&gt; calls g(X&amp;)</span>
-&#125;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(X <span class="hljs-keyword">const</span>&amp; val)</span></span>&#123;
-    g(val);            <span class="hljs-comment">// val is const lvalue =&gt; calls g(X const&amp;)</span>
-&#125;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(X&amp;&amp; val)</span></span>&#123;
-    g(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(val)); <span class="hljs-comment">// val is non-const  lvalue =&gt; needs std::move() to call g(X&amp;&amp;)</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(X&amp; val)</span></span>&#123;<br>    <span class="hljs-built_in">g</span>(val);            <span class="hljs-comment">// val is non-const lvalue =&gt; calls g(X&amp;)</span><br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(X <span class="hljs-keyword">const</span>&amp; val)</span></span>&#123;<br>    <span class="hljs-built_in">g</span>(val);            <span class="hljs-comment">// val is const lvalue =&gt; calls g(X const&amp;)</span><br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(X&amp;&amp; val)</span></span>&#123;<br>    <span class="hljs-built_in">g</span>(std::<span class="hljs-built_in">move</span>(val)); <span class="hljs-comment">// val is non-const  lvalue =&gt; needs std::move() to call g(X&amp;&amp;)</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>注意针对可移动对象（通过一个右值引用）编写的代码和其他代码不同：它需要 <code>std::move()</code>，因为根据语法规则，参数的移动语意不能被传递。尽管 <code>val</code> 在第三个 <code>f()</code> 被定义为右值引用，但它在表达式中使用时，是一个<strong>非常量左值(nonconstant lvalues)</strong>，它的作用和第一个 <code>f()</code> 相同。如果没有使用 <code>move()</code>，将会调用的是针对非常量左值的函数 <code>g(X&amp;)</code>，而并非 <code>g(X&amp;&amp;)</code>。</p>
 <p>如果我们想要将三种情况的代码合并为一个泛型代码，我们会遇到一个问题：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T&amp; val)</span></span>&#123;
-    g(val);
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T&amp; val)</span></span>&#123;<br>    <span class="hljs-built_in">g</span>(val);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p> 在前两种情况下是适用的，但是在第三种情况是不适用的。</p>
 <p>基于此，C++11 引入了特殊的规则来实现对参数的完美转发。实现这个特性惯用的代码如下：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T&amp;&amp; val)</span></span>&#123;
-    g(<span class="hljs-built_in">std</span>::forward&lt;T&gt;(val)); <span class="hljs-comment">//perfect forward val to g()</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T&amp;&amp; val)</span></span>&#123;<br>    <span class="hljs-built_in">g</span>(std::forward&lt;T&gt;(val)); <span class="hljs-comment">//perfect forward val to g()</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>注意 <code>std::move()</code> 并没有模板参数，而且会对传递的参数触发移动语意。然而 <code>std::forward&lt;&gt;()</code> 只会根据传递的模板参数情况决定是否转发其潜在的移动语意。</p>
 <p>不要假想模板参数 <code>T</code> 的 <code>T&amp;&amp;</code> 和具体类型 <code>X</code> 的 <code>X&amp;&amp;</code> 作用是相同的。他们有不同的规则，尽管他们在语法上看起来很类似：</p>
@@ -323,162 +282,63 @@
 </ul>
 <p>注意 <code>T</code> 必须是一个模板参数的名字，只是依赖于模板参数是不行的。对于模板参数 <code>T</code>，如同 <code>typename T::iterator&amp;&amp;</code> 的声明只是一个右值引用，而不是一个 forwarding reference。</p>
 <p>最后，能够实现完美转发的程序如下所示：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">X</span> &#123;</span><br>  <span class="hljs-comment">//...</span><br>&#125;;<br><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X&amp;)</span> </span>&#123;<br>  std::cout &lt;&lt; <span class="hljs-string">&quot;g() for variable\n&quot;</span>;<br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X <span class="hljs-keyword">const</span>&amp;)</span> </span>&#123;<br>  std::cout &lt;&lt; <span class="hljs-string">&quot;g() for constant\n&quot;</span>;<br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X&amp;&amp;)</span> </span>&#123;<br>  std::cout &lt;&lt; <span class="hljs-string">&quot;g() for movable object\n&quot;</span>;<br>&#125;<br><br><span class="hljs-comment">// let f() perfect forward argument val to g():</span><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span> <span class="hljs-params">(T&amp;&amp; val)</span> </span>&#123;<br>  <span class="hljs-built_in">g</span>(std::forward&lt;T&gt;(val));   <span class="hljs-comment">// call the right g() for any passed argument val</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  X v;              <span class="hljs-comment">// create variable</span><br>  X <span class="hljs-keyword">const</span> c;        <span class="hljs-comment">// create constant</span><br><br>  <span class="hljs-built_in">f</span>(v);             <span class="hljs-comment">// f() for variable calls f(X&amp;)  =&gt;  calls g(X&amp;)</span><br>  <span class="hljs-built_in">f</span>(c);             <span class="hljs-comment">// f() for constant calls f(X const&amp;)  =&gt;  calls g(X const&amp;)</span><br>  <span class="hljs-built_in">f</span>(<span class="hljs-built_in">X</span>());           <span class="hljs-comment">// f() for temporary calls f(X&amp;&amp;)  =&gt;  calls g(X&amp;&amp;)</span><br>  <span class="hljs-built_in">f</span>(std::<span class="hljs-built_in">move</span>(v));  <span class="hljs-comment">// f() for move-enabled variable calls f(X&amp;&amp;)  =&gt;  calls g(X&amp;&amp;)</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">X</span> &#123;</span>
-  <span class="hljs-comment">//...</span>
-&#125;;
-
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X&amp;)</span> </span>&#123;
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"g() for variable\n"</span>;
-&#125;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X <span class="hljs-keyword">const</span>&amp;)</span> </span>&#123;
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"g() for constant\n"</span>;
-&#125;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">g</span> <span class="hljs-params">(X&amp;&amp;)</span> </span>&#123;
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"g() for movable object\n"</span>;
-&#125;
-
-<span class="hljs-comment">// let f() perfect forward argument val to g():</span>
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span> <span class="hljs-params">(T&amp;&amp; val)</span> </span>&#123;
-  g(<span class="hljs-built_in">std</span>::forward&lt;T&gt;(val));   <span class="hljs-comment">// call the right g() for any passed argument val</span>
-&#125;
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  X v;              <span class="hljs-comment">// create variable</span>
-  X <span class="hljs-keyword">const</span> c;        <span class="hljs-comment">// create constant</span>
-
-  f(v);             <span class="hljs-comment">// f() for variable calls f(X&amp;)  =&gt;  calls g(X&amp;)</span>
-  f(c);             <span class="hljs-comment">// f() for constant calls f(X const&amp;)  =&gt;  calls g(X const&amp;)</span>
-  f(X());           <span class="hljs-comment">// f() for temporary calls f(X&amp;&amp;)  =&gt;  calls g(X&amp;&amp;)</span>
-  f(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(v));  <span class="hljs-comment">// f() for move-enabled variable calls f(X&amp;&amp;)  =&gt;  calls g(X&amp;&amp;)</span>
-&#125;</code></pre>
-
-<p>当然，完美转发也可以被用于可变参数模板（<a href="https://vinkle.top/2020/09/06/cpp-template-4/#4-3-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF%E7%9A%84%E5%BA%94%E7%94%A8" target="_blank" rel="noopener">参见 4.3 节</a>）。更多关于完美转发的细节<a href>参见15.6.3 节（未写）</a>。</p>
+<p>当然，完美转发也可以被用于可变参数模板（<a target="_blank" rel="noopener" href="https://vinkle.top/2020/09/06/cpp-template-4/#4-3-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF%E7%9A%84%E5%BA%94%E7%94%A8">参见 4.3 节</a>）。更多关于完美转发的细节<a href>参见15.6.3 节（未写）</a>。</p>
 <h2 id="6-2-特殊成员的函数模板"><a href="#6-2-特殊成员的函数模板" class="headerlink" title="6.2 特殊成员的函数模板"></a>6.2 特殊成员的函数模板</h2><p>特殊成员函数（例如构造函数）也可以使用成员函数模板，但有时可能会带来意想不到的行为。</p>
 <p>考虑下面的这个例子：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span></span>
-<span class="hljs-class">&#123;</span>
-  <span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> name;
-  <span class="hljs-keyword">public</span>:
-    <span class="hljs-comment">// constructor for passed initial name:</span>
-    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Person</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span>&amp; n)</span> : <span class="hljs-title">name</span><span class="hljs-params">(n)</span> </span>&#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"copying string-CONSTR for '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Person</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&amp;&amp; n)</span> : <span class="hljs-title">name</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(n))</span> </span>&#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"moving string-CONSTR for '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-    <span class="hljs-comment">// copy and move constructor:</span>
-    Person (Person <span class="hljs-keyword">const</span>&amp; p) : name(p.name) &#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"COPY-CONSTR Person '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-    Person (Person&amp;&amp; p) : name(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(p.name)) &#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"MOVE-CONSTR Person '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-&#125;;
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> s = <span class="hljs-string">"sname"</span>;
-  <span class="hljs-function">Person <span class="hljs-title">p1</span><span class="hljs-params">(s)</span></span>;              <span class="hljs-comment">// init with string object =&gt; calls copying string-CONSTR</span>
-  <span class="hljs-function">Person <span class="hljs-title">p2</span><span class="hljs-params">(<span class="hljs-string">"tmp"</span>)</span></span>;          <span class="hljs-comment">// init with string literal =&gt; calls moving string-CONSTR</span>
-  <span class="hljs-function">Person <span class="hljs-title">p3</span><span class="hljs-params">(p1)</span></span>;             <span class="hljs-comment">// copy Person =&gt; calls COPY-CONSTR</span>
-  <span class="hljs-function">Person <span class="hljs-title">p4</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(p1))</span></span>;  <span class="hljs-comment">// move Person =&gt; calls MOVE-CONST</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-keyword">private</span>:<br>    std::string name;<br>  <span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// constructor for passed initial name:</span><br>    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Person</span><span class="hljs-params">(std::string <span class="hljs-keyword">const</span>&amp; n)</span> : name(n) &#123;</span><br>        std::cout &lt;&lt; <span class="hljs-string">&quot;copying string-CONSTR for &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Person</span><span class="hljs-params">(std::string&amp;&amp; n)</span> : name(std::move(n)) &#123;</span><br>        std::cout &lt;&lt; <span class="hljs-string">&quot;moving string-CONSTR for &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>    <span class="hljs-comment">// copy and move constructor:</span><br>    <span class="hljs-built_in">Person</span> (Person <span class="hljs-keyword">const</span>&amp; p) : <span class="hljs-built_in">name</span>(p.name) &#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;COPY-CONSTR Person &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>    <span class="hljs-built_in">Person</span> (Person&amp;&amp; p) : <span class="hljs-built_in">name</span>(std::<span class="hljs-built_in">move</span>(p.name)) &#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;MOVE-CONSTR Person &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  std::string s = <span class="hljs-string">&quot;sname&quot;</span>;<br>  <span class="hljs-function">Person <span class="hljs-title">p1</span><span class="hljs-params">(s)</span></span>;              <span class="hljs-comment">// init with string object =&gt; calls copying string-CONSTR</span><br>  <span class="hljs-function">Person <span class="hljs-title">p2</span><span class="hljs-params">(<span class="hljs-string">&quot;tmp&quot;</span>)</span></span>;          <span class="hljs-comment">// init with string literal =&gt; calls moving string-CONSTR</span><br>  <span class="hljs-function">Person <span class="hljs-title">p3</span><span class="hljs-params">(p1)</span></span>;             <span class="hljs-comment">// copy Person =&gt; calls COPY-CONSTR</span><br>  <span class="hljs-function">Person <span class="hljs-title">p4</span><span class="hljs-params">(std::move(p1))</span></span>;  <span class="hljs-comment">// move Person =&gt; calls MOVE-CONST</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p><code>Person</code> 类中有一个 <code>string</code> 类型成员 <code>name</code>，我们对它提供了几个初始化构造函数。为了支持移动语意，我们重载了接受 <code>std::string</code> 类型参数的构造函数：</p>
 <ul>
 <li><p>针对调用者仍需要使用的 <code>string</code> 对象，<code>name</code> 被传递参数的拷贝完成初始化：</p>
-<pre><code class="hljs c++">Person(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> <span class="hljs-keyword">const</span>&amp; n) : name(n)&#123;
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"coping string-CONSTR for '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">Person</span>(std::string <span class="hljs-keyword">const</span>&amp; n) : <span class="hljs-built_in">name</span>(n)&#123;<br>    std::cout &lt;&lt; <span class="hljs-string">&quot;coping string-CONSTR for &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 </li>
 <li><p>针对可移动的 <code>string</code> 对象，<code>name</code> 通过 <code>std::move</code> 将值从参数中窃取完成初始化：</p>
-<pre><code class="hljs c++">Person(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(n))&#123;
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"moving string-CONSTR for'"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">Person</span>(std::string&amp;&amp; n) : <span class="hljs-built_in">name</span>(std::<span class="hljs-built_in">move</span>(n))&#123;<br>    std::cout &lt;&lt; <span class="hljs-string">&quot;moving string-CONSTR for&#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 
 </li>
 </ul>
 <p>按照预期，传递一个正在使用的值（左值）时，第一个函数会被调用，当传递一个可移动的对象时（右值），第二个函数会被调用：</p>
-<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> s = <span class="hljs-string">"sname"</span>;
-<span class="hljs-function">Person <span class="hljs-title">p1</span><span class="hljs-params">(s)</span></span>;              <span class="hljs-comment">// init with string object =&gt; calls copying string-CONSTR</span>
-<span class="hljs-function">Person <span class="hljs-title">p2</span><span class="hljs-params">(<span class="hljs-string">"tmp"</span>)</span></span>;          <span class="hljs-comment">// init with string literal =&gt; calls moving string-CONSTR</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::string s = <span class="hljs-string">&quot;sname&quot;</span>;<br><span class="hljs-function">Person <span class="hljs-title">p1</span><span class="hljs-params">(s)</span></span>;              <span class="hljs-comment">// init with string object =&gt; calls copying string-CONSTR</span><br><span class="hljs-function">Person <span class="hljs-title">p2</span><span class="hljs-params">(<span class="hljs-string">&quot;tmp&quot;</span>)</span></span>;          <span class="hljs-comment">// init with string literal =&gt; calls moving string-CONSTR</span><br></code></pre></td></tr></table></figure>
 
 <p>除了以上的这些构造函数，例子中还提供了拷贝和移动构造函数用于观察 <code>Person</code> 对象是如何被拷贝和移动的：</p>
-<pre><code class="hljs c++"><span class="hljs-function">Person <span class="hljs-title">p3</span><span class="hljs-params">(p1)</span></span>;             <span class="hljs-comment">// copy Person =&gt; calls COPY-CONSTR</span>
-<span class="hljs-function">Person <span class="hljs-title">p4</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(p1))</span></span>;  <span class="hljs-comment">// move Person =&gt; calls MOVE-CONST</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">Person <span class="hljs-title">p3</span><span class="hljs-params">(p1)</span></span>;             <span class="hljs-comment">// copy Person =&gt; calls COPY-CONSTR</span><br><span class="hljs-function">Person <span class="hljs-title">p4</span><span class="hljs-params">(std::move(p1))</span></span>;  <span class="hljs-comment">// move Person =&gt; calls MOVE-CONST</span><br></code></pre></td></tr></table></figure>
 
 <p>现在，我们将这两个 <code>string</code> 的构造函数用一个泛型构造函数来将参数完美转发给成员 <code>name</code>：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span></span>
-<span class="hljs-class">&#123;</span>
-  <span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> name;
-  <span class="hljs-keyword">public</span>:
-    <span class="hljs-comment">// generic constructor for passed initial name:</span>
-    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR&gt;
-    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Person</span><span class="hljs-params">(STR&amp;&amp; n)</span> : <span class="hljs-title">name</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::forward&lt;STR&gt;(n))</span> </span>&#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"TMPL-CONSTR for '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-
-    <span class="hljs-comment">// copy and move constructor:</span>
-    Person (Person <span class="hljs-keyword">const</span>&amp; p) : name(p.name) &#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"COPY-CONSTR Person '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-    Person (Person&amp;&amp; p) : name(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(p.name)) &#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"MOVE-CONSTR Person '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-keyword">private</span>:<br>    std::string name;<br>  <span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// generic constructor for passed initial name:</span><br>    <span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR&gt;</span><br><span class="hljs-function">    <span class="hljs-keyword">explicit</span> <span class="hljs-title">Person</span><span class="hljs-params">(STR&amp;&amp; n)</span> : name(std::forward&lt;STR&gt;(n)) &#123;</span><br>        std::cout &lt;&lt; <span class="hljs-string">&quot;TMPL-CONSTR for &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// copy and move constructor:</span><br>    <span class="hljs-built_in">Person</span> (Person <span class="hljs-keyword">const</span>&amp; p) : <span class="hljs-built_in">name</span>(p.name) &#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;COPY-CONSTR Person &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>    <span class="hljs-built_in">Person</span> (Person&amp;&amp; p) : <span class="hljs-built_in">name</span>(std::<span class="hljs-built_in">move</span>(p.name)) &#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;MOVE-CONSTR Person &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>当传递参数为 <code>string</code>，能够正常工作：</p>
-<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> s = <span class="hljs-string">"sname"</span>;
-<span class="hljs-function">Person <span class="hljs-title">p1</span><span class="hljs-params">(s)</span></span>;              <span class="hljs-comment">// init with string object =&gt; calls copying string-CONSTR</span>
-<span class="hljs-function">Person <span class="hljs-title">p2</span><span class="hljs-params">(<span class="hljs-string">"tmp"</span>)</span></span>;          <span class="hljs-comment">// init with string literal =&gt; calls moving string-CONSTR</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::string s = <span class="hljs-string">&quot;sname&quot;</span>;<br><span class="hljs-function">Person <span class="hljs-title">p1</span><span class="hljs-params">(s)</span></span>;              <span class="hljs-comment">// init with string object =&gt; calls copying string-CONSTR</span><br><span class="hljs-function">Person <span class="hljs-title">p2</span><span class="hljs-params">(<span class="hljs-string">&quot;tmp&quot;</span>)</span></span>;          <span class="hljs-comment">// init with string literal =&gt; calls moving string-CONSTR</span><br></code></pre></td></tr></table></figure>
 
 <p>注意在这个例子中 <code>p2</code> 调用的构造函数并不会创建一个临时的  <code>string</code> 对象：参数 <code>STR</code> 会被推导为 <code>char const[4]</code> 类型。将 <code>std::forward&lt;STR&gt;</code> 用于指针没有多大的意义，成员 <code>name</code> 会被一个以 <code>null</code> 结尾的字符串构造。</p>
 <p>但是当我们尝试调用拷贝构造函数式，遇到了错误：</p>
-<pre><code class="hljs c++"><span class="hljs-function">Person <span class="hljs-title">p3</span><span class="hljs-params">(p1)</span></span>;            <span class="hljs-comment">// ERROR</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">Person <span class="hljs-title">p3</span><span class="hljs-params">(p1)</span></span>;            <span class="hljs-comment">// ERROR </span><br></code></pre></td></tr></table></figure>
 
 <p>而当我们用可移动对象初始化新的 <code>Person</code> 对象时却能够正常工作：</p>
-<pre><code class="hljs c++"><span class="hljs-function">Person <span class="hljs-title">p4</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(p1))</span></span>; <span class="hljs-comment">// OK: move Person =&gt; calls COPY-CONSTR</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">Person <span class="hljs-title">p4</span><span class="hljs-params">(std::move(p1))</span></span>; <span class="hljs-comment">// OK: move Person =&gt; calls COPY-CONSTR</span><br></code></pre></td></tr></table></figure>
 
 <p>注意拷贝一个 <code>const</code> 类型的 <code>Person</code> 对象也可以正常工作：</p>
-<pre><code class="hljs c++"><span class="hljs-function">Person <span class="hljs-keyword">const</span> <span class="hljs-title">p2c</span><span class="hljs-params">(<span class="hljs-string">"ctmp"</span>)</span></span>; <span class="hljs-comment">// init constant object with string literal</span>
-<span class="hljs-function">Person <span class="hljs-title">p3c</span><span class="hljs-params">(p2c)</span></span>;          <span class="hljs-comment">// OK: copy constant Person =&gt; calls COPY-CONSTR</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">Person <span class="hljs-keyword">const</span> <span class="hljs-title">p2c</span><span class="hljs-params">(<span class="hljs-string">&quot;ctmp&quot;</span>)</span></span>; <span class="hljs-comment">// init constant object with string literal</span><br><span class="hljs-function">Person <span class="hljs-title">p3c</span><span class="hljs-params">(p2c)</span></span>;          <span class="hljs-comment">// OK: copy constant Person =&gt; calls COPY-CONSTR</span><br></code></pre></td></tr></table></figure>
 
 <p>问题出在，根据 C++ 的重载解析规则（<a href>参见 16.2.4（未写）</a>），对于一个非常量的左值 <code>Person p</code>，成员模板</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR&gt;
-Person(STR&amp;&amp; n)</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR&gt;</span><br><span class="hljs-function"><span class="hljs-title">Person</span><span class="hljs-params">(STR&amp;&amp; n)</span></span><br></code></pre></td></tr></table></figure>
 
 <p>会比拷贝构造函数（通常已经预先定义）更加匹配：</p>
-<pre><code class="hljs c++">Person(Person <span class="hljs-keyword">const</span>&amp; p)</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">Person</span>(Person <span class="hljs-keyword">const</span>&amp; p)<br></code></pre></td></tr></table></figure>
 
 <p><code>STR</code> 可以替换为 <code>Person&amp;</code>，但拷贝构造函数还需要转化为 <code>const</code> 类型对象。</p>
 <p>你可能认为解决这个问题只要在提供一个支持非常量的拷贝构造函数：</p>
-<pre><code class="hljs c++">Person(Person&amp; p)</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">Person</span>(Person&amp; p)<br></code></pre></td></tr></table></figure>
 
 <p>但是，这只能解决部分问题，以为对于子类对象，成员模板还是比拷贝构造函数更加匹配。你真正需要的是对于传递 <code>Person</code> 参数的对象或者是可以转化为 <code>Person</code> 类型参数的对象禁止成员模板。这可以通过使用 <code>std::enable_if&lt;&gt;</code> 实现，我们将在下一节介绍它。</p>
 <h2 id="6-3-使用-enable-if-lt-gt-禁用模板"><a href="#6-3-使用-enable-if-lt-gt-禁用模板" class="headerlink" title="6.3 使用 enable_if&lt;&gt; 禁用模板"></a>6.3 使用 enable_if&lt;&gt; 禁用模板</h2><p>从 C++11 开始，C++ 标准库提供了一个辅助的模板 <code>std::enable_if&lt;&gt;</code>，用于在特定的编译期条件下忽略某则函数模板。</p>
 <p>例如，如果函数模板 <code>foo&lt;&gt;()</code> 的定义如下：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">typename</span> <span class="hljs-built_in">std</span>::enable_if&lt;(<span class="hljs-keyword">sizeof</span>(T) &gt; <span class="hljs-number">4</span>)&gt;::type
-foo()&#123;&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">typename</span> std::enable_if&lt;(<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(T) &gt; <span class="hljs-number">4</span>)&gt;::<span class="hljs-function">type</span><br><span class="hljs-function"><span class="hljs-title">foo</span><span class="hljs-params">()</span></span>&#123;&#125;<br></code></pre></td></tr></table></figure>
 
 <p>这一模板会在 <code>sizeof(T) &gt; 4</code> 不为真时被忽略掉。如果 <code>sizeof(T) &gt; 4</code> 为真，那么函数模板会被实例化为</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span>&#123;&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span>&#123;&#125;<br></code></pre></td></tr></table></figure>
 
 <p>也就是说 <code>std::enable_if</code> 是一个 type trait，它会根据第一个模板参数给定的编译期表达式来决定其行为：</p>
 <ul>
@@ -489,195 +349,82 @@ foo()&#123;&#125;</code></pre>
 </li>
 <li>如果这个表达式为 <code>false</code>，它的 <code>type</code> 成员不会被定义。依据模板特性 <strong>SFINAE(substitute failure is not an error)</strong>（<a href>参见 8.4 节（未写）</a>），这会导致包含 <code>enable_if</code> 表达式的函数模板会被忽略掉。</li>
 </ul>
-<p>从 C++14 起，所有的 type trait 都返回一个类型，因此有一个相应的别名模板 <code>std::enable_if_t&lt;&gt;</code>，它可以允许你省略 <code>typename</code> 和 <code>::type</code>（<a href="https://vinkle.top/2020/07/17/cpp-template-2/#2-8-%E7%B1%BB%E5%9E%8B%E5%88%AB%E5%90%8D" target="_blank" rel="noopener">参见 2.8 节</a>）。因此，在 C++14 你可以写</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;(<span class="hljs-keyword">sizeof</span>(T) &gt; <span class="hljs-number">4</span>)&gt;
-foo()&#123;&#125;</code></pre>
+<p>从 C++14 起，所有的 type trait 都返回一个类型，因此有一个相应的别名模板 <code>std::enable_if_t&lt;&gt;</code>，它可以允许你省略 <code>typename</code> 和 <code>::type</code>（<a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/17/cpp-template-2/#2-8-%E7%B1%BB%E5%9E%8B%E5%88%AB%E5%90%8D">参见 2.8 节</a>）。因此，在 C++14 你可以写</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br>std::<span class="hljs-keyword">enable_if_t</span>&lt;(<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(T) &gt; <span class="hljs-number">4</span>)&gt;<br><span class="hljs-built_in">foo</span>()&#123;&#125;<br></code></pre></td></tr></table></figure>
 
 <p>当有第二个参数传递给 <code>enable_if&lt;&gt;</code> 或 <code>enable_if_t&lt;&gt;</code> 时：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;(<span class="hljs-keyword">sizeof</span>(T) &gt; <span class="hljs-number">4</span>), T&gt;
-foo()&#123;
-    <span class="hljs-keyword">return</span> T();
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br>std::<span class="hljs-keyword">enable_if_t</span>&lt;(<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(T) &gt; <span class="hljs-number">4</span>), T&gt;<br><span class="hljs-built_in">foo</span>()&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">T</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>当表达式为 <code>true</code> 时，<code>enable_if</code> 会被或者为第二个参数。因此如果 <code>T</code> 被推导为 <code>MyType</code>（它的 <code>size</code> 大于 4），那么就等效于</p>
-<pre><code class="hljs c++"><span class="hljs-function">MyType <span class="hljs-title">foo</span><span class="hljs-params">()</span></span>;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">MyType <span class="hljs-title">foo</span><span class="hljs-params">()</span></span>;<br></code></pre></td></tr></table></figure>
 
 <p> 注意将 <code>enable_if</code> 表达式放在中间是一个很笨拙的做法。因此，<code>enable_if</code> 通常的使用方法是添加一个额外的有默认值的函数模板参数：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T,
-		 <span class="hljs-keyword">typename</span> = <span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;(<span class="hljs-keyword">sizeof</span>(T) &gt; <span class="hljs-number">4</span>)&gt;&gt;
-<span class="hljs-keyword">void</span> foo()&#123;&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T,<br>		 <span class="hljs-keyword">typename</span> = std::<span class="hljs-keyword">enable_if_t</span>&lt;(<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(T) &gt; <span class="hljs-number">4</span>)&gt;&gt;<br><span class="hljs-keyword">void</span> <span class="hljs-built_in">foo</span>()&#123;&#125;<br></code></pre></td></tr></table></figure>
 
 <p>如果<code>sizeof(T) &gt; 4</code>，它会扩展为</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T,
-		 <span class="hljs-keyword">typename</span> = <span class="hljs-keyword">void</span>&gt;&gt;
-<span class="hljs-keyword">void</span> foo()&#123;&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T,<br>		 <span class="hljs-keyword">typename</span> = <span class="hljs-keyword">void</span>&gt;&gt;<br><span class="hljs-keyword">void</span> <span class="hljs-built_in">foo</span>()&#123;&#125;<br></code></pre></td></tr></table></figure>
 
 <p>如果这看起来依然很笨拙，而且你想要使约束更加明显，你可以用<strong>别名模板(Alias Templates)</strong>定义你自己想要的名称：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">using</span> EnableIfSizeGreater4 = <span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;(<span class="hljs-keyword">sizeof</span>(T) &gt; <span class="hljs-number">4</span>)&gt;;
-
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T,
-         <span class="hljs-keyword">typename</span> EnableIfSizeGreater4&lt;T&gt;&gt;
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span>&#123;&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">using</span> EnableIfSizeGreater4 = std::<span class="hljs-keyword">enable_if_t</span>&lt;(<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(T) &gt; <span class="hljs-number">4</span>)&gt;;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T,<br>         <span class="hljs-keyword">typename</span> EnableIfSizeGreater4&lt;T&gt;&gt;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span>&#123;&#125;<br></code></pre></td></tr></table></figure>
 
 <p>关于 <code>std::enable_if</code> 是如何实现的，<a href>参见 20.3 节（未写）</a>。</p>
 <h2 id="6-4-使用-enable-if-lt-gt"><a href="#6-4-使用-enable-if-lt-gt" class="headerlink" title="6.4 使用 enable_if&lt;&gt;"></a>6.4 使用 enable_if&lt;&gt;</h2><p>我们可以使用 <code>enable_if&lt;&gt;</code> 来解决 <a href="#6-2-特殊成员的函数模板">6.2 节</a>我们遇到的问题。</p>
 <p>在这个问题中，我们需要禁止的是模板构造函数的声明是：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR&gt;
-Person(STR&amp;&amp; n);</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR&gt;</span><br><span class="hljs-function"><span class="hljs-title">Person</span><span class="hljs-params">(STR&amp;&amp; n)</span></span>;<br></code></pre></td></tr></table></figure>
 
 <p>如果传递的参数 <code>STR</code> 有它的右值（它是一个 <code>std::string</code> 类型或者是可以转化为 <code>std::string</code> 类型的类型）。</p>
 <p>对于此，我们使用另一个标准库中的 type trait，<code>std::is_convertible&lt;FROM,TO&gt;</code>。在 C++ 17 中，对应的函数声明如下所示：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR,
-		 <span class="hljs-keyword">typename</span> = <span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;
-             			<span class="hljs-built_in">std</span>::is_convertible_v&lt;STR, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;&gt;&gt;
-Person(STR&amp;&amp; n);</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR,<br>		 <span class="hljs-keyword">typename</span> = std::<span class="hljs-keyword">enable_if_t</span>&lt;<br>             			std::is_convertible_v&lt;STR, std::string&gt;&gt;&gt;<br><span class="hljs-built_in">Person</span>(STR&amp;&amp; n);<br></code></pre></td></tr></table></figure>
 
 <p>如果 <code>STR</code> 可以被转换为 <code>std::string</code>，这个声明会被扩展为</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR,
-		 <span class="hljs-keyword">typename</span> = <span class="hljs-keyword">void</span>&gt;
-Person(STR&amp;&amp; n);</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR,</span><br><span class="hljs-function">		 <span class="hljs-keyword">typename</span> </span>= <span class="hljs-keyword">void</span>&gt;<br><span class="hljs-built_in">Person</span>(STR&amp;&amp; n);<br></code></pre></td></tr></table></figure>
 
 <p>如果 <code>STR</code> 不能转换为 <code>std::string</code>，那么这个函数模板会被忽略。</p>
 <p>同样我们可以通过别名模板来为这个约束定义名称：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">using</span> EnableIfString = <span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;
-             			<span class="hljs-built_in">std</span>::is_convertible_v&lt;T, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;&gt;;
-...
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR, <span class="hljs-keyword">typename</span> = EnableIfString&lt;STR&gt;&gt;
-Person(STR&amp;&amp; n);</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">using</span> EnableIfString = std::<span class="hljs-keyword">enable_if_t</span>&lt;<br>             			std::is_convertible_v&lt;T, std::string&gt;&gt;;<br>...<br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR, <span class="hljs-keyword">typename</span> = EnableIfString&lt;STR&gt;&gt;<br><span class="hljs-built_in">Person</span>(STR&amp;&amp; n);<br></code></pre></td></tr></table></figure>
 
 <p>因此，完整的 <code>Person</code> 类如下所示：</p>
-<pre><code class="hljs c++"><span class="hljs-comment">// specialmemtmpl3.hpp</span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;type_traits&gt;</span></span>
-
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">using</span> EnableIfString = <span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;
-                         <span class="hljs-built_in">std</span>::is_convertible_v&lt;T,<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;&gt;;
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span></span>
-<span class="hljs-class">&#123;</span>
-  <span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> name;
-  <span class="hljs-keyword">public</span>:
-    <span class="hljs-comment">// generic constructor for passed initial name:</span>
-    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR, <span class="hljs-keyword">typename</span> = EnableIfString&lt;STR&gt;&gt;
-    <span class="hljs-keyword">explicit</span> Person(STR&amp;&amp; n)
-     : name(<span class="hljs-built_in">std</span>::forward&lt;STR&gt;(n)) &#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"TMPL-CONSTR for '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-    <span class="hljs-comment">// copy and move constructor:</span>
-    Person (Person <span class="hljs-keyword">const</span>&amp; p) : name(p.name) &#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"COPY-CONSTR Person '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-    Person (Person&amp;&amp; p) : name(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(p.name)) &#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"MOVE-CONSTR Person '"</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">"'\n"</span>;
-    &#125;
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// specialmemtmpl3.hpp</span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;utility&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;type_traits&gt;</span></span><br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">using</span> EnableIfString = std::<span class="hljs-keyword">enable_if_t</span>&lt;<br>                         std::is_convertible_v&lt;T,std::string&gt;&gt;;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-keyword">private</span>:<br>    std::string name;<br>  <span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// generic constructor for passed initial name:</span><br>    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR, <span class="hljs-keyword">typename</span> = EnableIfString&lt;STR&gt;&gt;<br>    <span class="hljs-keyword">explicit</span> <span class="hljs-built_in">Person</span>(STR&amp;&amp; n)<br>     : <span class="hljs-built_in">name</span>(std::forward&lt;STR&gt;(n)) &#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;TMPL-CONSTR for &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>    <span class="hljs-comment">// copy and move constructor:</span><br>    <span class="hljs-built_in">Person</span> (Person <span class="hljs-keyword">const</span>&amp; p) : <span class="hljs-built_in">name</span>(p.name) &#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;COPY-CONSTR Person &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>    <span class="hljs-built_in">Person</span> (Person&amp;&amp; p) : <span class="hljs-built_in">name</span>(std::<span class="hljs-built_in">move</span>(p.name)) &#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;MOVE-CONSTR Person &#x27;&quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot;&#x27;\n&quot;</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>现在，所有的调用都符合预期：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"specialmemtmpl3.hpp"</span></span>
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> s = <span class="hljs-string">"sname"</span>;
-  <span class="hljs-function">Person <span class="hljs-title">p1</span><span class="hljs-params">(s)</span></span>;              <span class="hljs-comment">// init with string object =&gt; calls TMPL-CONSTR</span>
-  <span class="hljs-function">Person <span class="hljs-title">p2</span><span class="hljs-params">(<span class="hljs-string">"tmp"</span>)</span></span>;          <span class="hljs-comment">// init with string literal =&gt; calls TMPL-CONSTR</span>
-  <span class="hljs-function">Person <span class="hljs-title">p3</span><span class="hljs-params">(p1)</span></span>;             <span class="hljs-comment">// OK =&gt; calls COPY-CONSTR</span>
-  <span class="hljs-function">Person <span class="hljs-title">p4</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">move</span>(p1))</span></span>;  <span class="hljs-comment">// OK =&gt; calls MOVE-CONST</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;specialmemtmpl3.hpp&quot;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  std::string s = <span class="hljs-string">&quot;sname&quot;</span>;<br>  <span class="hljs-function">Person <span class="hljs-title">p1</span><span class="hljs-params">(s)</span></span>;              <span class="hljs-comment">// init with string object =&gt; calls TMPL-CONSTR</span><br>  <span class="hljs-function">Person <span class="hljs-title">p2</span><span class="hljs-params">(<span class="hljs-string">&quot;tmp&quot;</span>)</span></span>;          <span class="hljs-comment">// init with string literal =&gt; calls TMPL-CONSTR</span><br>  <span class="hljs-function">Person <span class="hljs-title">p3</span><span class="hljs-params">(p1)</span></span>;             <span class="hljs-comment">// OK =&gt; calls COPY-CONSTR</span><br>  <span class="hljs-function">Person <span class="hljs-title">p4</span><span class="hljs-params">(std::move(p1))</span></span>;  <span class="hljs-comment">// OK =&gt; calls MOVE-CONST</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>注意，在 C++14 中，因为返回一个值的 <code>_v</code> 的 type trait 没有被定义，我们需要这样定义别名模板：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">using</span> EnableIfString = <span class="hljs-built_in">std</span>::enable_if&lt;
-             			<span class="hljs-built_in">std</span>::is_convertible&lt;T, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;::value&gt;::type;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">using</span> EnableIfString = std::enable_if&lt;<br>             			std::is_convertible&lt;T, std::string&gt;::value&gt;::type;<br></code></pre></td></tr></table></figure>
 
 <p>但是通过定义 <code>EnableIfString&lt;&gt;</code>，这些复杂的语法都被隐藏了。</p>
 <p>同样注意，此处有一个可以替代 <code>std::is_converible&lt;&gt;</code> 的做法，因为它需要的类型是通过隐式转换的。通过使用 <code>std::is_constructible&lt;&gt;</code>，我们可以允许显式转换来进行初始化。但是，它的参数使用的顺序和 <code>std::convertible&lt;&gt;</code> 相反：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">using</span> EnableIfString = <span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;
-						<span class="hljs-built_in">std</span>::is_constructible_v&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>, T&gt;&gt;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">using</span> EnableIfString = std::<span class="hljs-keyword">enable_if_t</span>&lt;<br>						std::is_constructible_v&lt;std::string, T&gt;&gt;;<br></code></pre></td></tr></table></figure>
 
 <p><code>std::is_constructible&lt;&gt;</code>更多信息，<a href>参见附录 D.3.2（未写）</a>;<code>std::is_convertible&lt;&gt;</code> 更多信息，<a href>参见附录 D.3.3（未写）</a>。关于 <code>enable_if&lt;&gt;</code> 在可变参数模板的应用，<a href>参见附录 D.6（未写）</a>。</p>
 <h3 id="禁止特殊的成员函数"><a href="#禁止特殊的成员函数" class="headerlink" title="禁止特殊的成员函数"></a>禁止特殊的成员函数</h3><p>通常，我们不能使用 <code>enable_if&lt;&gt;</code> 去禁止先前定义好的拷贝/移动构造函数或者是赋值函数。这是因为成员函数模板不算为特殊成员函数，而且在拷贝构造需要时，相应的成员函数模板会被忽略。因此，可以向下面这样定义：</p>
-<pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span>&#123;</span>
-<span class="hljs-keyword">public</span>:
-    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-    C (T <span class="hljs-keyword">const</span>&amp;)&#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"tmpl copy constructor\n"</span>;
-    &#125;
-    ...
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span>&#123;</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function">    <span class="hljs-title">C</span> <span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp;)</span></span>&#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;tmpl copy constructor\n&quot;</span>;<br>    &#125;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>当需要拷贝 <code>C</code> 时，先前定义好的拷贝构造函数还能够使用:</p>
-<pre><code class="hljs c++">C x;
-C y&#123;x&#125;; <span class="hljs-comment">// still uses the predefined copy constructor(not the member template)</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">C x;<br>C y&#123;x&#125;; <span class="hljs-comment">// still uses the predefined copy constructor(not the member template)</span><br></code></pre></td></tr></table></figure>
 
 <p>（这里实际上没有方法可以使用成员模板因为这里不能够特指或者推导模板参数 <code>T</code>。）</p>
 <p>没有办法可以删除先前定义好的拷贝构造函数，否则随后对于  <code>C</code> 的拷贝会产生错误。</p>
 <p>但是，有一个小技巧：我们可以对于 <code>const volatile</code> 的参数声明拷贝构造函数然后将其标记为“删除”（定义时加上<code>= delete</code>）。这么做会能够避免使用其他拷贝构造函数被非显示地声明。在此基础上，我们可以定义一个构造函数模板，对于 nonvolatile 类型的参数，它会被优先匹配（相较于删除的拷贝构造）：</p>
-<pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span>
-<span class="hljs-class">&#123;</span>
-  <span class="hljs-keyword">public</span>:
-    ...
-    <span class="hljs-comment">// user-define the predefined copy constructor as deleted</span>
-    <span class="hljs-comment">// (with conversion to volatile to enable better matchs)</span>
-    C(C <span class="hljs-keyword">const</span> <span class="hljs-keyword">volatile</span>&amp;) = <span class="hljs-keyword">delete</span>;
-    
-    <span class="hljs-comment">// implement copy constructor template with better match:</span>
-    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-    C(T <span class="hljs-keyword">const</span>&amp;)&#123;
-        <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"tmpl constructor\n"</span>;
-    &#125;
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-keyword">public</span>:<br>    ...<br>    <span class="hljs-comment">// user-define the predefined copy constructor as deleted</span><br>    <span class="hljs-comment">// (with conversion to volatile to enable better matchs)</span><br>    <span class="hljs-built_in">C</span>(C <span class="hljs-keyword">const</span> <span class="hljs-keyword">volatile</span>&amp;) = <span class="hljs-keyword">delete</span>;<br>    <br>    <span class="hljs-comment">// implement copy constructor template with better match:</span><br>    <span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function">    <span class="hljs-title">C</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp;)</span></span>&#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;tmpl constructor\n&quot;</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>现在，甚至在一般的拷贝中也会使用到模板构造函数：</p>
-<pre><code class="hljs c++">C x;
-C y&#123;x&#125;; <span class="hljs-comment">// uses the member template</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">C x;<br>C y&#123;x&#125;; <span class="hljs-comment">// uses the member template</span><br></code></pre></td></tr></table></figure>
 
 <p>在这个模板构造函数中我们还可以通过 <code>enable_if&lt;&gt;</code> 添加一些约束。例如，当模板参数类型为整数类型时，我们要禁止拷贝对象，我们可以这么实现：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span>
-<span class="hljs-class">&#123;</span>
-  <span class="hljs-keyword">public</span>:
-    ...
-    <span class="hljs-comment">// user-define the predefined copy constructor as deleted</span>
-    <span class="hljs-comment">// (with conversion to volatile to enable better matchs)</span>
-    C(C <span class="hljs-keyword">const</span> <span class="hljs-keyword">volatile</span>&amp;) = <span class="hljs-keyword">delete</span>;
-    
-    <span class="hljs-comment">// if T is no integral type, provide copy constructor template with better match:</span>
-    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> U,
-    		 <span class="hljs-keyword">typename</span> = <span class="hljs-built_in">std</span>::<span class="hljs-keyword">enable_if_t</span>&lt;!<span class="hljs-built_in">std</span>::is_integral&lt;U&gt;::value&gt;&gt;
-    C(C&lt;U&gt; <span class="hljs-keyword">const</span>&amp;)&#123;
-    	...
-    &#125;
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-keyword">public</span>:<br>    ...<br>    <span class="hljs-comment">// user-define the predefined copy constructor as deleted</span><br>    <span class="hljs-comment">// (with conversion to volatile to enable better matchs)</span><br>    <span class="hljs-built_in">C</span>(C <span class="hljs-keyword">const</span> <span class="hljs-keyword">volatile</span>&amp;) = <span class="hljs-keyword">delete</span>;<br>    <br>    <span class="hljs-comment">// if T is no integral type, provide copy constructor template with better match:</span><br>    <span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> U,<br>    		 <span class="hljs-keyword">typename</span> = std::<span class="hljs-keyword">enable_if_t</span>&lt;!std::is_integral&lt;U&gt;::value&gt;&gt;<br>    <span class="hljs-built_in">C</span>(C&lt;U&gt; <span class="hljs-keyword">const</span>&amp;)&#123;<br>    	...<br>    &#125;<br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h2 id="6-5-使用-concepts-简化-enable-if-lt-gt-表达式"><a href="#6-5-使用-concepts-简化-enable-if-lt-gt-表达式" class="headerlink" title="6.5 使用 concepts 简化 enable_if&lt;&gt; 表达式"></a>6.5 使用 concepts 简化 enable_if&lt;&gt; 表达式</h2><p>即使使用了别名模板，<code>enable_if</code> 的语法也显得有些愚拙，因为它是用了这样的解决方法：为了达到需要的效果，添加了一个额外的模板参数，通过滥用这个参数来对函数模板添加一些特性的限制。这样的代码可读性很差而且使其余的函数模板也变得难以理解。</p>
 <p>原则上来说，我们需要一个语言特性来允许我们对函数施加需求或者限制，当这个需求或者限制不满足时，函数会被忽略掉。</p>
 <p>这个语言特性就是期待已久的 <em>concepts</em> ，它允许我们通过简单的语法就能对函数施加要求或者限制，但是 <em>concepts</em> 还没有进入 C++17 标准中。一些编译器对这个特性提供了试验性的支持，但是， <em>concepts</em> 很有可能成为 C++17 的下一个标准中得到支持。（C++20 中已经添加了对 <em>concepts</em> 的支持。）</p>
 <p>借助 <em>concepts</em>，根据已经提议的使用方法，我们可以很简单地写出如下的代码：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR&gt;
-<span class="hljs-keyword">requires</span> <span class="hljs-built_in">std</span>::is_convertible_v&lt;STR,<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;
-Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&lt;STR&gt;(n))&#123;
-    ...
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> STR&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">requires</span> std::is_convertible_v&lt;STR,std::string&gt;</span><br><span class="hljs-function"><span class="hljs-title">Person</span><span class="hljs-params">(STR&amp;&amp; n)</span> : name(std::forward&lt;STR&gt;(n))&#123;</span><br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>我们也可以将这个条件定义成一个普通的 <em>concept</em></p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-keyword">concept</span> ConvertibleToString = <span class="hljs-built_in">std</span>::is_convertible_v&lt;T,<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">concept</span> ConvertibleToString = std::is_convertible_v&lt;T,std::string&gt;;<br></code></pre></td></tr></table></figure>
 
 <p>然后将这个 <em>concept</em> 作为条件：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;ConvertibleToString STR&gt;
-Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&lt;STR&gt;(n))&#123;
-    ...
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;ConvertibleToString STR&gt;</span><br><span class="hljs-function"><span class="hljs-title">Person</span><span class="hljs-params">(STR&amp;&amp; n)</span> : name(std::forward&lt;STR&gt;(n))&#123;</span><br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>更多关于 <em>concepts</em> 的讨论<a href>参见附录 E（未写）</a></p>
 <h2 id="6-6-小结"><a href="#6-6-小结" class="headerlink" title="6.6 小结"></a>6.6 小结</h2><ul>
@@ -689,7 +436,7 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
 <li><em>Concepts</em> 将会让我们能够使用更直观的语法为函数模板施加限制。</li>
 </ul>
 
-            </article>
+            </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
@@ -715,15 +462,19 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
                 
               </div>
               
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
               
               
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
                     
                     
-                  </div>
-                  <div class="post-next col-6">
+                  </article>
+                  <article class="post-next col-6">
                     
                     
                       <a href="/2020/10/12/cpp-template-5/">
@@ -732,13 +483,39 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
                         <i class="iconfont icon-arrowright"></i>
                       </a>
                     
-                  </div>
+                  </article>
                 </div>
               
             </div>
 
             
-          </div>
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="SOHUCS" sid='http://yoursite.com/2021/01/15/cpp-template-6/'></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#SOHUCS', function() {
+      var appid = 'cyvv8wewD';
+      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+      } else {
+        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
+          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
+        });
+      }
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
         </div>
       </div>
     </div>
@@ -746,7 +523,7 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
       <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
         <div id="toc">
   <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
+  <div class="toc-body" id="toc-body"></div>
 </div>
 
       </div>
@@ -758,16 +535,15 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
 
 
     
-  </main>
 
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
@@ -788,21 +564,16 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
     </div>
   </div>
 </div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
     
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
   <div class="statistics">
     
     
@@ -828,29 +599,61 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
   </div>
 
 
-    
+  
 
-    
-  </div>
+  
 </footer>
 
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
 <!-- Plugins -->
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
 
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
@@ -859,95 +662,15 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
 
 
 
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
   <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: 'article.markdown-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 0,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "C++ Template-6 移动语意和 enable_if<>&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
-      placement: "right",
-      visible: "hover",
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
       
-    };
-    var el = "h1,h2,h3,h4,h5,h6".split(",");
-    var res = [];
-    for (item of el) {
-      res.push(".markdown-body > " + item)
-    }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
+      typing(title)
+      
+    })(window, document);
   </script>
 
 
@@ -989,14 +712,9 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
       };
     </script>
 
-    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.1.4/es5/tex-svg.js" ></script>
 
   
-
-
-
-
-
 
 
 
@@ -1030,6 +748,10 @@ Person(STR&amp;&amp; n) : name(<span class="hljs-built_in">std</span>::forward&l
 
 
 
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
 
 
 </body>

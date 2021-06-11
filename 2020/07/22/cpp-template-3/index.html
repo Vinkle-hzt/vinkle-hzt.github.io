@@ -1,46 +1,54 @@
+
+
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
-  <link rel="icon" type="image/png" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <meta name="theme-color" content="">
-  <meta name="description" content="vinkle&#39;s space">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="通过大量例子介绍了非类型模板参数。你可以学习到如何使用非类型模板参数，了解非类型模板参数使用的限制。">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
+  
   <title>C++ Template-3 非类型模板参数 - vinkle&#39;s space</title>
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
   <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
   
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
   
+
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
 
 
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
 
 
 <link  rel="stylesheet" href="/css/main.css" />
@@ -48,8 +56,13 @@
 <!-- 自定义样式保持在最底部 -->
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"e29593c0eaefc83ba96301b9153d7d11","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
   <script  src="/js/utils.js" ></script>
-<meta name="generator" content="Hexo 4.2.1"></head>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -143,8 +156,14 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
       </ul>
@@ -152,25 +171,28 @@
   </div>
 </nav>
 
-    <div class="view intro-2" id="background" parallax=true
+    <div class="banner" id="banner" parallax=true
          style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="C++ Template-3 非类型模板参数">
               
             </span>
 
             
-              
-  <div class="mt-3 post-meta">
-    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-22 19:30">
-      2020年7月22日 晚上
-    </time>
-  </div>
-
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-07-22 19:30" pubdate>
+        2020年7月22日 晚上
+      </time>
+    </span>
+  
+</div>
 
 <div class="mt-1">
   
@@ -187,20 +209,12 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      45
+      46
        分钟
     </span>
   
 
   
-  
-    
-      <!-- 不蒜子统计文章PV -->
-      <span id="busuanzi_container_page_pv" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="busuanzi_value_page_pv"></span> 次
-      </span>
-    
   
 </div>
 
@@ -217,171 +231,63 @@
     
       
 
-<div class="container-fluid">
-  <div class="row">
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
     <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
         <div class="py-5" id="board">
-          <div class="post-content mx-auto" id="post">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">C++ Template-3 非类型模板参数</h1>
             
-              <p class="note note-info">
-                
-                  本文最后更新于：2021年1月15日 下午
-                
-              </p>
-            
-            <article class="markdown-body">
+            <div class="markdown-body">
               <p>通过大量例子介绍了非类型模板参数。你可以学习到如何使用非类型模板参数，了解非类型模板参数使用的限制。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <p>这<strong>不是</strong>本系列第一篇文章，推荐阅读完前面的文章再看本文，以下是本系列文章目录。</p>
-<p><a href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">1. 函数模板</a></p>
-<p><a href="https://vinkle.top/2020/07/17/cpp-template-2/#2-%E7%B1%BB%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">2. 类模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/09/cpp-template-1/#1-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF">1. 函数模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/07/17/cpp-template-2/#2-%E7%B1%BB%E6%A8%A1%E6%9D%BF">2. 类模板</a></p>
 <p><a href="#3-非类型模板参数">3. 非类型模板参数（本文）</a></p>
-<p><a href="https://vinkle.top/2020/09/06/cpp-template-4/#4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF" target="_blank" rel="noopener">4. 可变参数模板</a></p>
-<p><a href="https://vinkle.top/2020/10/12/cpp-template-5/#5-%E5%9F%BA%E7%A1%80%E6%8A%80%E6%9C%AF" target="_blank" rel="noopener">5. 基础技术</a></p>
-<p><a href="https://vinkle.top/2021/01/15/cpp-template-6" target="_blank" rel="noopener">6. 移动语意与 enable_if&lt;&gt;</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/09/06/cpp-template-4/#4-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E6%A8%A1%E6%9D%BF">4. 可变参数模板</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2020/10/12/cpp-template-5/#5-%E5%9F%BA%E7%A1%80%E6%8A%80%E6%9C%AF">5. 基础技术</a></p>
+<p><a target="_blank" rel="noopener" href="https://vinkle.top/2021/01/15/cpp-template-6">6. 移动语意与 enable_if&lt;&gt;</a></p>
 <h1 id="3-非类型模板参数"><a href="#3-非类型模板参数" class="headerlink" title="3. 非类型模板参数"></a>3. 非类型模板参数</h1><p>对于函数模板和类模板，模板参数不一定必须为类型，它们也可以是普通的值。和使用类型作为模板参数类似，你可以使代码的部分细节留到使用的时候再确定。只是，这些待定的细节不再是类型，而是某个数值。当我们使用这种模板的时候，你必须显式地表明出数值的具体值，之后代码才会被实例化。本章会通过一个新版本的 stack 类模板来说明这一新特性。顺便我们会介绍一下函数模板的非类型参数的使用，并讨论这一技术的一些局限性。</p>
 <h2 id="3-1-类模板的非类型参数"><a href="#3-1-类模板的非类型参数" class="headerlink" title="3.1 类模板的非类型参数"></a>3.1 类模板的非类型参数</h2><p>作为和前面章节实现的 stack 的对比，你可以实现一个用一个固定大小的数组作为容器的 stack。这种方式的优点是可以避免开发者或者标准库容器管理内存的开销。不同，确定一个合适的大小是一个难题。如果指定的值太小，那么 stack 容器就容易满。如果指定的大小太大，可能造成内存的浪费。因此最好让用户根据自身的情况合理确定 stack 的大小</p>
 <p>为此，可以将 stack 的大小定义成模板参数：</p>
-<pre><code class="hljs c++"><span class="hljs-comment">//stacknontype.hpp</span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;array&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span>
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span>&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span>
-    <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> numElems;         <span class="hljs-comment">// current number of elements</span>
-<span class="hljs-keyword">public</span>:
-    Stack();                  <span class="hljs-comment">// constructor</span>
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span>
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span>
-    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span>
-    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>
-<span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return whether the stack is empty</span>
-        <span class="hljs-keyword">return</span> numElems == <span class="hljs-number">0</span>;
-    &#125;
-    <span class="hljs-function"><span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>
-<span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return current number of elements</span>
-        <span class="hljs-keyword">return</span> numElems;
-    &#125;
-&#125;;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
-Stack&lt;T, Maxsize&gt;::Stack()
-    : numElems(<span class="hljs-number">0</span>) <span class="hljs-comment">// start with no elements</span>
-&#123;
-    <span class="hljs-comment">// nothing else to do</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::push(T <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    assert(numElems &lt; Maxsize);
-    elems[numElems] = elem; <span class="hljs-comment">// append element</span>
-    ++numElems;             <span class="hljs-comment">// increment number of elements</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::pop()
-&#123;
-    assert(!elems.empty());
-    --numElems; <span class="hljs-comment">// decrement number of elements</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
-T <span class="hljs-keyword">const</span> &amp;Stack&lt;T, Maxsize&gt;::top() <span class="hljs-keyword">const</span>
-&#123;
-    assert(!elems.empty());
-    <span class="hljs-keyword">return</span> elems[numElems - <span class="hljs-number">1</span>]; <span class="hljs-comment">// return last element</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//stacknontype.hpp</span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;array&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span><br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> Maxsize&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">private</span>:<br>    std::array&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span><br>    std::<span class="hljs-keyword">size_t</span> numElems;         <span class="hljs-comment">// current number of elements</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">Stack</span>();                  <span class="hljs-comment">// constructor</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span><br>    <span class="hljs-function">T <span class="hljs-keyword">const</span>&amp; <span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span><br>    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span><br><span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return whether the stack is empty</span><br>        <span class="hljs-keyword">return</span> numElems == <span class="hljs-number">0</span>;<br>    &#125;<br>    <span class="hljs-function">std::<span class="hljs-keyword">size_t</span> <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span><br><span class="hljs-function">    </span>&#123; <span class="hljs-comment">// return current number of elements</span><br>        <span class="hljs-keyword">return</span> numElems;<br>    &#125;<br>&#125;;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> Maxsize&gt;<br>Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">Stack</span>()<br>    : <span class="hljs-built_in">numElems</span>(<span class="hljs-number">0</span>) <span class="hljs-comment">// start with no elements</span><br>&#123;<br>    <span class="hljs-comment">// nothing else to do</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> Maxsize&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">push</span>(T <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    <span class="hljs-built_in">assert</span>(numElems &lt; Maxsize);<br>    elems[numElems] = elem; <span class="hljs-comment">// append element</span><br>    ++numElems;             <span class="hljs-comment">// increment number of elements</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> Maxsize&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">pop</span>()<br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    --numElems; <span class="hljs-comment">// decrement number of elements</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> Maxsize&gt;<br>T <span class="hljs-keyword">const</span> &amp;Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">top</span>() <span class="hljs-keyword">const</span><br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    <span class="hljs-keyword">return</span> elems[numElems - <span class="hljs-number">1</span>]; <span class="hljs-comment">// return last element</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>第二个新的模板参数 <code>Maxsize</code> 是 <code>int</code> 类型的，它指定了 stack 中数组中的大小：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span>&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span>
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> Maxsize&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">private</span>:<br>    std::array&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span><br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>另外，成员函数 <code>push()</code> 在使用时也检测了 stack 是否已满：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::push(T <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    assert(numElems &lt; Maxsize);
-    elems[numElems] = elem; <span class="hljs-comment">// append element</span>
-    ++numElems;             <span class="hljs-comment">// increment number of elements</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> Maxsize&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">push</span>(T <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    <span class="hljs-built_in">assert</span>(numElems &lt; Maxsize);<br>    elems[numElems] = elem; <span class="hljs-comment">// append element</span><br>    ++numElems;             <span class="hljs-comment">// increment number of elements</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>为了使用这个类模板你必须同时显式地写出 stack 中元素的类型和其最大容量：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"stacknontype.hpp"</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">20</span>&gt;         int20Stack;     <span class="hljs-comment">// stack of up to 20 ints</span>
-  Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">40</span>&gt;         int40Stack;     <span class="hljs-comment">// stack of up to 40 ints</span>
-  Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>,<span class="hljs-number">40</span>&gt; stringStack;    <span class="hljs-comment">// stack of up to 40 strings</span>
-
-  <span class="hljs-comment">// manipulate stack of up to 20 ints</span>
-  int20Stack.push(<span class="hljs-number">7</span>);
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; int20Stack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-  int20Stack.pop();
-
-  <span class="hljs-comment">// manipulate stack of up to 40 strings</span>
-  stringStack.push(<span class="hljs-string">"hello"</span>);
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; stringStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-  stringStack.pop();
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;stacknontype.hpp&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">20</span>&gt;         int20Stack;     <span class="hljs-comment">// stack of up to 20 ints</span><br>  Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">40</span>&gt;         int40Stack;     <span class="hljs-comment">// stack of up to 40 ints</span><br>  Stack&lt;std::string,<span class="hljs-number">40</span>&gt; stringStack;    <span class="hljs-comment">// stack of up to 40 strings</span><br><br>  <span class="hljs-comment">// manipulate stack of up to 20 ints</span><br>  int20Stack.<span class="hljs-built_in">push</span>(<span class="hljs-number">7</span>);<br>  std::cout &lt;&lt; int20Stack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>  int20Stack.<span class="hljs-built_in">pop</span>();<br><br>  <span class="hljs-comment">// manipulate stack of up to 40 strings</span><br>  stringStack.<span class="hljs-built_in">push</span>(<span class="hljs-string">&quot;hello&quot;</span>);<br>  std::cout &lt;&lt; stringStack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>  stringStack.<span class="hljs-built_in">pop</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>注意，上面每一个模板都实例化出一个不同的类型。因此，<code>int20Stack</code> 和 <code>int40Stack</code> 它们的类型是不同的，而且它们之间没有定义隐式或者是显式的类型转换规则。因此，不能用其中一个取代另一个，也不能将其中一个赋值给另外一个。</p>
 <p>同时，对于非类型模板参数来说，也可以指定默认值：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T = <span class="hljs-keyword">int</span>, <span class="hljs-built_in">std</span>::<span class="hljs-keyword">size_t</span> Maxsize = <span class="hljs-number">100</span>&gt;
-class Stack
-&#123;
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T = <span class="hljs-keyword">int</span>, std::<span class="hljs-keyword">size_t</span> Maxsize = <span class="hljs-number">100</span>&gt;<br>class Stack<br>&#123;<br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>但是，从良好的程序设计的角度来看，这可能不是一个合适的例子。默认值应该直观地看上去是正确的。不过对于默认类型是 <code>int</code> 或者是默认大小是 <code>100</code> 对于一般的 stack 模板看上去都不够直观。因此，最好是让程序员同时显式地指定这两个模板参数，这样在声明的时候这个两个模板参数都可以被<strong>文档化(documented)</strong>。</p>
 <h2 id="3-2-非类型函数模板参数"><a href="#3-2-非类型函数模板参数" class="headerlink" title="3.2 非类型函数模板参数"></a>3.2 非类型函数模板参数</h2><p>你也可以为函数模板定义非类型模板参数。例如，下面这个函数模板定义了一组可以添加一个确定的值的函数：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">int</span> Val, <span class="hljs-keyword">typename</span> T&gt;
-<span class="hljs-function">T <span class="hljs-title">addValue</span><span class="hljs-params">(T x)</span></span>
-<span class="hljs-function"></span>&#123;
-  <span class="hljs-keyword">return</span> x + Val;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">int</span> Val, <span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-function">T <span class="hljs-title">addValue</span><span class="hljs-params">(T x)</span></span><br><span class="hljs-function"></span>&#123;<br>  <span class="hljs-keyword">return</span> x + Val;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>这类函数或者操作作用于其他函数的参数时，会十分有用。例如，当你使用 C++ 标准库时，你可以传递实例化后的次函数模板来为每一个元素添加一个值：</p>
-<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::transform(source.<span class="hljs-built_in">begin</span>(), source.<span class="hljs-built_in">end</span>(), <span class="hljs-comment">// start and end of source</span>
-               dest.<span class="hljs-built_in">begin</span>(),                 <span class="hljs-comment">// start of destination</span>
-               addValue&lt;<span class="hljs-number">5</span>,<span class="hljs-keyword">int</span>&gt;);             <span class="hljs-comment">// operation</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::<span class="hljs-built_in">transform</span>(source.<span class="hljs-built_in">begin</span>(), source.<span class="hljs-built_in">end</span>(), <span class="hljs-comment">// start and end of source</span><br>               dest.<span class="hljs-built_in">begin</span>(),                 <span class="hljs-comment">// start of destination</span><br>               addValue&lt;<span class="hljs-number">5</span>,<span class="hljs-keyword">int</span>&gt;);             <span class="hljs-comment">// operation</span><br></code></pre></td></tr></table></figure>
 
 <p>最后一个参数是 <code>addValue&lt;&gt;()</code> 实例化出可以传入 <code>int</code> 类型的值，并为其加 <code>5</code> 的函数实例。这个函数会用来处理 <code>source</code> 中的每一个元素，必将结果保存在 <code>dest</code> 中。</p>
 <p>注意在这一你必须显式指出 <code>addValue&lt;&gt;()</code> 的模板参数 <code>T</code> 的类型是 <code>int</code>。因为模板参数类型推导只会在立即发生的调用中起作用，但是 <code>std::transform()</code> 需要一个完整的类型去推导第四个模板参数。目前还不支持部分替换或推导模板参数然后再根据情况推导出剩余的模板参数。</p>
 <p>同样，你也可以指出模板参数是从前一个参数推导出来的。比如，通过传入的非类型模板参数来推导出返回类型：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">auto</span> Val, <span class="hljs-keyword">typename</span> T = <span class="hljs-keyword">decltype</span>(Val)&gt;
-T foo();</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">auto</span> Val, <span class="hljs-keyword">typename</span> T = <span class="hljs-keyword">decltype</span>(Val)&gt;<br>T <span class="hljs-built_in">foo</span>();<br></code></pre></td></tr></table></figure>
 
 <p>或者可以通过以下方式确保非类型模板参数的类型和返回类型一样：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, T Val = T&#123;&#125;&gt;
-T bar();</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, T Val = T&#123;&#125;&gt;<br>T <span class="hljs-built_in">bar</span>();<br></code></pre></td></tr></table></figure>
 
 <h2 id="3-3-非类型模板参数的限制"><a href="#3-3-非类型模板参数的限制" class="headerlink" title="3.3 非类型模板参数的限制"></a>3.3 非类型模板参数的限制</h2><p>注意非类型模板参数会带来某些限制。通常，他们只可以是整型的常量（包括枚举），指向 objects/functions/members 的指针，objects/functions 的左值引用，或者 <code>std::nullptr_t</code>（<code>nullptr</code> 的类型）。</p>
 <p>浮点型数值或者 class 类型的对象是不允许作为非类型模板参数的：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">double</span> VAT&gt;      <span class="hljs-comment">// ERROR: floating-point values are not</span>
-<span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">process</span> <span class="hljs-params">(<span class="hljs-keyword">double</span> v)</span> <span class="hljs-comment">// allowed as template parameters</span></span>
-<span class="hljs-function"></span>&#123;
-	<span class="hljs-keyword">return</span> v * VAT;
-&#125;
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> name&gt; <span class="hljs-comment">// ERROR: class-type objects are not</span>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>               // <span class="hljs-title">allowed</span> <span class="hljs-title">as</span> <span class="hljs-title">template</span> <span class="hljs-title">parameters</span></span>
-<span class="hljs-class">&#123;</span> 
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">double</span> VAT&gt;      <span class="hljs-comment">// ERROR: floating-point values are not</span><br><span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">process</span> <span class="hljs-params">(<span class="hljs-keyword">double</span> v)</span> <span class="hljs-comment">// allowed as template parameters</span></span><br><span class="hljs-function"></span>&#123;<br>	<span class="hljs-keyword">return</span> v * VAT;<br>&#125;<br><span class="hljs-keyword">template</span> &lt;std::string name&gt; <span class="hljs-comment">// ERROR: class-type objects are not</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span>               // <span class="hljs-title">allowed</span> <span class="hljs-title">as</span> <span class="hljs-title">template</span> <span class="hljs-title">parameters</span></span><br><span class="hljs-class">&#123;</span> <br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>当传递指针或者引用给模板参数时，这个对象不能为字符串常量，临时变量或者数据成员以及其他子对象。在 C++17 之前，每个 C++ 版本的更新都会放宽这个限制：</p>
 <ul>
@@ -389,205 +295,69 @@ T bar();</code></pre>
 <li>在 C++14 中，对象必须要有外部链接或者内部链接。</li>
 </ul>
 <p>因此下面的写法是不正确的：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>* name&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span></span>
-<span class="hljs-class">&#123;</span>
-    ...
-&#125;;
-MyClass&lt;<span class="hljs-string">"hello"</span>&gt; x; <span class="hljs-comment">// ERROR: class-type objects are not</span>
-                    <span class="hljs-comment">//        allowed as template parameters</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span>* name&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span></span><br><span class="hljs-class">&#123;</span><br>    ...<br>&#125;;<br>MyClass&lt;<span class="hljs-string">&quot;hello&quot;</span>&gt; x; <span class="hljs-comment">// ERROR: class-type objects are not</span><br>                    <span class="hljs-comment">//        allowed as template parameters</span><br></code></pre></td></tr></table></figure>
 
 <p>但是有如下的变通方法（视 C++ 版本而定）：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">extern</span> <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> s03[] = <span class="hljs-string">"hi"</span>;  <span class="hljs-comment">// external linkage</span>
-<span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> s11[] = <span class="hljs-string">"hi"</span>;         <span class="hljs-comment">// internal linkage</span>
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-    Message&lt;s03&gt; m03;            <span class="hljs-comment">// OK(all versions)</span>
-    Message&lt;s11&gt; m11;            <span class="hljs-comment">// OK since C++11</span>
-    <span class="hljs-keyword">static</span> <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> s17[] = <span class="hljs-string">"hi"</span>; <span class="hljs-comment">// no linkage</span>
-    Message&lt;s17&gt; m17;               <span class="hljs-comment">// OK since C++17</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">extern</span> <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> s03[] = <span class="hljs-string">&quot;hi&quot;</span>;  <span class="hljs-comment">// external linkage</span><br><span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> s11[] = <span class="hljs-string">&quot;hi&quot;</span>;         <span class="hljs-comment">// internal linkage</span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    Message&lt;s03&gt; m03;            <span class="hljs-comment">// OK(all versions)</span><br>    Message&lt;s11&gt; m11;            <span class="hljs-comment">// OK since C++11</span><br>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> s17[] = <span class="hljs-string">&quot;hi&quot;</span>; <span class="hljs-comment">// no linkage</span><br>    Message&lt;s17&gt; m17;               <span class="hljs-comment">// OK since C++17</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>在上面三种情况中字符数组都是被 <code>&quot;hi&quot;</code> 初始化，这个对象被用来作为被声明为 <code>char const*</code> 的模板参数。如果这个对象有外部链接（<code>s03</code>），那么在所有版本都是有效的，如果对象有内部链接，那么对 C++11 和 C++14 也是有效的，从 C++17开始，即使对象没有链接属性也是有效的。</p>
 <p><a href>12.3.3 节（未写)</a>对这一问题进行了更加详细的讨论，<a href>17.2 节（未写）</a>对这一问题未来的变化进行了讨论。</p>
 <h3 id="避免无效的表达式"><a href="#避免无效的表达式" class="headerlink" title="避免无效的表达式"></a>避免无效的表达式</h3><p>非类型模板参数可以使任何编译期的表达式，比如：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">int</span> T, <span class="hljs-keyword">bool</span> B&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span>;</span>
-...
-C&lt;<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">int</span>) + <span class="hljs-number">4</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">int</span>) == <span class="hljs-number">4</span>&gt; c;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">int</span> T, <span class="hljs-keyword">bool</span> B&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span>;</span><br>...<br>C&lt;<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(<span class="hljs-keyword">int</span>) + <span class="hljs-number">4</span>, <span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(<span class="hljs-keyword">int</span>) == <span class="hljs-number">4</span>&gt; c;<br></code></pre></td></tr></table></figure>
 
 <p>不过如果在表达式中使用了 <code>operator &gt;</code>，就必须将相应的表达式放在括号里面，否则 <code>&gt;</code> 会被认为模板参数列表末尾的 <code>&gt;</code>:</p>
-<pre><code class="hljs c++">C&lt;<span class="hljs-number">42</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">int</span>) &gt; <span class="hljs-number">4</span>&gt; c; <span class="hljs-comment">// ERROR: first &gt; ends the template argument list</span>
-C&lt;<span class="hljs-number">42</span>, (<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">int</span>) &gt; <span class="hljs-number">4</span>)&gt; c; <span class="hljs-comment">// OK</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">C&lt;<span class="hljs-number">42</span>, <span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(<span class="hljs-keyword">int</span>) &gt; <span class="hljs-number">4</span>&gt; c; <span class="hljs-comment">// ERROR: first &gt; ends the template argument list</span><br>C&lt;<span class="hljs-number">42</span>, (<span class="hljs-built_in"><span class="hljs-keyword">sizeof</span></span>(<span class="hljs-keyword">int</span>) &gt; <span class="hljs-number">4</span>)&gt; c; <span class="hljs-comment">// OK</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="3-4-模板参数类型-auto"><a href="#3-4-模板参数类型-auto" class="headerlink" title="3.4 模板参数类型 auto"></a>3.4 模板参数类型 auto</h2><p>从 C++17 开始，你可以定义非类型模板参数来接受任何允许的非类型模板参数。通过这一特性，我们可以设计一个更加泛化的有固定大小的 stack：</p>
-<pre><code class="hljs c++"><span class="hljs-comment">//stackauto.hpp</span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;array&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span>
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-<span class="hljs-keyword">public</span>:
-    <span class="hljs-keyword">using</span> size_type = <span class="hljs-keyword">decltype</span>(Maxsize);
-
-<span class="hljs-keyword">private</span>:
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span>&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span>
-    size_type numElems;           <span class="hljs-comment">// current number of elements</span>
-<span class="hljs-keyword">public</span>:
-    Stack();                  <span class="hljs-comment">// constructor</span>
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span>
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span>
-    <span class="hljs-function">T <span class="hljs-keyword">const</span> &amp;<span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span>
-    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>        <span class="hljs-comment">// return whether the stack is empty</span></span>
-<span class="hljs-function">    </span>&#123; 
-        <span class="hljs-keyword">return</span> numElems == <span class="hljs-number">0</span>;
-    &#125;
-    <span class="hljs-function">size_type <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>    <span class="hljs-comment">// return current number of elements</span></span>
-<span class="hljs-function">    </span>&#123; 
-        <span class="hljs-keyword">return</span> numElems;
-    &#125;
-&#125;;
-
-<span class="hljs-comment">// constructor</span>
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;
-Stack&lt;T, Maxsize&gt;::Stack()
-    : numElems(<span class="hljs-number">0</span>) <span class="hljs-comment">// start with no elements</span>
-&#123;
-    <span class="hljs-comment">// nothing else to do</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::push(T <span class="hljs-keyword">const</span>&amp; elem)
-&#123;
-    assert(numElems &lt; Maxsize);
-    elems[numElems] = elem; <span class="hljs-comment">// append element</span>
-    ++numElems;             <span class="hljs-comment">// increment number of elements</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;
-<span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::pop()
-&#123;
-    assert(!elems.empty());
-    --numElems; <span class="hljs-comment">// decrement number of elements</span>
-&#125;
-
-<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;
-T <span class="hljs-keyword">const</span> &amp;Stack&lt;T, Maxsize&gt;::top() <span class="hljs-keyword">const</span>
-&#123;
-    assert(!elems.empty());
-    <span class="hljs-keyword">return</span> elems[numElems - <span class="hljs-number">1</span>]; <span class="hljs-comment">// return last element</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//stackauto.hpp</span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;array&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cassert&gt;</span></span><br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-keyword">using</span> size_type = <span class="hljs-keyword">decltype</span>(Maxsize);<br><br><span class="hljs-keyword">private</span>:<br>    std::array&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span><br>    size_type numElems;           <span class="hljs-comment">// current number of elements</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">Stack</span>();                  <span class="hljs-comment">// constructor</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; elem)</span></span>; <span class="hljs-comment">// push element</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// pop element</span><br>    <span class="hljs-function">T <span class="hljs-keyword">const</span> &amp;<span class="hljs-title">top</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;     <span class="hljs-comment">// return top element</span><br>    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">empty</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>        <span class="hljs-comment">// return whether the stack is empty</span></span><br><span class="hljs-function">    </span>&#123; <br>        <span class="hljs-keyword">return</span> numElems == <span class="hljs-number">0</span>;<br>    &#125;<br>    <span class="hljs-function">size_type <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>    <span class="hljs-comment">// return current number of elements</span></span><br><span class="hljs-function">    </span>&#123; <br>        <span class="hljs-keyword">return</span> numElems;<br>    &#125;<br>&#125;;<br><br><span class="hljs-comment">// constructor</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;<br>Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">Stack</span>()<br>    : <span class="hljs-built_in">numElems</span>(<span class="hljs-number">0</span>) <span class="hljs-comment">// start with no elements</span><br>&#123;<br>    <span class="hljs-comment">// nothing else to do</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">push</span>(T <span class="hljs-keyword">const</span>&amp; elem)<br>&#123;<br>    <span class="hljs-built_in">assert</span>(numElems &lt; Maxsize);<br>    elems[numElems] = elem; <span class="hljs-comment">// append element</span><br>    ++numElems;             <span class="hljs-comment">// increment number of elements</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;<br><span class="hljs-keyword">void</span> Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">pop</span>()<br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    --numElems; <span class="hljs-comment">// decrement number of elements</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;<br>T <span class="hljs-keyword">const</span> &amp;Stack&lt;T, Maxsize&gt;::<span class="hljs-built_in">top</span>() <span class="hljs-keyword">const</span><br>&#123;<br>    <span class="hljs-built_in">assert</span>(!elems.<span class="hljs-built_in">empty</span>());<br>    <span class="hljs-keyword">return</span> elems[numElems - <span class="hljs-number">1</span>]; <span class="hljs-comment">// return last element</span><br>&#125;<br><br></code></pre></td></tr></table></figure>
 
 <p>通过定义</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span>
-<span class="hljs-class">&#123;</span>
-    ...
-&#125;;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">auto</span> Maxsize&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stack</span></span><br><span class="hljs-class">&#123;</span><br>    ...<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>通过使用 <em>placeholder type</em> <code>auto</code>，你定义了类型待定的 <code>Maxsize</code>。它的类型可以使任何费类型模板参数所允许的类型。</p>
 <p>在模板内存，你可以直接使用它的值：</p>
-<pre><code class="hljs c++"><span class="hljs-built_in">std</span>::<span class="hljs-built_in">array</span>&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::array&lt;T, Maxsize&gt; elems; <span class="hljs-comment">// elements</span><br></code></pre></td></tr></table></figure>
 
 <p>也可以使用它的类型：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">using</span> size_type = <span class="hljs-keyword">decltype</span>(Maxsize);</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">using</span> size_type = <span class="hljs-keyword">decltype</span>(Maxsize);<br></code></pre></td></tr></table></figure>
 
 <p>然后也可以作为 <code>size()</code> 函数的返回类型：</p>
-<pre><code class="hljs c++"><span class="hljs-function">size_type <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>    <span class="hljs-comment">// return current number of elements</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">return</span> numElems;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">size_type <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>    <span class="hljs-comment">// return current number of elements</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> numElems;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>从 C++ 14 开始，你也可以只使用 <code>auto</code> 作为返回值，让编译器推导出返回的类型：</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>        <span class="hljs-comment">// return current number of elements</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">return</span> numElems;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">size</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span>        <span class="hljs-comment">// return current number of elements</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> numElems;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>根据类的声明，<code>numElems</code> 的类型是由非类型模板参数的类型来决定的：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"stackauto.hpp"</span></span>
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">20u</span>&gt;        int20Stack;     <span class="hljs-comment">// stack of up to 20 ints</span>
-  Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>,<span class="hljs-number">40</span>&gt; stringStack;    <span class="hljs-comment">// stack of up to 40 strings</span>
-
-  <span class="hljs-comment">// manipulate stack of up to 20 ints</span>
-  int20Stack.push(<span class="hljs-number">7</span>);
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; int20Stack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-  <span class="hljs-keyword">auto</span> size1 = int20Stack.<span class="hljs-built_in">size</span>();
-
-  <span class="hljs-comment">// manipulate stack of up to 40 strings</span>
-  stringStack.push(<span class="hljs-string">"hello"</span>);
-  <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; stringStack.top() &lt;&lt; <span class="hljs-string">'\n'</span>;
-  <span class="hljs-keyword">auto</span> size2 = stringStack.<span class="hljs-built_in">size</span>();
-
-  <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">std</span>::is_same_v&lt;<span class="hljs-keyword">decltype</span>(size1), <span class="hljs-keyword">decltype</span>(size2)&gt;) 
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"size types differ"</span> &lt;&lt; <span class="hljs-string">'\n'</span>;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;stackauto.hpp&quot;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">20u</span>&gt;        int20Stack;     <span class="hljs-comment">// stack of up to 20 ints</span><br>  Stack&lt;std::string,<span class="hljs-number">40</span>&gt; stringStack;    <span class="hljs-comment">// stack of up to 40 strings</span><br><br>  <span class="hljs-comment">// manipulate stack of up to 20 ints</span><br>  int20Stack.<span class="hljs-built_in">push</span>(<span class="hljs-number">7</span>);<br>  std::cout &lt;&lt; int20Stack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>  <span class="hljs-keyword">auto</span> size1 = int20Stack.<span class="hljs-built_in">size</span>();<br><br>  <span class="hljs-comment">// manipulate stack of up to 40 strings</span><br>  stringStack.<span class="hljs-built_in">push</span>(<span class="hljs-string">&quot;hello&quot;</span>);<br>  std::cout &lt;&lt; stringStack.<span class="hljs-built_in">top</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>  <span class="hljs-keyword">auto</span> size2 = stringStack.<span class="hljs-built_in">size</span>();<br><br>  <span class="hljs-keyword">if</span> (!std::is_same_v&lt;<span class="hljs-keyword">decltype</span>(size1), <span class="hljs-keyword">decltype</span>(size2)&gt;) <br>    std::cout &lt;&lt; <span class="hljs-string">&quot;size types differ&quot;</span> &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>对于</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">20u</span>&gt; int20Stack;     <span class="hljs-comment">// stack of up to 20 ints</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>,<span class="hljs-number">20u</span>&gt; int20Stack;     <span class="hljs-comment">// stack of up to 20 ints</span><br></code></pre></td></tr></table></figure>
 
 <p>由于传递的非类型模板参数是 <code>20u</code>，因此 <code>size_type</code> 的类型是 <code>unsigned int</code>。</p>
 <p>对于</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>,<span class="hljs-number">40</span>&gt; stringStack; <span class="hljs-comment">// stack of up to 40 strings</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;std::string,<span class="hljs-number">40</span>&gt; stringStack; <span class="hljs-comment">// stack of up to 40 strings</span><br></code></pre></td></tr></table></figure>
 
 <p>因为传递的非类型模板参数是 <code>40</code>， 因此 <code>size_type</code> 的类型是 <code>int</code>。</p>
 <p>两种 stack 的 <code>size()</code> 函数的返回类型是不同的，所以</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">auto</span> size1 = int20Stack.<span class="hljs-built_in">size</span>();
-...
-<span class="hljs-keyword">auto</span> size2 = stringStack.<span class="hljs-built_in">size</span>();</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">auto</span> size1 = int20Stack.<span class="hljs-built_in">size</span>();<br>...<br><span class="hljs-keyword">auto</span> size2 = stringStack.<span class="hljs-built_in">size</span>();<br></code></pre></td></tr></table></figure>
 
 <p>中的 <code>size1</code> 和 <code>size2</code> 的类型也是不同的。通过使用 <em>standard type trait</em> <code>std::is_same</code> 和 <code>decltype</code>，可以验证：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">if</span> (!<span class="hljs-built_in">std</span>::is_same&lt;<span class="hljs-keyword">decltype</span>(size1), <span class="hljs-keyword">decltype</span>(size2)&gt;::value) 
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"size types differ"</span> &lt;&lt; <span class="hljs-string">'\n'</span>;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">if</span> (!std::is_same&lt;<span class="hljs-keyword">decltype</span>(size1), <span class="hljs-keyword">decltype</span>(size2)&gt;::value) <br>    std::cout &lt;&lt; <span class="hljs-string">&quot;size types differ&quot;</span> &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br></code></pre></td></tr></table></figure>
 
 <p>输出的结果是：</p>
-<pre><code class="hljs arduino"><span class="hljs-built_in">size</span> types differ</code></pre>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arduino">size types differ<br></code></pre></td></tr></table></figure>
 
 <p>从 C++17 开始，对于返回类型的 <em>type trait</em>，可以通过后缀 <code>_v</code> 来省略 <code>::value</code> （<a href>参考5.6节 （未写）</a>）：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">if</span> (!<span class="hljs-built_in">std</span>::is_same_v&lt;<span class="hljs-keyword">decltype</span>(size1), <span class="hljs-keyword">decltype</span>(size2)&gt;) 
-    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"size types differ"</span> &lt;&lt; <span class="hljs-string">'\n'</span>;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">if</span> (!std::is_same_v&lt;<span class="hljs-keyword">decltype</span>(size1), <span class="hljs-keyword">decltype</span>(size2)&gt;) <br>    std::cout &lt;&lt; <span class="hljs-string">&quot;size types differ&quot;</span> &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br></code></pre></td></tr></table></figure>
 
 <p>注意非类型模板的限制依然存在。尤其是那些 <a href="#3-3-非类型模板参数的限制">3.3 节</a>讨论的限制。比如：</p>
-<pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>, <span class="hljs-number">3.14</span>&gt; sd; <span class="hljs-comment">// ERROR: Floating-point nontype argument</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">Stack&lt;<span class="hljs-keyword">int</span>, <span class="hljs-number">3.14</span>&gt; sd; <span class="hljs-comment">// ERROR: Floating-point nontype argument</span><br></code></pre></td></tr></table></figure>
 
 <p>由于你可以传递字符串常量数组作为非类型模板参数（从 C++17 开始甚至可以是静态的局部变量，<a href="#3-3-非类型模板参数的限制">参见 3.3 节</a>），下面的用法也是正确的：</p>
-<pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
-
-<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">auto</span> T&gt;       <span class="hljs-comment">// take value of any possible nontype parameter (since C++17)</span>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> </span>
-<span class="hljs-class">&#123;</span>
-  <span class="hljs-keyword">public</span>:
-    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">()</span> </span>
-<span class="hljs-function">    </span>&#123;
-      <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; T &lt;&lt; <span class="hljs-string">'\n'</span>; 
-    &#125;
-&#125;;
-
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
-<span class="hljs-function"></span>&#123;
-  Message&lt;<span class="hljs-number">42</span>&gt; msg1;
-  msg1.<span class="hljs-built_in">print</span>();        <span class="hljs-comment">// initialize with int 42 and print that value</span>
-
-  <span class="hljs-keyword">static</span> <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> s[] = <span class="hljs-string">"hello"</span>;
-  Message&lt;s&gt; msg2;     <span class="hljs-comment">// initialize with char~const[6] "hello"</span>
-  msg2.<span class="hljs-built_in">print</span>();        <span class="hljs-comment">// and print that value</span>
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">auto</span> T&gt;       <span class="hljs-comment">// take value of any possible nontype parameter (since C++17)</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> </span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">()</span> </span><br><span class="hljs-function">    </span>&#123;<br>      std::cout &lt;&lt; T &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>; <br>    &#125;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  Message&lt;<span class="hljs-number">42</span>&gt; msg1;<br>  msg1.<span class="hljs-built_in">print</span>();        <span class="hljs-comment">// initialize with int 42 and print that value</span><br><br>  <span class="hljs-keyword">static</span> <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> s[] = <span class="hljs-string">&quot;hello&quot;</span>;<br>  Message&lt;s&gt; msg2;     <span class="hljs-comment">// initialize with char~const[6] &quot;hello&quot;</span><br>  msg2.<span class="hljs-built_in">print</span>();        <span class="hljs-comment">// and print that value</span><br>&#125;<br><br></code></pre></td></tr></table></figure>
 
 <p>也可以使用 <code>template &lt;decltype(auto) N&gt;</code>，这样可以将 <code>N</code> 实例化为引用类型：</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">decltype</span>(<span class="hljs-keyword">auto</span>) N&gt;
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span>
-<span class="hljs-class">&#123;</span>
-    ...
-&#125;;
-<span class="hljs-keyword">int</span> i;
-C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">decltype</span>(<span class="hljs-keyword">auto</span>) N&gt;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span></span><br><span class="hljs-class">&#123;</span><br>    ...<br>&#125;;<br><span class="hljs-keyword">int</span> i;<br>C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span><br></code></pre></td></tr></table></figure>
 
 <p>更多细节<a href>参见 15.10.1 节（未写）</a>。</p>
 <h2 id="3-5-小结"><a href="#3-5-小结" class="headerlink" title="3.5 小结"></a>3.5 小结</h2><ul>
@@ -596,7 +366,7 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
 <li>通过使用关键字 <code>auto</code>，可以使非类型模板参数的类型更加泛化。</li>
 </ul>
 
-            </article>
+            </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
@@ -622,11 +392,15 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
                 
               </div>
               
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
               
               
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
                     
                     
                       <a href="/2020/09/06/cpp-template-4/">
@@ -635,8 +409,8 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
-                  </div>
-                  <div class="post-next col-6">
+                  </article>
+                  <article class="post-next col-6">
                     
                     
                       <a href="/2020/07/17/cpp-template-2/">
@@ -645,13 +419,39 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
                     
-                  </div>
+                  </article>
                 </div>
               
             </div>
 
             
-          </div>
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="SOHUCS" sid='http://yoursite.com/2020/07/22/cpp-template-3/'></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#SOHUCS', function() {
+      var appid = 'cyvv8wewD';
+      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+      } else {
+        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
+          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
+        });
+      }
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
         </div>
       </div>
     </div>
@@ -659,7 +459,7 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
       <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
         <div id="toc">
   <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
+  <div class="toc-body" id="toc-body"></div>
 </div>
 
       </div>
@@ -671,16 +471,15 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
 
 
     
-  </main>
 
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
@@ -701,21 +500,16 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
     </div>
   </div>
 </div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
     
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
   <div class="statistics">
     
     
@@ -741,29 +535,61 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
   </div>
 
 
-    
+  
 
-    
-  </div>
+  
 </footer>
 
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
 <!-- Plugins -->
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
 
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
@@ -772,95 +598,15 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
 
 
 
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
   <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: 'article.markdown-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 0,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "C++ Template-3 非类型模板参数&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
-      placement: "right",
-      visible: "hover",
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
       
-    };
-    var el = "h1,h2,h3,h4,h5,h6".split(",");
-    var res = [];
-    for (item of el) {
-      res.push(".markdown-body > " + item)
-    }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
+      typing(title)
+      
+    })(window, document);
   </script>
 
 
@@ -902,14 +648,9 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
       };
     </script>
 
-    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.1.4/es5/tex-svg.js" ></script>
 
   
-
-
-
-
-
 
 
 
@@ -943,6 +684,10 @@ C&lt;(i)&gt; x; <span class="hljs-comment">// N is int&amp;</span></code></pre>
 
 
 
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
 
 
 </body>

@@ -1,35 +1,38 @@
+
+
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
-  <link rel="icon" type="image/png" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <meta name="theme-color" content="">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
   <meta name="description" content="vinkle&#39;s space">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
+  
   <title>vinkle&#39;s space</title>
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
 
 
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
 
 
 <link  rel="stylesheet" href="/css/main.css" />
@@ -37,8 +40,13 @@
 <!-- 自定义样式保持在最底部 -->
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"e29593c0eaefc83ba96301b9153d7d11","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
   <script  src="/js/utils.js" ></script>
-<meta name="generator" content="Hexo 4.2.1"></head>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -132,8 +140,14 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
       </ul>
@@ -141,13 +155,13 @@
   </div>
 </nav>
 
-    <div class="view intro-2" id="background" parallax=true
+    <div class="banner" id="banner" parallax=true
          style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/face.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Welcome to Vinkle's space">
               
             </span>
 
@@ -166,7 +180,7 @@
 
   <main>
     
-      <div class="container nopadding-md">
+      <div class="container nopadding-x-md">
         <div class="py-5" id="board"
           style=margin-top:0>
           
@@ -181,25 +195,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2021/01/15/cpp-template-6/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" alt="C++ Template-6 移动语意和 enable_if&lt;&gt;">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" lazyload alt="C++ Template-6 移动语意和 enable_if&lt;&gt;">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2021/01/15/cpp-template-6/">C++ Template-6 移动语意和 enable_if&lt;&gt;</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/01/15/cpp-template-6/" target="_self">
+          C++ Template-6 移动语意和 enable_if&lt;&gt;
+        </a>
+      </h1>
 
-      <a href="/2021/01/15/cpp-template-6/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2021/01/15/cpp-template-6/" target="_self">
           
-        
-        <div>移动语意(move semantics)是 C++11 中引入的一个重要特性。本章将会介绍移动语意的特性， enable_if&lt;&gt; 的使用和对于 concept 的简单介绍。</div>
-      </a>
+          
+            
+          
+          移动语意(move semantics)是 C++11 中引入的一个重要特性。本章将会介绍移动语意的特性， enable_if&lt;&gt; 的使用和对于 concept 的简单介绍。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2021-01-15
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-15 17:03" pubdate>
+              2021-01-15
+            </time>
           </div>
         
         
@@ -223,7 +247,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -231,25 +255,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/10/12/cpp-template-5/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" alt="C++ Template-5 基础技术">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" lazyload alt="C++ Template-5 基础技术">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/10/12/cpp-template-5/">C++ Template-5 基础技术</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/10/12/cpp-template-5/" target="_self">
+          C++ Template-5 基础技术
+        </a>
+      </h1>
 
-      <a href="/2020/10/12/cpp-template-5/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/10/12/cpp-template-5/" target="_self">
           
-        
-        <div>本章介绍了模板使用时的一些基础技术：关键字 typename 的使用，将成员函数和嵌套类定义成模板，模板参数模板(template template parameters)，零初始化和一些关于使用字符串常量作为函数模板参数的细节。</div>
-      </a>
+          
+            
+          
+          本章介绍了模板使用时的一些基础技术：关键字 typename 的使用，将成员函数和嵌套类定义成模板，模板参数模板(template template parameters)，零初始化和一些关于使用字符串常量作为函数模板参数的细节。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-10-12
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-10-12 19:40" pubdate>
+              2020-10-12
+            </time>
           </div>
         
         
@@ -273,7 +307,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -281,25 +315,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/09/06/cpp-template-4/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" alt="C++ Template-4 可变参数模板">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" lazyload alt="C++ Template-4 可变参数模板">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/09/06/cpp-template-4/">C++ Template-4 可变参数模板</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/09/06/cpp-template-4/" target="_self">
+          C++ Template-4 可变参数模板
+        </a>
+      </h1>
 
-      <a href="/2020/09/06/cpp-template-4/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/09/06/cpp-template-4/" target="_self">
           
-        
-        <div>通过大量例子介绍了非类型模板参数。你可以学习到如何使用非类型模板参数，了解非类型模板参数使用的限制。</div>
-      </a>
+          
+            
+          
+          通过大量例子介绍了非类型模板参数。你可以学习到如何使用非类型模板参数，了解非类型模板参数使用的限制。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-09-06
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-09-06 19:00" pubdate>
+              2020-09-06
+            </time>
           </div>
         
         
@@ -323,7 +367,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -331,25 +375,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/07/22/cpp-template-3/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" alt="C++ Template-3 非类型模板参数">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" lazyload alt="C++ Template-3 非类型模板参数">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/07/22/cpp-template-3/">C++ Template-3 非类型模板参数</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/07/22/cpp-template-3/" target="_self">
+          C++ Template-3 非类型模板参数
+        </a>
+      </h1>
 
-      <a href="/2020/07/22/cpp-template-3/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/07/22/cpp-template-3/" target="_self">
           
-        
-        <div>通过大量例子介绍了非类型模板参数。你可以学习到如何使用非类型模板参数，了解非类型模板参数使用的限制。</div>
-      </a>
+          
+            
+          
+          通过大量例子介绍了非类型模板参数。你可以学习到如何使用非类型模板参数，了解非类型模板参数使用的限制。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-07-22
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-07-22 19:30" pubdate>
+              2020-07-22
+            </time>
           </div>
         
         
@@ -373,7 +427,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -381,25 +435,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/07/17/cpp-template-2/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" alt="C++ Template-2 类模板">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" lazyload alt="C++ Template-2 类模板">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/07/17/cpp-template-2/">C++ Template-2 类模板</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/07/17/cpp-template-2/" target="_self">
+          C++ Template-2 类模板
+        </a>
+      </h1>
 
-      <a href="/2020/07/17/cpp-template-2/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/07/17/cpp-template-2/" target="_self">
           
-        
-        <div>运用大量例子介绍了类模板。你可以学习到如何声明和定义类模板，如何使用类模板，如何特化和偏特化类模板，类模板的参数推导等相关的知识。</div>
-      </a>
+          
+            
+          
+          运用大量例子介绍了类模板。你可以学习到如何声明和定义类模板，如何使用类模板，如何特化和偏特化类模板，类模板的参数推导等相关的知识。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-07-17
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-07-17 13:30" pubdate>
+              2020-07-17
+            </time>
           </div>
         
         
@@ -423,7 +487,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -431,25 +495,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/07/15/union-find/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/4.png" srcset="/img/loading.gif" alt="并查集">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/4.png" srcset="/img/loading.gif" lazyload alt="并查集">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/07/15/union-find/">并查集</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/07/15/union-find/" target="_self">
+          并查集
+        </a>
+      </h1>
 
-      <a href="/2020/07/15/union-find/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/07/15/union-find/" target="_self">
           
-        
-        <div>并查集是一种树型的数据结构，主要用于处理一些不交集的合并及查询问题。本文通过样例介绍了并查集，并给出了 C++ 算法的实现和两种优化方案。</div>
-      </a>
+          
+            
+          
+          并查集是一种树型的数据结构，主要用于处理一些不交集的合并及查询问题。本文通过样例介绍了并查集，并给出了 C++ 算法的实现和两种优化方案。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-07-15
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-07-15 20:06" pubdate>
+              2020-07-15
+            </time>
           </div>
         
         
@@ -464,14 +538,14 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
-            
               <a href="/tags/%E5%9B%BE%E8%AE%BA/">图论</a>
+            
+              <a href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
             
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -479,25 +553,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/07/13/Dijkstra/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/1.png" srcset="/img/loading.gif" alt="Dijkstra 算法">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/Dijkstra/1.png" srcset="/img/loading.gif" lazyload alt="Dijkstra 算法">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/07/13/Dijkstra/">Dijkstra 算法</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/07/13/Dijkstra/" target="_self">
+          Dijkstra 算法
+        </a>
+      </h1>
 
-      <a href="/2020/07/13/Dijkstra/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/07/13/Dijkstra/" target="_self">
           
-        
-        <div>Dijkstra 算法是一个最短路径算法，常用于解决非负有权图中的最短路径问题。本文通过示例介绍了 Dijkstra 算法，并给出了 C++ 的算法实现和一种优化策略。</div>
-      </a>
+          
+            
+          
+          Dijkstra 算法是一个最短路径算法，常用于解决非负有权图中的最短路径问题。本文通过示例介绍了 Dijkstra 算法，并给出了 C++ 的算法实现和一种优化策略。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-07-13
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-07-13 10:34" pubdate>
+              2020-07-13
+            </time>
           </div>
         
         
@@ -512,14 +596,14 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
-            
               <a href="/tags/%E5%9B%BE%E8%AE%BA/">图论</a>
+            
+              <a href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
             
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -527,25 +611,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/07/09/cpp-template-1/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" alt="C++ Template-1 函数模板">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp-templates.jpg" srcset="/img/loading.gif" lazyload alt="C++ Template-1 函数模板">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/07/09/cpp-template-1/">C++ Template-1 函数模板</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/07/09/cpp-template-1/" target="_self">
+          C++ Template-1 函数模板
+        </a>
+      </h1>
 
-      <a href="/2020/07/09/cpp-template-1/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/07/09/cpp-template-1/" target="_self">
           
-        
-        <div>通过大量的例子介绍了C++函数模板。你可以学习到如何使用C++的函数模板以及使用时需要注意的要点。</div>
-      </a>
+          
+            
+          
+          通过大量的例子介绍了C++函数模板。你可以学习到如何使用C++的函数模板以及使用时需要注意的要点。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-07-09
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-07-09 08:30" pubdate>
+              2020-07-09
+            </time>
           </div>
         
         
@@ -569,7 +663,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -577,25 +671,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/07/07/CSAPP_2_1/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/csapp.jpg" srcset="/img/loading.gif" alt="CSAPP-2.1 信息表示和处理-信息储存">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/csapp.jpg" srcset="/img/loading.gif" lazyload alt="CSAPP-2.1 信息表示和处理-信息储存">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/07/07/CSAPP_2_1/">CSAPP-2.1 信息表示和处理-信息储存</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/07/07/CSAPP_2_1/" target="_self">
+          CSAPP-2.1 信息表示和处理-信息储存
+        </a>
+      </h1>
 
-      <a href="/2020/07/07/CSAPP_2_1/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/07/07/CSAPP_2_1/" target="_self">
           
-        
-        <div>简述了计算机信息的储存方式、十六进制表示法，布尔代数和C语言中的位运算、逻辑运算和移位操作三类运算符。</div>
-      </a>
+          
+            
+          
+          简述了计算机信息的储存方式、十六进制表示法，布尔代数和C语言中的位运算、逻辑运算和移位操作三类运算符。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-07-07
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-07-07 22:58" pubdate>
+              2020-07-07
+            </time>
           </div>
         
         
@@ -615,7 +719,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -623,25 +727,35 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2020/07/07/cpp_virtual_function/" target="_self">
-          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp_virtual_function.jpg" srcset="/img/loading.gif" alt="C++ Virtual Function">
+          <img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/cover/cpp_virtual_function.jpg" srcset="/img/loading.gif" lazyload alt="C++ Virtual Function">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2020/07/07/cpp_virtual_function/">C++ Virtual Function</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/07/07/cpp_virtual_function/" target="_self">
+          C++ Virtual Function
+        </a>
+      </h1>
 
-      <a href="/2020/07/07/cpp_virtual_function/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/07/07/cpp_virtual_function/" target="_self">
           
-        
-        <div>简单介绍了C++虚函数的基本概念和用法及其底层的实现原理</div>
-      </a>
+          
+            
+          
+          简单介绍了C++虚函数的基本概念和用法及其底层的实现原理
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-07-07
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-07-07 01:26" pubdate>
+              2020-07-07
+            </time>
           </div>
         
         
@@ -663,22 +777,16 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="iconfont icon-arrowright"></i></a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
-  
-  <script>
-    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
-      ele.href += '#board';
-    }
-  </script>
 
 
 
@@ -688,16 +796,15 @@
         </div>
       </div>
     
-  </main>
 
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
@@ -718,21 +825,16 @@
     </div>
   </div>
 </div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
     
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
   <div class="statistics">
     
     
@@ -758,29 +860,55 @@
   </div>
 
 
-    
+  
 
-    
-  </div>
+  
 </footer>
 
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
 <!-- Plugins -->
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
 
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
+  
+
+
+
+
+
+
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
@@ -789,47 +917,16 @@
 
 
 
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
   <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "Welcome to Vinkle's space&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
   </script>
-
-
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-
-
-
-
 
 
 
@@ -867,6 +964,10 @@
 
 
 
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
 
 
 </body>

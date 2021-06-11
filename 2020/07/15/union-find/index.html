@@ -1,46 +1,54 @@
+
+
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
-  <link rel="icon" type="image/png" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
+  <link rel="icon" href="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <meta name="theme-color" content="">
-  <meta name="description" content="vinkle&#39;s space">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="并查集是一种树型的数据结构，主要用于处理一些不交集的合并及查询问题。本文通过样例介绍了并查集，并给出了 C++ 算法的实现和两种优化方案。">
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
+  
   <title>并查集 - vinkle&#39;s space</title>
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
 
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
   <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
   
 
   
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
   
+
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
 
 
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
 
 
 <link  rel="stylesheet" href="/css/main.css" />
@@ -48,8 +56,13 @@
 <!-- 自定义样式保持在最底部 -->
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"e29593c0eaefc83ba96301b9153d7d11","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
   <script  src="/js/utils.js" ></script>
-<meta name="generator" content="Hexo 4.2.1"></head>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -143,8 +156,14 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
       </ul>
@@ -152,25 +171,28 @@
   </div>
 </nav>
 
-    <div class="view intro-2" id="background" parallax=true
+    <div class="banner" id="banner" parallax=true
          style="background: url('https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/post_front.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="并查集">
               
             </span>
 
             
-              
-  <div class="mt-3 post-meta">
-    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-15 20:06">
-      2020年7月15日 晚上
-    </time>
-  </div>
-
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-07-15 20:06" pubdate>
+        2020年7月15日 晚上
+      </time>
+    </span>
+  
+</div>
 
 <div class="mt-1">
   
@@ -194,14 +216,6 @@
 
   
   
-    
-      <!-- 不蒜子统计文章PV -->
-      <span id="busuanzi_container_page_pv" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="busuanzi_value_page_pv"></span> 次
-      </span>
-    
-  
 </div>
 
             
@@ -217,23 +231,19 @@
     
       
 
-<div class="container-fluid">
-  <div class="row">
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
     <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
         <div class="py-5" id="board">
-          <div class="post-content mx-auto" id="post">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">并查集</h1>
             
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年7月15日 晚上
-                
-              </p>
-            
-            <article class="markdown-body">
+            <div class="markdown-body">
               <p>并查集是一种树型的数据结构，主要用于处理一些不交集的合并及查询问题。本文通过样例介绍了并查集，并给出了 C++ 算法的实现和两种优化方案。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h1 id="并查集"><a href="#并查集" class="headerlink" title="并查集"></a>并查集</h1><p>在计算机科学中，并查集是一种树型的数据结构，主要用于处理一些<strong>不交集（Disjoint Sets）</strong>的合并及查询问题。有一个<strong>联合-查找算法（Union-find Algorithm）</strong>定义了两个用于此数据结构的操作：</p>
 <ul>
@@ -242,93 +252,55 @@
 </ul>
 <p>为了更加精确的定义这些方法，需要定义如何表示集合。一种常用的策略是为每个集合选定一个固定的元素，称为代表，以表示整个集合。接着，<code>Find(x)</code> 返回 <code>x</code> 所属集合的代表，而 <code>Union</code> 使用两个集合的代表作为参数。</p>
 <h2 id="并查集介绍和实现"><a href="#并查集介绍和实现" class="headerlink" title="并查集介绍和实现"></a>并查集介绍和实现</h2><p>市场上原来有 $1,2,3,4,5,6$ 这六家公司，各自经营着自己的生意。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/1.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/1.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>有一天，$4$ 找到了 $1$ 说，最近形式不大好，要不我们两家公司合并成一家，$4$ 觉得自己的名字不够气派，就跟着 $1$ 叫同一个名字了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/2.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/2.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>过了不久，$2$ 也想着找人合作，就找到了 $4$，$4$ 说我已经改叫 $1$ 了，你跟我和合作就是跟 $1$ 合作，$2$ 和 $1$ 商量了一下，$2$ 也觉得自己的名字不好听，也改成 $1$ 的名字了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/3.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/3.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>$3,6$ 一看市场形势，也开始和 $5$ 商量起了合并的事宜，他们决定最后名字就是 $5$ 了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/4.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/4.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>可是 $5$ 合并的太晚了， 已经临近破产，$2$ 公司看到机会跟 $6$ 公司商量事宜，其实最后就是 $1$ 和 $5$ （他们合并后的公司）商量，结果 $5$ 很无奈，被合并了，最后所有公司归为 $1$ 管理了。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/5.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/5.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>其实这个合并的图是一个<strong>树状结构</strong>，寻找每个集合的代表元素，只要层层向上访问<strong>父节点</strong>搜索即可，直到到达树的<strong>根节点</strong>。根节点的父节点是它自身。我们可以直接把这幅图表示成一棵树。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/6.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/6.png" srcset="/img/loading.gif" lazyload alt></p>
 <h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>根据上面例子的步骤，我们可以轻松写出简单版本的并查集代码。</p>
-<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><pre><code class="hljs c++"><span class="hljs-keyword">int</span> root[N];
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)
-        root[i] = i;
-&#125;</code></pre>
+<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> root[N];<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)<br>        root[i] = i;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>我们用 <code>root</code> 数组存储每个节点的父节点， 刚开始，先把所有节点的父节点初始化为自己。</p>
-<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">if</span> (root[x] == x)
-        <span class="hljs-keyword">return</span> x;
-    <span class="hljs-keyword">else</span>
-        <span class="hljs-keyword">return</span> <span class="hljs-built_in">find</span>(root[x]);
-&#125;</code></pre>
+<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (root[x] == x)<br>        <span class="hljs-keyword">return</span> x;<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">find</span>(root[x]);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>查询这个节点的根节点时，我们使用递归的思想：一层一层访问该节点的父节点，直到访问到根节点（即父节点是自身）。</p>
-<h4 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h4><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span>
-<span class="hljs-function"></span>&#123;
-    root[<span class="hljs-built_in">find</span>(i)] = <span class="hljs-built_in">find</span>(j);
-&#125;</code></pre>
+<h4 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span><br><span class="hljs-function"></span>&#123;<br>    root[<span class="hljs-built_in">find</span>(i)] = <span class="hljs-built_in">find</span>(j);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>合并两个节点也很节点，只要把其中一个的根节点的父节点设置为另一个的父节点即可。</p>
 <h2 id="优化并查集"><a href="#优化并查集" class="headerlink" title="优化并查集"></a>优化并查集</h2><p>前面说的简单的并查集其实效率比较低。</p>
 <h3 id="路径压缩"><a href="#路径压缩" class="headerlink" title="路径压缩"></a>路径压缩</h3><p>我们可以看以下场景：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/7.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/7.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>我们进行 <code>merge(2,3)</code> 和 <code>merge(2,4)</code> 操作后，图变为如下：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/8.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/8.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>这是一条长链，随着节点的不断增多，这条链会越来越长，我们从链最底部找到其根节点的消耗也越来越多。</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/9.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/9.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>如果图是这样的，我们就不必层层查询根节点了。</p>
 <p>那么怎么实现呢？我们可以使用<strong>路径压缩</strong>的方法，在每次寻找元素根节点的时候，把它的父节点直接设为根节点，这样在下一次查询后，只要一次就能找到根节点了。</p>
 <p>同样用递归的方式，把沿途的父节点全设置为根节点：</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">if</span> (x != root[x])
-    &#123;
-        root[x] = <span class="hljs-built_in">find</span>(root[x]);
-    &#125;
-    <span class="hljs-keyword">return</span> root[x];
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (x != root[x])<br>    &#123;<br>        root[x] = <span class="hljs-built_in">find</span>(root[x]);<br>    &#125;<br>    <span class="hljs-keyword">return</span> root[x];<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h3 id="按秩合并"><a href="#按秩合并" class="headerlink" title="按秩合并"></a>按秩合并</h3><p>由于路径压缩只对访问过的路径进行压缩，不是每个节点的父节点都是根节点。所以并查集的结构仍然可能是负载的。看下面的情形：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/10.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/10.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>$8$ 要和 $7$ 合并，这是我们有两种方案，$7$ 作为 $8$ 的父节点和 $8$ 作为 $7$ 的父节点这两种方式：</p>
-<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/13.png" srcset="/img/loading.gif" alt></p>
+<p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/13.png" srcset="/img/loading.gif" lazyload alt></p>
 <p>显然第一种方式效率更加高。</p>
 <p>因为如果把  $8$ 作为 $7$ 的父节点，会使得数的<strong>深度</strong>（树中最长链的长度）加深，原来树的每个节点到根的距离都变长了，后面我们每次查询根节点复杂度也会变高。而把 $7$ 作为 $8$ 的父节点就不会有这个问题。因此我们每次合并的时候都应该把简单的树合并到复杂的树上面，保证每次合并到根节点距离变长的节点数量最少。</p>
 <p>运用这个思想我们可以写出相关的代码。</p>
 <h4 id="初始化-1"><a href="#初始化-1" class="headerlink" title="初始化"></a>初始化</h4><p>我们用 <code>rank</code> 数组来表示每个根节点对应的树的深度。一开始将所有的 <code>rank</code> 置为 <code>1</code>。</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">int</span> rank[N];
-<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)
-    &#123;
-        root[i] = i;
-        rank[i] = <span class="hljs-number">1</span>;
-    &#125;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> rank[N];<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)<br>    &#123;<br>        root[i] = i;<br>        rank[i] = <span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h4 id="合并-1"><a href="#合并-1" class="headerlink" title="合并"></a>合并</h4><p>合并时比较两个根节点的 <code>rank</code> 值，将 <code>rank</code> 小的向 <code>rank</code> 大的树合并。如果两个树深度相同，则合并后新树的 <code>rank</code> 值需要加一。</p>
-<pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span>
-<span class="hljs-function"></span>&#123;
-    <span class="hljs-keyword">int</span> x = <span class="hljs-built_in">find</span>(i), y = <span class="hljs-built_in">find</span>(j);
-    <span class="hljs-keyword">if</span> (rank[x] &lt;= rank[y])
-        root[x] = y;
-   	<span class="hljs-keyword">else</span>
-        root[y] = x;
-   	<span class="hljs-keyword">if</span> (rank[x] == rank[y] &amp;&amp; x != y)
-        rank[y]++;
-&#125;</code></pre>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">int</span> x = <span class="hljs-built_in">find</span>(i), y = <span class="hljs-built_in">find</span>(j);<br>    <span class="hljs-keyword">if</span> (rank[x] &lt;= rank[y])<br>        root[x] = y;<br>   	<span class="hljs-keyword">else</span><br>        root[y] = x;<br>   	<span class="hljs-keyword">if</span> (rank[x] == rank[y] &amp;&amp; x != y)<br>        rank[y]++;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>注意路径压缩和按秩合并一起使用时，可能会破坏按秩合并的准确性。</p>
 
-            </article>
+            </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
@@ -344,19 +316,23 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
-                    
                       <a class="hover-with-bg" href="/tags/%E5%9B%BE%E8%AE%BA/">图论</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
                     
                   </div>
                 
               </div>
               
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
               
               
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
                     
                     
                       <a href="/2020/07/17/cpp-template-2/">
@@ -365,8 +341,8 @@
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
-                  </div>
-                  <div class="post-next col-6">
+                  </article>
+                  <article class="post-next col-6">
                     
                     
                       <a href="/2020/07/13/Dijkstra/">
@@ -375,13 +351,39 @@
                         <i class="iconfont icon-arrowright"></i>
                       </a>
                     
-                  </div>
+                  </article>
                 </div>
               
             </div>
 
             
-          </div>
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="SOHUCS" sid='http://yoursite.com/2020/07/15/union-find/'></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#SOHUCS', function() {
+      var appid = 'cyvv8wewD';
+      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+      } else {
+        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
+          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
+        });
+      }
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
         </div>
       </div>
     </div>
@@ -389,7 +391,7 @@
       <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
         <div id="toc">
   <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
+  <div class="toc-body" id="toc-body"></div>
 </div>
 
       </div>
@@ -401,16 +403,15 @@
 
 
     
-  </main>
 
-  
-    <a id="scroll-top-button" href="#" role="button">
-      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-    </a>
-  
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
@@ -431,21 +432,16 @@
     </div>
   </div>
 </div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
-        <span>Fluid</span></a>
-    </div>
     
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
   <div class="statistics">
     
     
@@ -471,29 +467,61 @@
   </div>
 
 
-    
+  
 
-    
-  </div>
+  
 </footer>
 
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/main.js" ></script>
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
 
 <!-- Plugins -->
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
 
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
@@ -502,95 +530,15 @@
 
 
 
-
-  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
   <script>
-    $(document).ready(function () {
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: 'article.markdown-body',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        collapseDepth: 0,
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc').css('visibility', 'visible');
-      }
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "并查集&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
-      placement: "right",
-      visible: "hover",
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
       
-    };
-    var el = "h1,h2,h3,h4,h5,h6".split(",");
-    var res = [];
-    for (item of el) {
-      res.push(".markdown-body > " + item)
-    }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      searchFunc(path, 'local-search-input', 'local-search-result');
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <script>
-    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
-      function () {
-        var element = document.createElement('a');
-        $(element).attr('data-fancybox', 'images');
-        $(element).attr('href', $(this).attr('src'));
-        $(this).wrap(element);
-      }
-    );
+      typing(title)
+      
+    })(window, document);
   </script>
 
 
@@ -632,14 +580,9 @@
       };
     </script>
 
-    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.1.4/es5/tex-svg.js" ></script>
 
   
-
-
-
-
-
 
 
 
@@ -673,6 +616,10 @@
 
 
 
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
 
 
 </body>
