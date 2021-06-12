@@ -32,7 +32,7 @@
     
     
       
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/googlecode.min.css" />
     
   
 
@@ -267,20 +267,29 @@
                   
                 
                 
-  <div id="SOHUCS" sid='http://yoursite.com/2020/07/07/cpp_constructor/'></div>
   <script type="text/javascript">
-    Fluid.utils.loadComments('#SOHUCS', function() {
-      var appid = 'cyvv8wewD';
-      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
-      var width = window.innerWidth || document.documentElement.clientWidth;
-      if (width < 960) {
-        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
       } else {
-        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
-          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
-        });
+        schema = light;
       }
-    });
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'Vinkle-hzt/comments');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
   </script>
   <noscript>Please enable JavaScript to view the comments</noscript>
 

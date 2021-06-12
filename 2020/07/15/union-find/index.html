@@ -32,7 +32,7 @@
     
     
       
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/googlecode.min.css" />
     
   
 
@@ -264,13 +264,13 @@
 <p>其实这个合并的图是一个<strong>树状结构</strong>，寻找每个集合的代表元素，只要层层向上访问<strong>父节点</strong>搜索即可，直到到达树的<strong>根节点</strong>。根节点的父节点是它自身。我们可以直接把这幅图表示成一棵树。</p>
 <p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/6.png" srcset="/img/loading.gif" lazyload alt></p>
 <h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>根据上面例子的步骤，我们可以轻松写出简单版本的并查集代码。</p>
-<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> root[N];<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)<br>        root[i] = i;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> root[N];<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)<br>        root[i] = i;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>我们用 <code>root</code> 数组存储每个节点的父节点， 刚开始，先把所有节点的父节点初始化为自己。</p>
-<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (root[x] == x)<br>        <span class="hljs-keyword">return</span> x;<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">find</span>(root[x]);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (root[x] == x)<br>        <span class="hljs-keyword">return</span> x;<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">find</span>(root[x]);<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>查询这个节点的根节点时，我们使用递归的思想：一层一层访问该节点的父节点，直到访问到根节点（即父节点是自身）。</p>
-<h4 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span><br><span class="hljs-function"></span>&#123;<br>    root[<span class="hljs-built_in">find</span>(i)] = <span class="hljs-built_in">find</span>(j);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h4><figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span><br><span class="hljs-function"></span>&#123;<br>    root[<span class="hljs-built_in">find</span>(i)] = <span class="hljs-built_in">find</span>(j);<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>合并两个节点也很节点，只要把其中一个的根节点的父节点设置为另一个的父节点即可。</p>
 <h2 id="优化并查集"><a href="#优化并查集" class="headerlink" title="优化并查集"></a>优化并查集</h2><p>前面说的简单的并查集其实效率比较低。</p>
@@ -283,7 +283,7 @@
 <p>如果图是这样的，我们就不必层层查询根节点了。</p>
 <p>那么怎么实现呢？我们可以使用<strong>路径压缩</strong>的方法，在每次寻找元素根节点的时候，把它的父节点直接设为根节点，这样在下一次查询后，只要一次就能找到根节点了。</p>
 <p>同样用递归的方式，把沿途的父节点全设置为根节点：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (x != root[x])<br>    &#123;<br>        root[x] = <span class="hljs-built_in">find</span>(root[x]);<br>    &#125;<br>    <span class="hljs-keyword">return</span> root[x];<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (x != root[x])<br>    &#123;<br>        root[x] = <span class="hljs-built_in">find</span>(root[x]);<br>    &#125;<br>    <span class="hljs-keyword">return</span> root[x];<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <h3 id="按秩合并"><a href="#按秩合并" class="headerlink" title="按秩合并"></a>按秩合并</h3><p>由于路径压缩只对访问过的路径进行压缩，不是每个节点的父节点都是根节点。所以并查集的结构仍然可能是负载的。看下面的情形：</p>
 <p><img src="https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/artical/union_find/10.png" srcset="/img/loading.gif" lazyload alt></p>
@@ -293,10 +293,10 @@
 <p>因为如果把  $8$ 作为 $7$ 的父节点，会使得数的<strong>深度</strong>（树中最长链的长度）加深，原来树的每个节点到根的距离都变长了，后面我们每次查询根节点复杂度也会变高。而把 $7$ 作为 $8$ 的父节点就不会有这个问题。因此我们每次合并的时候都应该把简单的树合并到复杂的树上面，保证每次合并到根节点距离变长的节点数量最少。</p>
 <p>运用这个思想我们可以写出相关的代码。</p>
 <h4 id="初始化-1"><a href="#初始化-1" class="headerlink" title="初始化"></a>初始化</h4><p>我们用 <code>rank</code> 数组来表示每个根节点对应的树的深度。一开始将所有的 <code>rank</code> 置为 <code>1</code>。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> rank[N];<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)<br>    &#123;<br>        root[i] = i;<br>        rank[i] = <span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> rank[N];<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)<br>    &#123;<br>        root[i] = i;<br>        rank[i] = <span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <h4 id="合并-1"><a href="#合并-1" class="headerlink" title="合并"></a>合并</h4><p>合并时比较两个根节点的 <code>rank</code> 值，将 <code>rank</code> 小的向 <code>rank</code> 大的树合并。如果两个树深度相同，则合并后新树的 <code>rank</code> 值需要加一。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">int</span> x = <span class="hljs-built_in">find</span>(i), y = <span class="hljs-built_in">find</span>(j);<br>    <span class="hljs-keyword">if</span> (rank[x] &lt;= rank[y])<br>        root[x] = y;<br>   	<span class="hljs-keyword">else</span><br>        root[y] = x;<br>   	<span class="hljs-keyword">if</span> (rank[x] == rank[y] &amp;&amp; x != y)<br>        rank[y]++;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">int</span> x = <span class="hljs-built_in">find</span>(i), y = <span class="hljs-built_in">find</span>(j);<br>    <span class="hljs-keyword">if</span> (rank[x] &lt;= rank[y])<br>        root[x] = y;<br>   	<span class="hljs-keyword">else</span><br>        root[y] = x;<br>   	<span class="hljs-keyword">if</span> (rank[x] == rank[y] &amp;&amp; x != y)<br>        rank[y]++;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>注意路径压缩和按秩合并一起使用时，可能会破坏按秩合并的准确性。</p>
 
@@ -363,20 +363,29 @@
                   
                 
                 
-  <div id="SOHUCS" sid='http://yoursite.com/2020/07/15/union-find/'></div>
   <script type="text/javascript">
-    Fluid.utils.loadComments('#SOHUCS', function() {
-      var appid = 'cyvv8wewD';
-      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
-      var width = window.innerWidth || document.documentElement.clientWidth;
-      if (width < 960) {
-        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
       } else {
-        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
-          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
-        });
+        schema = light;
       }
-    });
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'Vinkle-hzt/comments');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
   </script>
   <noscript>Please enable JavaScript to view the comments</noscript>
 

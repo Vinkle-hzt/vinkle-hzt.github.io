@@ -264,7 +264,7 @@
 
   <!-- Custom -->
   <div class="custom mx-auto">
-    <hr><p>在下方留言申请加入我的友链，按如下格式提供信息：</p><ul><li>博客名：Fluid</li><li>简介：Fluid 主题官方博客</li><li>链接：https://hexo.fluid-dev.com</li><li>图片：https://hexo.fluid-dev.com/img/favicon.png</li></ul>
+    <hr><p>在下方留言申请加入我的友链，按如下格式提供信息：</p><ul><li>博客名：Vinkle's space</li><li>简介：Hello World</li><li>链接：https://vinkle.top</li><li>图片：https://vinkle-image-1302582473.cos.ap-shanghai.myqcloud.com/global/head.jpg</li></ul>
   </div>
 
 
@@ -273,20 +273,29 @@
   <article class="comments" id="comments" lazyload>
     
     
-  <div id="SOHUCS" sid=''></div>
   <script type="text/javascript">
-    Fluid.utils.loadComments('#SOHUCS', function() {
-      var appid = 'cyvv8wewD';
-      var conf = 'a86c1aca778cf5d18790652cdf0df57d';
-      var width = window.innerWidth || document.documentElement.clientWidth;
-      if (width < 960) {
-        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
       } else {
-        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
-          window.changyan.api.config({"appid":"cyvv8wewD","appkey":"a86c1aca778cf5d18790652cdf0df57d"})
-        });
+        schema = light;
       }
-    });
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'Vinkle-hzt/comments');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
   </script>
   <noscript>Please enable JavaScript to view the comments</noscript>
 
