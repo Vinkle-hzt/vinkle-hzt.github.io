@@ -20,7 +20,7 @@
   <meta name="author" content="Vinkle">
   <meta name="keywords" content="">
   
-  <title>按值传递还是按引用传递 - vinkle&#39;s space</title>
+  <title>C++ Template-7 按值传递还是按引用传递 - vinkle&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
@@ -177,7 +177,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="按值传递还是按引用传递">
+            <span class="h2" id="subtitle" title="C++ Template-7 按值传递还是按引用传递">
               
             </span>
 
@@ -199,7 +199,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.2k 字
+      7.5k 字
     </span>
   
 
@@ -209,7 +209,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      53
+      92
        分钟
     </span>
   
@@ -239,7 +239,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">按值传递还是按引用传递</h1>
+            <h1 style="display: none">C++ Template-7 按值传递还是按引用传递</h1>
             
             <div class="markdown-body">
               <p><strong>移动语意(move semantics)</strong>是 C++11 中引入的一个重要特性。本章将会介绍移动语意的特性， <code>enable_if&lt;&gt;</code> 的使用和对于 <em>concept</em> 的简单介绍。</p>
@@ -377,7 +377,123 @@
 <figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">isless</span><span class="hljs-params">(T arg1, T arg2)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> arg1 &lt; arg2;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>因为这时编译器推导<code>arg1</code>和<code>arg2</code>类型<code>T</code>时会得到两个冲突的类型。</p>
-<h2 id="7-4-处理字符串字面量常量与原始数组"><a href="#7-4-处理字符串字面量常量与原始数组" class="headerlink" title="7.4 处理字符串字面量常量与原始数组"></a>7.4 处理字符串字面量常量与原始数组</h2><h3 id="7-4-1-字符串字面常量和原始数组的特殊实现"><a href="#7-4-1-字符串字面常量和原始数组的特殊实现" class="headerlink" title="7.4.1 字符串字面常量和原始数组的特殊实现"></a>7.4.1 字符串字面常量和原始数组的特殊实现</h3><h2 id="7-5-处理返回值"><a href="#7-5-处理返回值" class="headerlink" title="7.5 处理返回值"></a>7.5 处理返回值</h2><h2 id="7-6-模板参数声明推荐"><a href="#7-6-模板参数声明推荐" class="headerlink" title="7.6 模板参数声明推荐"></a>7.6 模板参数声明推荐</h2><h2 id="7-7-小结"><a href="#7-7-小结" class="headerlink" title="7.7 小结"></a>7.7 小结</h2>
+<p><code>std::reference_wrapper&lt;&gt;</code>类的作用是将引用作为第一类对象(first class object)，使得你可以通过函数模板来拷贝和按值传递它。你也可以将它用于类对象，比如，存储一个容器类型的引用。但是，无论如何，该类型最后总需要转换回它潜在的原类型。</p>
+<h2 id="7-4-处理字符串字面量常量与原始数组"><a href="#7-4-处理字符串字面量常量与原始数组" class="headerlink" title="7.4 处理字符串字面量常量与原始数组"></a>7.4 处理字符串字面量常量与原始数组</h2><p>到目前为止，我们已经讨论了几种对字符串字面量常量与原始数组使用模板产生的效果：</p>
+<ul>
+<li>按值传递会导致类型退化，即变为指向元素类型的指针。</li>
+<li>任何按引用传递的方法都不会导致类型退化，因此引用的参数还是指向数组的。</li>
+</ul>
+<p>这两种方法各有利弊。当将数组退化成指针时，你不能区分该参数是元素的指针还是数组。当按引用传递时，处理字符串字面量常量时，类型不退化会产生一些问题（因为不同长度的字符串类型不同）。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(T <span class="hljs-keyword">const</span>&amp; arg1, T <span class="hljs-keyword">const</span>&amp; arg2)</span></span>&#123;<br>    ...<br>&#125;<br><br><span class="hljs-built_in">foo</span>(<span class="hljs-string">&quot;hi&quot;</span>, <span class="hljs-string">&quot;guy&quot;</span>); <span class="hljs-comment">//ERROR</span><br></code></pre></div></td></tr></table></figure>
+
+<p><code>foo(&quot;hi&quot;, &quot;guy&quot;)</code> 编译失败，是因为 <code>&quot;hi&quot;</code> 的类型时 <code>char const[3]</code>，而 <code>&quot;guy&quot;</code> 的类型时 <code>char const[4]</code>，但是模板要求他们必须要有相同的类型 <code>T</code>。只有当这两个字符串常量有相同的长度时，这个代码才能被正确编译。也正因为此，强烈建议在测试用例中使用不同的字符串常量。</p>
+<p>通过声明按值传递参数的函数模板 <code>foo()</code> 可以正确编译：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(T arg1, T arg2)</span></span>&#123;<br>    ...<br>&#125;<br><br><span class="hljs-built_in">foo</span>(<span class="hljs-string">&quot;hi&quot;</span>, <span class="hljs-string">&quot;guy&quot;</span>) <span class="hljs-comment">// compiles, but...</span><br></code></pre></div></td></tr></table></figure>
+
+<p>但是，能够正确编译不代表不会出现问题。更糟糕的是，编译期的问题可能会成为运行期间的问题。考虑下面的代码，当我们用 <code>operator==</code> 比较传递的参数时：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(T arg1, T arg2)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (arg1 == arg2)&#123;  <span class="hljs-comment">// OOPS: compares addresses of passed arrays</span><br>        ...<br>    &#125;<br>&#125;<br><br><span class="hljs-built_in">foo</span>(<span class="hljs-string">&quot;hi&quot;</span>, <span class="hljs-string">&quot;guy&quot;</span>); <span class="hljs-comment">// compilies, but...</span><br></code></pre></div></td></tr></table></figure>
+
+<p>作为代码编写者，你必须知道要传递的字符指针其实是字符串。但是，可能你处理的就是一个字符指针，因为函数模板同样要处理已经类型退化的字符串常量变量（这个变量是来自另一个按值传递的函数调用或者是该变量被分配给一个 <code>auto</code> 对象）。</p>
+<p>然而，在许多情况下，类型退化是很有帮助的，特别是检查两个对象（都通过函数参数传递，或者一个通过函数参数传递，另一个是期望的参数）是否是或者转化为了同一类型。一个典型的用法是完美转发。但是如果你想要完美转发的话，你必须将参数声明为转发引用。在这些这些情况下，你可能需要显式地使用 <code>std::decay&lt;&gt;()</code> 将参数进行类型退化。参见 <a href>7.6 节</a> <code>std::make_pair()</code> 这一例子。</p>
+<h3 id="7-4-1-字符串字面常量和原始数组的特殊实现"><a href="#7-4-1-字符串字面常量和原始数组的特殊实现" class="headerlink" title="7.4.1 字符串字面常量和原始数组的特殊实现"></a>7.4.1 字符串字面常量和原始数组的特殊实现</h3><p>你可能需要根据传递的是指针还是数组来决定你的实现。当然，这个传递的数组没有类型退化。</p>
+<p>为了区分这些情况，你需要查明是否有数组被传递。这有两个基础的方法：</p>
+<ul>
+<li><p>你可以定义函数模板，使它只有在参数为数组时合法：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> L1, std::<span class="hljs-keyword">size_t</span> L2&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(T (&amp;arg1)[L1], T(&amp;arg2)[L2])</span></span><br><span class="hljs-function"></span>&#123;<br>    T* pa = arg1;  <span class="hljs-comment">// decay arg1</span><br>    T* pb = arg2;  <span class="hljs-comment">// decay arg2</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">compareArrays</span>(pa, L1, pb, L2))&#123;<br>        ...<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这里，<code>arg1</code> 和 <code>arg2</code> 必须是存储同一类型 <code>T</code> 元素的原始数组，但是它们的大小不一定要相同。另外，为了支持多种类型的原始数组你可能需要多种实现方法（参见<a target="_blank" rel="noopener" href="https://vinkle.top/2020/10/12/cpp-template-5/#5-4-%E5%8E%9F%E5%A7%8B%E6%95%B0%E7%BB%84%E5%92%8C%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%AD%97%E9%9D%A2%E9%87%8F%E6%A8%A1%E6%9D%BF"> 5.4 节</a>)。</p>
+</li>
+<li><p>你也可以通过 type traits 去侦测是不是有数组（或者指针）传递过来：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T,<br>	     <span class="hljs-keyword">typename</span> = std::<span class="hljs-keyword">enable_if_t</span>&lt;std::is_array_v&lt;T&gt;&gt;&gt;<br><span class="hljs-keyword">void</span> <span class="hljs-built_in">foo</span>(T&amp;&amp; arg1, T&amp;&amp; arg2)<br>&#123;<br>	...<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+</li>
+</ul>
+<p>由于这些特殊的处理，通常最好的对数组进行不同处理的方式只是简单地使用不同的函数名称罢了。当然，如果调用者能使用 <code>std::vector</code> 和 <code>std::array</code> 那会更加好。但是，只要字符串常量是原始数组，在编写程序时，总需要将它们考虑进来。</p>
+<h2 id="7-5-处理返回值"><a href="#7-5-处理返回值" class="headerlink" title="7.5 处理返回值"></a>7.5 处理返回值</h2><p>对于返回值，你也可以决定时按值返回还是按引用返回。但是，按应用返回可能会有一些潜在的问题，如果你引用了一些不在你控制范围的对象。这里是一些在编写代码中需要返回引用的例子：</p>
+<ul>
+<li>返回容器或者字符串中的元素（通过 <code>operator[]</code> 或者 <code>front()</code>）</li>
+<li>授予对类成员的写权限</li>
+<li>返回链式调用的对象（对于 stream 的 <code>operator&lt;&lt;</code> 和 <code>oeprator&gt;&gt;</code> 还有对于一般对象的 <code>operator=</code>）</li>
+</ul>
+<p>另外，通常对类成员授予读权限我们使用的是返回一个常引用。</p>
+<p>注意，如果你使用不正确的话，即使符合这些情况下也会有一些错误。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++">std::string* s = <span class="hljs-keyword">new</span> std::<span class="hljs-built_in">string</span>(<span class="hljs-string">&quot;whatever&quot;</span>);<br><span class="hljs-keyword">auto</span>&amp; c = (*s)[<span class="hljs-number">0</span>];<br>s.<span class="hljs-built_in">reset</span>();<br>std::cout &lt;&lt; c; <span class="hljs-comment">// run-time ERROR</span><br></code></pre></div></td></tr></table></figure>
+
+<p>这里，我们获得了 <code>string</code> 类型的引用，但是当我们使用这个引用的时候，这个潜在的 <code>string</code> 类型就不存在了（我们创建了一个摇摆不定的引用），因此我们得到了一个 undefined behavior。这个例子可能有点做作（有经验的程序员可能会立刻注意到其中的问题），但是实际上可能问题没有那么明显，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">auto</span> s = std::make_shared&lt;std::string&gt;(<span class="hljs-string">&quot;whatever&quot;</span>);<br><span class="hljs-keyword">auto</span>&amp; c = (*s)[<span class="hljs-number">0</span>];<br>s.<span class="hljs-built_in">reset</span>();<br>std::cout &lt;&lt; c; <span class="hljs-comment">// run-time ERROR</span><br></code></pre></div></td></tr></table></figure>
+
+<p>因此我们呢必须确保函数模板按值返回。但是，本章讨论过，使用模板参数 <code>T</code> 并不意味着它不是个引用，因为 <code>T</code> 有时候会隐式地推导成一个引用类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function">T <span class="hljs-title">retR</span><span class="hljs-params">(T&amp;&amp; p)</span> <span class="hljs-comment">// p is a forwarding reference</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> T&#123;...&#125;; <span class="hljs-comment">// OOPS: returns a reference if T is a reference</span><br>&#125;<br><br><span class="hljs-keyword">int</span> x;<br>retV&lt;<span class="hljs-keyword">int</span>&amp;&gt;(x); <span class="hljs-comment">// retT() instantiated for T as int&amp;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>为了安全起见，我们有两种选择：</p>
+<ul>
+<li><p>使用 type trait <code>std::remove_reference&lt;&gt;</code> （<a href>参见附录 D.4（未写）</a>）将 <code>T</code> 转化为一个非引用类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">typename</span> std::remove_reference&lt;T&gt;::<span class="hljs-function">type <span class="hljs-title">retV</span><span class="hljs-params">(T p)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> T&#123;...&#125;; <span class="hljs-comment">// always returns by value</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+</li>
+<li><p>让编译器推导返回值——将返回类型声明为 <code>auto</code>（参见 <a href>1.3.2 节</a>），因为 <code>auto</code> 总会进行类型退化：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">retV</span><span class="hljs-params">(T p)</span> <span class="hljs-comment">// by-value return type deduced by compiler</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> T&#123;...&#125;;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="7-6-模板参数声明推荐"><a href="#7-6-模板参数声明推荐" class="headerlink" title="7.6 模板参数声明推荐"></a>7.6 模板参数声明推荐</h2><p>在前面几节我们以及了解到有很多方式声明模板参数：</p>
+<ul>
+<li><p>按值传递参数：</p>
+<p>这种方式比较简单，他会将字符串常量和原始数组类型退化，但是它在一些庞大的对象上表现不佳。调用者可以通过 <code>std::cref()</code> 和 <code>std::ref()</code> 来传递引用，但是必须清楚该行为是否合法。</p>
+</li>
+<li><p>按引用传递参数：</p>
+<p>这种方式在一些庞大的对象上面有更好的表现，特别是传递</p>
+<ul>
+<li>现有的对象(lvalues) 传递给 lvalue reference,</li>
+<li>临时对象(prvalues)或者可移动对象(xvalue)传递给 rvalue reference</li>
+<li>前面两种对象传递给转发引用。</li>
+</ul>
+<p>因为在这些情况下，参数不会类型退化，你需要对字符串常量和其他原始数组进行特殊处理。对于转发引用，你必须意识到这种方法中函数模板参数可能会隐式地推导为一个引用类型。</p>
+</li>
+</ul>
+<h3 id="一般性建议"><a href="#一般性建议" class="headerlink" title="一般性建议"></a>一般性建议</h3><p>考虑到声明模板参数的选择，对于函数模板，我们建议：</p>
+<ol>
+<li>默认地将参数声明为<strong>按值传递</strong>。这种方法比较方便而且通常在字符串常量上也能正常工作。它在一些小对象和临时对象和可移动对象上面表现比较好。调用者有时候也可以使用 <code>std::ref()</code> 和 <code>std::cref()</code> 来传递一些大型的对象(lvalues)来避免拷贝带来的巨大开销。</li>
+<li>如果有充分的理由，使用其他方式：<ul>
+<li>如果你需要 <strong>out</strong> 或 <strong>inout</strong> 参数，需要返回一个新对象或者允许修改对象并返回给调用者，按非常引用来传递参数（除非你更希望用指针传递参数）。然而，你需要考虑禁止程序意外地接受了一个 <code>const</code> 对象，参见 <a href>7.2.2 节</a>。</li>
+<li>如果模板是用来转发参数的话，使用完美转发。也就是通过将参数定义成转发引用，并使用 <code>std::forward&lt;&gt;()</code>。考虑使用 <code>std::decay&lt;&gt;</code> 和 <code>std::common&lt;&gt;()</code> 来处理字符串常量和原始数组。</li>
+<li>如果代码的开销是关键而且拷贝参数这一行为会有巨大开销，使用常引用。当然，不要使用它如果你需要本地副本的话。</li>
+</ul>
+</li>
+<li>如果你非常了解的话，不要遵守这些建议。但是，不要按照直觉来推测代码的行为，即使是专家按直觉也会出错。</li>
+</ol>
+<h3 id="不要过度泛型"><a href="#不要过度泛型" class="headerlink" title="不要过度泛型"></a>不要过度泛型</h3><p>注意，实际上，函数模板有一定的限制，一般不适用于任何类型的参数。例如，你可能知道要传递一些类型的 <code>vector</code> 对象。在这种情况下，最好不要将函数定义地太过泛型，因为可能会产生一些意想不到的错误。因此，最好使用以下的声明：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printVector</span><span class="hljs-params">(std::vector&lt;T&gt; <span class="hljs-keyword">const</span>&amp; v)</span></span><br><span class="hljs-function"></span>&#123;<br>    ...<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>通过这个声明，我们可以确保 <code>T</code> 不会成为一个引用类型，因为 <code>vector</code> 元素的类型不能是引用。同样，按值传递 <code>vector</code> 很有可能成为一个开销巨大的操作，因为 <code>std::vector&lt;&gt;</code> 的拷贝构造会将所有元素拷贝。因此，将 <code>vector</code> 参数声明为按值传递并不合适。如果我们只是用模板参数 <code>T</code> 声明参数 <code>v</code>，这个函数是按值调用还是按引用调用会更加不明显。 </p>
+<h3 id="std-make-pair-实例分析"><a href="#std-make-pair-实例分析" class="headerlink" title="std::make_pair() 实例分析"></a><code>std::make_pair()</code> 实例分析</h3><p><code>std::make_pair&lt;&gt;()</code> 是一个展示参数传递机制的陷阱很好的例子。它是 C++ 标准库中一个方便的函数模板，可以通过类型推导创建一个 <code>std::pair&lt;&gt;</code> 对象。它的声明在不同的 C++ 版本中不一样：</p>
+<ul>
+<li><p>在第一个 C++ 标准 C++98 中，<code>make_pair&lt;&gt;()</code> 声明在 <code>std</code> 命名空间中，用引用调用来避免不必要的拷贝：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;</span><br><span class="hljs-function">pair&lt;T1, T2&gt; <span class="hljs-title">make_pair</span><span class="hljs-params">(T1 <span class="hljs-keyword">const</span>&amp; a, T2 <span class="hljs-keyword">const</span>&amp; b)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> pair&lt;T1, T2&gt;(a, b);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<p>当使用字符串常量或者原始数组类型的 <code>pair</code> 时，这个声明会产生一些严重的错误。</p>
+</li>
+<li><p>因此，在 C++03时，函数被定义成了按值调用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;</span><br><span class="hljs-function">pair&lt;T1, T2&gt; <span class="hljs-title">make_pair</span><span class="hljs-params">(T1 a, T2 b)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> pair&lt;T1, T2&gt;(a, b);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>编写者对这个更改的解释如下：”与其他两个建议相比，这是对标准库的一个非常小的更改。而且该解决方案带来优势足以抵消它性能方面的不足。“</p>
+</li>
+<li><p>但是，通过 C++11，<code>make_pair()</code> 需要支持移动语义，因此参数必须是转发引用。因此，函数的定义差不多如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T1, <span class="hljs-keyword">typename</span> T2&gt;<br><span class="hljs-keyword">constexpr</span> pair&lt;<span class="hljs-keyword">typename</span> decay&lt;T1&gt;::type, <span class="hljs-keyword">typename</span> decay&lt;T2&gt;::type&gt;<br><span class="hljs-built_in">make_pair</span>(T1&amp;&amp; a, T2&amp;&amp; b)<br>&#123;<br>    <span class="hljs-keyword">return</span> pair&lt;<span class="hljs-keyword">typename</span> decay&lt;T1&gt;::type,<br>                <span class="hljs-keyword">typename</span> decay&lt;T2&gt;::type&gt;(forward&lt;T1&gt;(a),<br>                                          forward&lt;T2&gt;(b)));<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>真正完整的实现比这个更加复杂：为了支持 <code>std::ref()</code> 和 <code>std::cref()</code>，这个函数也拆包了 <code>std::reference_wrapper</code> 实例，转化成了真正的引用。</p>
+</li>
+</ul>
+<p>C++ 标准库现在已经在很多地方通过同样的方法完美转发了传递的参数，这些实现通常都使用了 <code>std::decay&lt;&gt;</code>。</p>
+<h2 id="7-7-小结"><a href="#7-7-小结" class="headerlink" title="7.7 小结"></a>7.7 小结</h2><ul>
+<li>当测试模板时，请用不同长度的字符串常量。</li>
+<li>按值传递的模板参数会类型退化，但按引用传递的不会。</li>
+<li>type trait <code>std::decay&lt;&gt;</code> 允许你将模板中按引用传递的参数进行类型退化。</li>
+<li>在一些情况下 <code>std::cref()</code> 和  <code>std::ref()</code> 允许你在按值传递参数的函数模板中按引用传递参数。</li>
+<li>按值传递模板参数比较简单，但是并不适用于所有情况。</li>
+<li>按值传递函数模板参数，除非你有足够的理由使用其他方式。</li>
+<li>确保返回的值是按值返回的（函数模板的类型不能直接用于返回类型）。</li>
+<li>经常测试重要代码的表现。不要依赖直觉；它可能是错误的。</li>
+</ul>
+
             </div>
             <hr>
             <div>
